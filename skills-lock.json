@@ -13,6 +13,12 @@
       "skillPath": "skills/frontend-design/SKILL.md",
       "computedHash": "106acf230014cbb43ca34e6410371321b56ca742f9ee0442e8ec05bf02eb0384"
     },
+    "gog": {
+      "source": "openclaw/openclaw",
+      "sourceType": "github",
+      "skillPath": "skills/gog/SKILL.md",
+      "computedHash": "eeaffacc4aaca29734edafcc0df2deffa31c132e71e2442fe1ce6721a184b675"
+    },
     "gog-appscript": {
       "source": "openclaw/gogcli",
       "sourceType": "github",

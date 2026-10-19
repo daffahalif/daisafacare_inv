@@ -73,8 +73,10 @@ function getSheetData(name) {
 
 function getNextId(name) {
   const sh = getSheet(name);
-  if (sh.getLastRow() < 2) return 1;
-  const ids = sh.getRange(2, 1, sh.getLastRow() - 1, 1).getValues().flat().filter(id => id !== '');
+  if (!sh || sh.getLastRow() < 2) return 1;
+  const ids = sh.getRange(2, 1, sh.getLastRow() - 1, 1).getValues().flat()
+    .map(v => typeof v === 'number' ? v : Number(String(v == null ? '' : v).trim()))
+    .filter(n => typeof n === 'number' && isFinite(n));
   return ids.length ? Math.max(...ids) + 1 : 1;
 }
 
@@ -92,7 +94,7 @@ function isActive(val) { return val === 1 || val === true || val === '1'; }
 
 function fmtDate(val) {
   if (!val) return '';
-  if (val instanceof Date) return val.toISOString().split('T')[0];
+  if (val instanceof Date) return Utilities.formatDate(val, Session.getScriptTimeZone(), 'yyyy-MM-dd');
   return String(val).split('T')[0];
 }
 
@@ -102,9 +104,50 @@ function fmtTs(val) {
   return String(val);
 }
 
+function fmtTime(val) {
+  if (val === null || val === undefined || val === '') return '';
+  if (val instanceof Date) return Utilities.formatDate(val, Session.getScriptTimeZone(), 'HH:mm');
+  const s = String(val).trim();
+  const m = s.match(/(\d{1,2}):(\d{2})/);
+  return m ? (String(m[1]).padStart(2, '0') + ':' + m[2]) : s;
+}
+
+// Data sheet untuk dikirim ke halaman web. Objek Date tidak boleh dikirim lewat google.script.run,
+// jadi setiap sel bertanggal diubah menjadi teks waktu lokal spreadsheet.
+function getSheetDataClient(name) {
+  const tz = Session.getScriptTimeZone();
+  return getSheetData(name).map(row => row.map(v => {
+    if (v instanceof Date) return Utilities.formatDate(v, tz, "yyyy-MM-dd'T'HH:mm:ss");
+    if (v === null || v === undefined) return '';
+    return v;
+  }));
+}
+
+// Peta teks jam per id jadwal. Kolom jam disimpan sheet sebagai angka epoch 1899,
+// jadi dibaca sebagai teks tampilan supaya jamnya persis seperti di sheet.
+function getScheduleTimeById() {
+  const out = {};
+  const sh = getSheet(SHEETS.SCHEDULES);
+  const n = sh ? sh.getLastRow() - 1 : 0;
+  if (n < 1) return out;
+  const ids = sh.getRange(2, SC.ID + 1, n, 1).getValues();
+  const times = sh.getRange(2, SC.TIME + 1, n, 1).getDisplayValues();
+  for (let i = 0; i < n; i++) out[ids[i][0]] = String(times[i][0] || '').trim();
+  return out;
+}
+
 function getUsernameById(uid) {
   const r = findRowByValue(SHEETS.USERS, U.ID, parseInt(uid));
   return r ? r.data[U.NAME] : 'Unknown';
+}
+
+// ─── Role Policy & Settings ────────────────────────────────────────────────────
+const WRITER_ROLES = ['admin', 'receptionist'];
+function canWrite(role) { return WRITER_ROLES.indexOf(String(role || '').toLowerCase()) !== -1; }
+
+function getSetting(key, fallback) {
+  const r = findRowByValue(SHEETS.SETTINGS, ST.KEY, key);
+  return (r && r.data[ST.VAL] !== '' && r.data[ST.VAL] != null) ? r.data[ST.VAL] : fallback;
 }
 
 // ─── Auth ──────────────────────────────────────────────────────────────────────
@@ -129,7 +172,7 @@ function login(email, password) {
 function getUsers(userId, role) {
   try {
     if (role !== 'admin') return { success: false, message: 'Akses ditolak' };
-    const data = getSheetData(SHEETS.USERS);
+    const data = getSheetDataClient(SHEETS.USERS);
     return {
       success: true,
       data: data.map(r => ({
@@ -147,6 +190,8 @@ function addUser(data, userId, role) {
     const { full_name, email, phone, password, userRole } = data;
     if (!full_name || !email || !password) return { success: false, message: 'Nama, email, dan password wajib diisi' };
     if (password.length < 6) return { success: false, message: 'Password minimal 6 karakter' };
+    const newRole = String(userRole || 'receptionist').toLowerCase().trim();
+    if (['admin','therapist','receptionist'].indexOf(newRole) === -1) return { success: false, message: 'Role tidak valid' };
     const existing = findRowByValue(SHEETS.USERS, U.EMAIL, email.trim().toLowerCase());
     if (existing) return { success: false, message: 'Email sudah terdaftar' };
     const sh = getSheet(SHEETS.USERS);
@@ -154,7 +199,7 @@ function addUser(data, userId, role) {
     try {
       const newId = getNextId(SHEETS.USERS);
       const now = ts();
-      sh.appendRow([newId, full_name.trim(), email.trim().toLowerCase(), phone||'', password, userRole||'receptionist', 1, now, now]);
+      sh.appendRow([newId, full_name.trim(), email.trim().toLowerCase(), phone||'', password, newRole, 1, now, now]);
       logActivity(userId, '', 'CREATE', 'Users', newId, 'Added: '+full_name.trim());
       return { success: true, message: 'Pengguna berhasil ditambahkan', data: { id: newId } };
     } finally { lock.releaseLock(); }
@@ -166,6 +211,7 @@ function updateUser(data, userId, role) {
     if (role !== 'admin') return { success: false, message: 'Akses ditolak' };
     const { id, full_name, email, phone, password, userRole, is_active } = data;
     if (!id || !full_name || !email) return { success: false, message: 'Nama dan email wajib diisi' };
+    if (password && String(password).length < 6) return { success: false, message: 'Password minimal 6 karakter' };
     const r = findRowByValue(SHEETS.USERS, U.ID, parseInt(id));
     if (!r) return { success: false, message: 'Pengguna tidak ditemukan' };
     const ec = findRowByValue(SHEETS.USERS, U.EMAIL, email.trim().toLowerCase());
@@ -175,8 +221,8 @@ function updateUser(data, userId, role) {
     row[U.EMAIL] = email.trim().toLowerCase();
     row[U.PHONE] = phone||'';
     row[U.ROLE] = userRole||'receptionist';
-    row[U.ACTIVE] = (is_active==1||is_active===true) ? 1 : 0;
-    if (password && password.length >= 6) row[U.PWD] = password;
+    if (is_active !== undefined && is_active !== null) row[U.ACTIVE] = (is_active==1||is_active===true) ? 1 : 0;
+    if (password) row[U.PWD] = password;
     row[U.UPDATED] = ts();
     getSheet(SHEETS.USERS).getRange(r.row, 1, 1, row.length).setValues([row]);
     logActivity(userId, '', 'UPDATE', 'Users', parseInt(id), 'Updated: '+full_name.trim());
@@ -234,7 +280,7 @@ function changePassword(userId, currentPassword, newPassword) {
 
 function getTherapistsForDropdown() {
   try {
-    const data = getSheetData(SHEETS.USERS);
+    const data = getSheetDataClient(SHEETS.USERS);
     return { success: true, data: data.filter(r => isActive(r[U.ACTIVE]) && (r[U.ROLE]==='therapist'||r[U.ROLE]==='admin')).map(r => ({ id: r[U.ID], name: r[U.NAME] })) };
   } catch(e) { return { success: true, data: [] }; }
 }
@@ -242,8 +288,8 @@ function getTherapistsForDropdown() {
 // ─── Customers ─────────────────────────────────────────────────────────────────
 function getCustomers(userId, role) {
   try {
-    const data = getSheetData(SHEETS.CUSTOMERS);
-    const uData = getSheetData(SHEETS.USERS);
+    const data = getSheetDataClient(SHEETS.CUSTOMERS);
+    const uData = getSheetDataClient(SHEETS.USERS);
     const uMap = {}; uData.forEach(r => { uMap[r[U.ID]] = r[U.NAME]; });
     return {
       success: true,
@@ -260,6 +306,7 @@ function getCustomers(userId, role) {
 
 function addCustomer(cuData, userId, role) {
   try {
+    if (!canWrite(role)) return { success: false, message: 'Akses ditolak' };
     const { name, phone, address, baby_name, baby_age, notes } = cuData;
     if (!name) return { success: false, message: 'Nama pelanggan wajib diisi' };
     const sh = getSheet(SHEETS.CUSTOMERS);
@@ -275,6 +322,7 @@ function addCustomer(cuData, userId, role) {
 
 function updateCustomer(cuData, userId, role) {
   try {
+    if (!canWrite(role)) return { success: false, message: 'Akses ditolak' };
     const { id, name, phone, address, baby_name, baby_age, notes, is_active } = cuData;
     if (!id || !name) return { success: false, message: 'Nama wajib diisi' };
     const r = findRowByValue(SHEETS.CUSTOMERS, CU.ID, parseInt(id));
@@ -286,7 +334,7 @@ function updateCustomer(cuData, userId, role) {
     row[CU.BABY_NAME] = baby_name||'';
     row[CU.BABY_AGE] = baby_age||'';
     row[CU.NOTES] = notes||'';
-    row[CU.ACTIVE] = (is_active==1||is_active===true) ? 1 : 0;
+    if (is_active !== undefined && is_active !== null) row[CU.ACTIVE] = (is_active==1||is_active===true) ? 1 : 0;
     getSheet(SHEETS.CUSTOMERS).getRange(r.row, 1, 1, row.length).setValues([row]);
     logActivity(userId, '', 'UPDATE', 'Customers', parseInt(id), 'Updated: '+name.trim());
     return { success: true, message: 'Pelanggan berhasil diperbarui' };
@@ -309,7 +357,7 @@ function deleteCustomer(id, userId, role) {
 
 function getCustomersForDropdown() {
   try {
-    const data = getSheetData(SHEETS.CUSTOMERS);
+    const data = getSheetDataClient(SHEETS.CUSTOMERS);
     return { success: true, data: data.filter(r => isActive(r[CU.ACTIVE])).map(r => ({ id: r[CU.ID], name: r[CU.NAME], phone: r[CU.PHONE]||'' })) };
   } catch(e) { return { success: true, data: [] }; }
 }
@@ -326,17 +374,18 @@ function getCustomerLedger(custId, userId, role) {
       total_paid: parseFloat(cr.data[CU.PAID])||0,
       total_due: parseFloat(cr.data[CU.DUE])||0
     };
-    const scData = getSheetData(SHEETS.SCHEDULES);
-    const uData = getSheetData(SHEETS.USERS);
+    const timeById = getScheduleTimeById();
+    const scData = getSheetDataClient(SHEETS.SCHEDULES);
+    const uData = getSheetDataClient(SHEETS.USERS);
     const uMap = {}; uData.forEach(u => { uMap[u[U.ID]] = u[U.NAME]; });
     const schedules = scData.filter(s => s[SC.CUST_ID] == parseInt(custId)).map(s => ({
       id: s[SC.ID], invoice_no: s[SC.INV_NO],
-      date: fmtDate(s[SC.DATE]), time: s[SC.TIME]||'', location: s[SC.LOCATION]||'',
+      date: fmtDate(s[SC.DATE]), time: fmtTime(timeById[s[SC.ID]] || s[SC.TIME]), location: s[SC.LOCATION]||'',
       grand_total: parseFloat(s[SC.TOTAL])||0, paid: parseFloat(s[SC.PAID])||0,
       due: parseFloat(s[SC.DUE])||0, status: s[SC.STATUS]||'', keterangan: s[SC.KETERANGAN]||'',
       therapist_name: uMap[s[SC.THERAPIST_ID]]||''
     })).reverse();
-    const pyData = getSheetData(SHEETS.PAYMENTS);
+    const pyData = getSheetDataClient(SHEETS.PAYMENTS);
     const payments = pyData.filter(p => p[PAY.CUST_ID] == parseInt(custId)).map(p => ({
       id: p[PAY.ID], schedule_id: p[PAY.SCHED_ID],
       amount: parseFloat(p[PAY.AMT])||0, method: p[PAY.METHOD]||'',
@@ -349,7 +398,7 @@ function getCustomerLedger(custId, userId, role) {
 // ─── Treatments ────────────────────────────────────────────────────────────────
 function getTreatments(userId, role) {
   try {
-    const data = getSheetData(SHEETS.TREATMENTS);
+    const data = getSheetDataClient(SHEETS.TREATMENTS);
     return {
       success: true,
       data: data.map(r => ({
@@ -391,7 +440,7 @@ function updateTreatment(trData, userId, role) {
     row[TR.DESC] = description||'';
     row[TR.PRICE] = parseFloat(price);
     row[TR.DURATION] = parseInt(duration_min)||60;
-    row[TR.ACTIVE] = (is_active==1||is_active===true) ? 1 : 0;
+    if (is_active !== undefined && is_active !== null) row[TR.ACTIVE] = (is_active==1||is_active===true) ? 1 : 0;
     getSheet(SHEETS.TREATMENTS).getRange(r.row, 1, 1, row.length).setValues([row]);
     logActivity(userId, '', 'UPDATE', 'Treatments', parseInt(id), 'Updated: '+name.trim());
     return { success: true, message: 'Treatment berhasil diperbarui' };
@@ -412,7 +461,7 @@ function deleteTreatment(id, userId, role) {
 
 function getTreatmentsForDropdown() {
   try {
-    const data = getSheetData(SHEETS.TREATMENTS);
+    const data = getSheetDataClient(SHEETS.TREATMENTS);
     return {
       success: true,
       data: data.filter(r => isActive(r[TR.ACTIVE])).map(r => ({
@@ -427,21 +476,25 @@ function getTreatmentsForDropdown() {
 function genInvoiceNo() {
   const d = new Date();
   const dt = d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+  const prefix = String(getSetting('invoice_prefix', 'DSF') || 'DSF').trim() || 'DSF';
   const data = getSheetData(SHEETS.SCHEDULES);
-  const today = data.filter(r => String(r[SC.INV_NO]).includes(dt));
-  const maxSeq = today.reduce((m, r) => {
-    const parts = String(r[SC.INV_NO]).split('-');
-    return Math.max(m, parseInt(parts[parts.length-1]) || 0);
-  }, 0);
-  return 'DSF-' + dt + '-' + String(maxSeq + 1).padStart(3, '0');
+  let maxSeq = 0;
+  data.forEach(r => {
+    const m = String(r[SC.INV_NO] || '').match(/^([A-Za-z]+)-(\d{8})-(\d+)$/);
+    if (!m) return;
+    if (m[2] !== dt) return;
+    maxSeq = Math.max(maxSeq, parseInt(m[3], 10) || 0);
+  });
+  return prefix + '-' + dt + '-' + String(maxSeq + 1).padStart(3, '0');
 }
 
 // ─── Schedules ─────────────────────────────────────────────────────────────────
 function getSchedules(userId, role, filters) {
   try {
-    const data = getSheetData(SHEETS.SCHEDULES);
-    const cuData = getSheetData(SHEETS.CUSTOMERS);
-    const uData = getSheetData(SHEETS.USERS);
+    const data = getSheetDataClient(SHEETS.SCHEDULES);
+    const timeById = getScheduleTimeById();
+    const cuData = getSheetDataClient(SHEETS.CUSTOMERS);
+    const uData = getSheetDataClient(SHEETS.USERS);
     const cuMap = {}; cuData.forEach(r => { cuMap[r[CU.ID]] = { name: r[CU.NAME], phone: r[CU.PHONE]||'' }; });
     const uMap = {}; uData.forEach(r => { uMap[r[U.ID]] = r[U.NAME]; });
     const f = filters || {};
@@ -451,7 +504,7 @@ function getSchedules(userId, role, filters) {
       customer_id: r[SC.CUST_ID], customer_name: cuMap[r[SC.CUST_ID]] ? cuMap[r[SC.CUST_ID]].name : 'Walk-in',
       customer_phone: cuMap[r[SC.CUST_ID]] ? cuMap[r[SC.CUST_ID]].phone : '',
       therapist_id: r[SC.THERAPIST_ID], therapist_name: uMap[r[SC.THERAPIST_ID]]||'',
-      schedule_date: fmtDate(r[SC.DATE]), schedule_time: r[SC.TIME]||'',
+      schedule_date: fmtDate(r[SC.DATE]), schedule_time: fmtTime(timeById[r[SC.ID]] || r[SC.TIME]),
       location: r[SC.LOCATION]||'', km: parseFloat(r[SC.KM])||0,
       fee_treatment: parseFloat(r[SC.FEE])||0, transport_fee: parseFloat(r[SC.TRANSPORT])||0,
       subtotal: parseFloat(r[SC.SUBTOTAL])||0, discount: parseFloat(r[SC.DISCOUNT])||0,
@@ -474,18 +527,81 @@ function getSchedules(userId, role, filters) {
 
 function addSchedule(scData, userId, role) {
   try {
-    const { customer_id, therapist_id, schedule_date, schedule_time, location, km, items, discount, paid_amount, payment_method, keterangan, notes } = scData;
+    if (!canWrite(role)) return { success: false, message: 'Akses ditolak' };
+    const { customer_id, therapist_id, schedule_date, schedule_time, location, km, items, discount, paid_amount, payment_method, notes } = scData;
     if (!schedule_date) return { success: false, message: 'Tanggal jadwal wajib diisi' };
     if (!items || !items.length) return { success: false, message: 'Tambahkan minimal satu treatment' };
 
-    const feeTreatment = items.reduce((s, i) => s + (parseFloat(i.subtotal)||0), 0);
-    const kmDist = parseFloat(km)||0;
-    const transportFee = scData.transport_fee !== undefined ? parseFloat(scData.transport_fee)||0 : Math.round(kmDist * 2000);
-    const subtotal = feeTreatment + transportFee;
-    const disc = parseFloat(discount)||0;
+    // ── Validasi tanggal ──
+    let dateStr = '';
+    if (schedule_date instanceof Date) {
+      if (isNaN(schedule_date.getTime())) return { success: false, message: 'Tanggal jadwal tidak valid' };
+      dateStr = fmtDate(schedule_date);
+    } else {
+      const raw = String(schedule_date).trim();
+      const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (!m) return { success: false, message: 'Tanggal jadwal tidak valid' };
+      const y = parseInt(m[1], 10), mo = parseInt(m[2], 10), dy = parseInt(m[3], 10);
+      const probe = new Date(y, mo - 1, dy);
+      if (isNaN(probe.getTime()) || probe.getFullYear() !== y || probe.getMonth() !== mo - 1 || probe.getDate() !== dy) {
+        return { success: false, message: 'Tanggal jadwal tidak valid' };
+      }
+      dateStr = m[1] + '-' + m[2] + '-' + m[3];
+    }
+
+    // ── Validasi angka non-negatif ──
+    const kmDist = parseFloat(km) || 0;
+    const disc = parseFloat(discount) || 0;
+    const paidIn = parseFloat(paid_amount) || 0;
+    if (kmDist < 0 || disc < 0 || paidIn < 0) return { success: false, message: 'Nilai tidak boleh negatif' };
+
+    // ── Harga ditentukan server (Treatments), bukan dari klien ──
+    const trData = getSheetData(SHEETS.TREATMENTS);
+    const trMap = {};
+    trData.forEach(t => { if (isActive(t[TR.ACTIVE])) trMap[String(t[TR.ID])] = t; });
+
+    const cleanItems = [];
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i] || {};
+      const qty = parseInt(item.qty, 10);
+      if (!qty || qty < 1) return { success: false, message: 'Jumlah (qty) treatment minimal 1' };
+      const trId = item.treatment_id ? parseInt(item.treatment_id, 10) : '';
+      const master = trId !== '' && !isNaN(trId) ? trMap[String(trId)] : null;
+      let price, name;
+      if (master) {
+        price = parseFloat(master[TR.PRICE]) || 0;
+        name = String(master[TR.CAT] || '').trim() + ' - ' + String(master[TR.NAME] || '').trim();
+      } else {
+        price = parseFloat(item.price) || 0;
+        name = String(item.treatment_name || '').trim();
+      }
+      if (price < 0) return { success: false, message: 'Harga tidak boleh negatif' };
+      cleanItems.push({
+        treatment_id: trId,
+        treatment_name: name,
+        price: price,
+        qty: qty,
+        subtotal: Math.round(price * qty * 100) / 100
+      });
+    }
+
+    const feeTreatment = Math.round(cleanItems.reduce((s, i) => s + i.subtotal, 0) * 100) / 100;
+    const ratePerKm = parseFloat(getSetting('transport_rate_per_km', 2000)) || 0;
+    const transportFee = scData.transport_fee !== undefined && scData.transport_fee !== null && scData.transport_fee !== ''
+      ? (parseFloat(scData.transport_fee) || 0)
+      : Math.round(kmDist * ratePerKm);
+    if (transportFee < 0) return { success: false, message: 'Nilai tidak boleh negatif' };
+    const subtotal = Math.round((feeTreatment + transportFee) * 100) / 100;
     const grandTotal = Math.max(0, Math.round((subtotal - disc) * 100) / 100);
-    const paid = Math.min(parseFloat(paid_amount)||0, grandTotal);
+    const paid = Math.min(Math.max(0, paidIn), grandTotal);
     const due = Math.round((grandTotal - paid) * 100) / 100;
+
+    // ── Keterangan ditentukan server (abaikan dari klien) ──
+    const method = payment_method || 'TF/QRIS';
+    let ket;
+    if (due <= 0) ket = 'LUNAS ' + (method === 'Cash' ? 'CASH' : 'TF/QRIS');
+    else if (paid > 0) ket = 'DP';
+    else ket = 'BELUM BAYAR';
 
     const sh = getSheet(SHEETS.SCHEDULES);
     const siSh = getSheet(SHEETS.SCHEDULE_ITEMS);
@@ -495,13 +611,13 @@ function addSchedule(scData, userId, role) {
       const invNo = genInvoiceNo();
       const now = ts();
       sh.appendRow([sId, invNo, customer_id ? parseInt(customer_id) : '', therapist_id ? parseInt(therapist_id) : '',
-        schedule_date, schedule_time||'', location||'', kmDist,
+        dateStr, schedule_time||'', location||'', kmDist,
         feeTreatment, transportFee, subtotal, disc, grandTotal, paid, due,
-        payment_method||'TF/QRIS', due <= 0 ? 'done' : 'scheduled',
-        due <= 0 ? 'LUNAS TF/QRIS' : (keterangan||'BELUM BAYAR'), notes||'', userId, now, now]);
+        method, due <= 0 ? 'done' : 'scheduled',
+        ket, notes||'', userId, now, now]);
 
       let siId = getNextId(SHEETS.SCHEDULE_ITEMS);
-      const siRows = items.map(item => [siId++, sId, parseInt(item.treatment_id)||'', item.treatment_name||'', parseFloat(item.price)||0, parseInt(item.qty)||1, parseFloat(item.subtotal)||0]);
+      const siRows = cleanItems.map(item => [siId++, sId, item.treatment_id, item.treatment_name, item.price, item.qty, item.subtotal]);
       if (siRows.length) siSh.getRange(siSh.getLastRow()+1, 1, siRows.length, 7).setValues(siRows);
 
       if (customer_id) {
@@ -517,7 +633,7 @@ function addSchedule(scData, userId, role) {
 
       if (paid > 0) {
         const pyId = getNextId(SHEETS.PAYMENTS);
-        getSheet(SHEETS.PAYMENTS).appendRow([pyId, sId, customer_id ? parseInt(customer_id) : '', paid, payment_method||'TF/QRIS', '', schedule_date, '', userId, now]);
+        getSheet(SHEETS.PAYMENTS).appendRow([pyId, sId, customer_id ? parseInt(customer_id) : '', paid, method, '', dateStr, '', userId, now]);
       }
 
       logActivity(userId, '', 'CREATE', 'Schedules', sId, invNo + ' Rp'+grandTotal);
@@ -531,16 +647,17 @@ function getScheduleDetail(id, userId, role) {
     const r = findRowByValue(SHEETS.SCHEDULES, SC.ID, parseInt(id));
     if (!r) return { success: false, message: 'Jadwal tidak ditemukan' };
     const s = r.data;
-    const uData = getSheetData(SHEETS.USERS);
+    const timeById = getScheduleTimeById();
+    const uData = getSheetDataClient(SHEETS.USERS);
     const uMap = {}; uData.forEach(u => { uMap[u[U.ID]] = u[U.NAME]; });
-    const cuData = getSheetData(SHEETS.CUSTOMERS);
+    const cuData = getSheetDataClient(SHEETS.CUSTOMERS);
     const cuMap = {}; cuData.forEach(c => { cuMap[c[CU.ID]] = { name: c[CU.NAME], phone: c[CU.PHONE]||'', address: c[CU.ADDR]||'', baby_name: c[CU.BABY_NAME]||'', baby_age: c[CU.BABY_AGE]||'' }; });
-    const siData = getSheetData(SHEETS.SCHEDULE_ITEMS);
+    const siData = getSheetDataClient(SHEETS.SCHEDULE_ITEMS);
     const items = siData.filter(si => si[SI.SCHED_ID] == parseInt(id)).map(si => ({
       id: si[SI.ID], treatment_id: si[SI.TR_ID], treatment_name: si[SI.TR_NAME],
       price: parseFloat(si[SI.PRICE])||0, qty: parseInt(si[SI.QTY])||1, subtotal: parseFloat(si[SI.SUBTOTAL])||0
     }));
-    const pyData = getSheetData(SHEETS.PAYMENTS);
+    const pyData = getSheetDataClient(SHEETS.PAYMENTS);
     const payments = pyData.filter(p => p[PAY.SCHED_ID] == parseInt(id)).map(p => ({
       id: p[PAY.ID], amount: parseFloat(p[PAY.AMT])||0, method: p[PAY.METHOD]||'',
       date: fmtDate(p[PAY.DATE]), notes: p[PAY.NOTES]||''
@@ -554,7 +671,7 @@ function getScheduleDetail(id, userId, role) {
         customer_phone: custInfo.phone||'', customer_address: custInfo.address||'',
         baby_name: custInfo.baby_name||'', baby_age: custInfo.baby_age||'',
         therapist_id: s[SC.THERAPIST_ID], therapist_name: uMap[s[SC.THERAPIST_ID]]||'',
-        schedule_date: fmtDate(s[SC.DATE]), schedule_time: s[SC.TIME]||'',
+        schedule_date: fmtDate(s[SC.DATE]), schedule_time: fmtTime(timeById[s[SC.ID]] || s[SC.TIME]),
         location: s[SC.LOCATION]||'', km: parseFloat(s[SC.KM])||0,
         fee_treatment: parseFloat(s[SC.FEE])||0, transport_fee: parseFloat(s[SC.TRANSPORT])||0,
         subtotal: parseFloat(s[SC.SUBTOTAL])||0, discount: parseFloat(s[SC.DISCOUNT])||0,
@@ -570,47 +687,110 @@ function getScheduleDetail(id, userId, role) {
 
 function updateScheduleStatus(id, status, keterangan, userId, role) {
   try {
-    const r = findRowByValue(SHEETS.SCHEDULES, SC.ID, parseInt(id));
-    if (!r) return { success: false, message: 'Jadwal tidak ditemukan' };
-    const row = r.data.slice();
-    const oldStatus = row[SC.STATUS];
-    row[SC.STATUS] = status;
-    if (keterangan) row[SC.KETERANGAN] = keterangan;
-    row[SC.UPDATED] = ts();
-    getSheet(SHEETS.SCHEDULES).getRange(r.row, 1, 1, row.length).setValues([row]);
-    logActivity(userId, '', 'UPDATE', 'Schedules', parseInt(id), 'Status: '+oldStatus+' to '+status);
-    return { success: true, message: 'Status jadwal berhasil diperbarui' };
-  } catch(e) { return { success: false, message: 'Gagal memperbarui status' }; }
+    if (!canWrite(role)) return { success: false, message: 'Akses ditolak' };
+    const newStatus = String(status || '').toLowerCase().trim();
+    if (['scheduled','done','cancelled'].indexOf(newStatus) === -1) return { success: false, message: 'Status tidak valid' };
+    const lock = LockService.getScriptLock(); lock.waitLock(10000);
+    try {
+      const r = findRowByValue(SHEETS.SCHEDULES, SC.ID, parseInt(id));
+      if (!r) return { success: false, message: 'Jadwal tidak ditemukan' };
+      const row = r.data.slice();
+      const oldStatus = String(row[SC.STATUS] || '').toLowerCase().trim();
+      const method = row[SC.METHOD] || 'TF/QRIS';
+      row[SC.STATUS] = newStatus;
+      if (newStatus === 'done') {
+        // "done" = treatment selesai, bukan berarti sudah lunas
+        const dueNow = parseFloat(row[SC.DUE]) || 0;
+        const paidNow = parseFloat(row[SC.PAID]) || 0;
+        if (dueNow <= 0) row[SC.KETERANGAN] = 'LUNAS ' + (method === 'Cash' ? 'CASH' : 'TF/QRIS');
+        else if (paidNow > 0) row[SC.KETERANGAN] = 'DP';
+        else row[SC.KETERANGAN] = 'BELUM BAYAR';
+      } else if (keterangan) {
+        row[SC.KETERANGAN] = keterangan;
+      }
+      row[SC.UPDATED] = ts();
+      getSheet(SHEETS.SCHEDULES).getRange(r.row, 1, 1, row.length).setValues([row]);
+
+      // ── Kembalikan / tambahkan lagi total pelanggan saat status cancelled berubah ──
+      const custId = row[SC.CUST_ID];
+      if (custId) {
+        const total = parseFloat(row[SC.TOTAL]) || 0;
+        const paid = parseFloat(row[SC.PAID]) || 0;
+        const cr = findRowByValue(SHEETS.CUSTOMERS, CU.ID, parseInt(custId));
+        if (cr && oldStatus !== newStatus) {
+          const crow = cr.data.slice();
+          let cuTotal = parseFloat(crow[CU.TOTAL]) || 0;
+          let cuPaid = parseFloat(crow[CU.PAID]) || 0;
+          if (newStatus === 'cancelled' && oldStatus !== 'cancelled') {
+            cuTotal = Math.max(0, cuTotal - total);
+            cuPaid = Math.max(0, cuPaid - paid);
+          } else if (oldStatus === 'cancelled' && newStatus !== 'cancelled') {
+            cuTotal = cuTotal + total;
+            cuPaid = cuPaid + paid;
+          }
+          crow[CU.TOTAL] = Math.round(cuTotal * 100) / 100;
+          crow[CU.PAID] = Math.round(cuPaid * 100) / 100;
+          crow[CU.DUE] = Math.max(0, Math.round((crow[CU.TOTAL] - crow[CU.PAID]) * 100) / 100);
+          getSheet(SHEETS.CUSTOMERS).getRange(cr.row, 1, 1, crow.length).setValues([crow]);
+        }
+      }
+
+      logActivity(userId, '', 'UPDATE', 'Schedules', parseInt(id), 'Status: '+oldStatus+' to '+newStatus);
+      return { success: true, message: 'Status jadwal berhasil diperbarui' };
+    } finally { lock.releaseLock(); }
+  } catch(e) { console.error('updateScheduleStatus:', e); return { success: false, message: 'Gagal memperbarui status' }; }
 }
 
 function addSchedulePayment(payData, userId, role) {
   try {
-    const { schedule_id, customer_id, amount, method, reference_no, payment_date, notes } = payData;
-    if (!schedule_id || !amount || parseFloat(amount) <= 0) return { success: false, message: 'Jumlah pembayaran wajib diisi' };
-    const sr = findRowByValue(SHEETS.SCHEDULES, SC.ID, parseInt(schedule_id));
-    if (!sr) return { success: false, message: 'Jadwal tidak ditemukan' };
+    if (!canWrite(role)) return { success: false, message: 'Akses ditolak' };
+    const { schedule_id, amount, method, reference_no, payment_date, notes } = payData;
+    const amt = parseFloat(amount);
+    if (!schedule_id || !amount || !isFinite(amt) || amt <= 0) return { success: false, message: 'Jumlah pembayaran wajib diisi' };
+    const payMethod = method || 'TF/QRIS';
     const lock = LockService.getScriptLock(); lock.waitLock(10000);
     try {
+      // Dibaca di dalam lock agar dua pembayaran bersamaan tidak saling menimpa
+      const sr = findRowByValue(SHEETS.SCHEDULES, SC.ID, parseInt(schedule_id));
+      if (!sr) return { success: false, message: 'Jadwal tidak ditemukan' };
+      if (String(sr.data[SC.STATUS] || '').toLowerCase() === 'cancelled') {
+        return { success: false, message: 'Tidak bisa membayar invoice yang dibatalkan' };
+      }
+      const custId = sr.data[SC.CUST_ID];
+      const dueBefore = Math.max(0, Math.round((parseFloat(sr.data[SC.DUE]) || 0) * 100) / 100);
+      if (amt > dueBefore + 0.5) {
+        return { success: false, message: 'Jumlah melebihi sisa tagihan (Rp ' + Math.round(dueBefore).toLocaleString('id-ID') + ')' };
+      }
+
       const now = ts();
       const pyId = getNextId(SHEETS.PAYMENTS);
-      getSheet(SHEETS.PAYMENTS).appendRow([pyId, parseInt(schedule_id), customer_id ? parseInt(customer_id) : '', parseFloat(amount), method||'TF/QRIS', reference_no||'', payment_date||now.split('T')[0], notes||'', userId, now]);
+      getSheet(SHEETS.PAYMENTS).appendRow([pyId, parseInt(schedule_id), custId ? parseInt(custId) : '', amt, payMethod, reference_no||'', payment_date || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd'), notes||'', userId, now]);
+
       const srow = sr.data.slice();
-      srow[SC.PAID] = (parseFloat(srow[SC.PAID])||0) + parseFloat(amount);
-      srow[SC.DUE] = Math.round(((parseFloat(srow[SC.TOTAL])||0) - srow[SC.PAID]) * 100) / 100;
-      if (srow[SC.DUE] <= 0) { srow[SC.DUE] = 0; srow[SC.STATUS] = 'done'; srow[SC.KETERANGAN] = 'LUNAS TF/QRIS'; }
+      srow[SC.PAID] = Math.round(((parseFloat(srow[SC.PAID])||0) + amt) * 100) / 100;
+      let sDue = Math.round(((parseFloat(srow[SC.TOTAL])||0) - srow[SC.PAID]) * 100) / 100;
+      if (sDue < 0) sDue = 0;
+      srow[SC.DUE] = sDue;
+      if (sDue <= 0) {
+        srow[SC.STATUS] = 'done';
+        srow[SC.KETERANGAN] = 'LUNAS ' + (payMethod === 'Cash' ? 'CASH' : 'TF/QRIS');
+      } else {
+        srow[SC.KETERANGAN] = 'DP';
+      }
       srow[SC.UPDATED] = now;
       getSheet(SHEETS.SCHEDULES).getRange(sr.row, 1, 1, srow.length).setValues([srow]);
-      if (customer_id) {
-        const cr = findRowByValue(SHEETS.CUSTOMERS, CU.ID, parseInt(customer_id));
+
+      if (custId) {
+        const cr = findRowByValue(SHEETS.CUSTOMERS, CU.ID, parseInt(custId));
         if (cr) {
           const crow = cr.data.slice();
-          crow[CU.PAID] = (parseFloat(crow[CU.PAID])||0) + parseFloat(amount);
+          crow[CU.PAID] = Math.round(((parseFloat(crow[CU.PAID])||0) + amt) * 100) / 100;
           crow[CU.DUE] = Math.round(((parseFloat(crow[CU.TOTAL])||0) - crow[CU.PAID]) * 100) / 100;
           if (crow[CU.DUE] < 0) crow[CU.DUE] = 0;
           getSheet(SHEETS.CUSTOMERS).getRange(cr.row, 1, 1, crow.length).setValues([crow]);
         }
       }
-      logActivity(userId, '', 'CREATE', 'Payments', pyId, 'Rp'+parseFloat(amount)+' for '+sr.data[SC.INV_NO]);
+      logActivity(userId, '', 'CREATE', 'Payments', pyId, 'Rp'+amt+' for '+sr.data[SC.INV_NO]);
       return { success: true, message: 'Pembayaran berhasil dicatat' };
     } finally { lock.releaseLock(); }
   } catch(e) { console.error('addSchedulePayment:', e); return { success: false, message: 'Gagal mencatat pembayaran' }; }
@@ -652,14 +832,20 @@ function deleteSchedule(id, userId, role) {
 function getDashboardStats(userId, role) {
   try {
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
+    const tz = Session.getScriptTimeZone();
+    const todayStr = Utilities.formatDate(now, tz, 'yyyy-MM-dd');
+    // mStart adalah tengah malam lokal awal bulan, jadi tanggal jadwal harus dibandingkan sebagai waktu lokal juga
     const mStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const scData = getSheetData(SHEETS.SCHEDULES);
+    const scData = getSheetDataClient(SHEETS.SCHEDULES);
+    const timeById = getScheduleTimeById();
     const activeScheds = scData.filter(s => s[SC.STATUS] !== 'cancelled');
     const todayScheds = activeScheds.filter(s => fmtDate(s[SC.DATE]) === todayStr);
-    const cuData = getSheetData(SHEETS.CUSTOMERS);
+    const cuData = getSheetDataClient(SHEETS.CUSTOMERS);
     const totalCustDue = cuData.reduce((s, c) => s + (parseFloat(c[CU.DUE])||0), 0);
-    const monthScheds = activeScheds.filter(s => new Date(fmtDate(s[SC.DATE])) >= mStart);
+    const monthScheds = activeScheds.filter(s => {
+      const d = new Date(fmtDate(s[SC.DATE]) + 'T00:00:00');
+      return !isNaN(d) && d >= mStart;
+    });
     const monthRevenue = monthScheds.reduce((s, sc) => s + (parseFloat(sc[SC.TOTAL])||0), 0);
     const monthCollected = monthScheds.reduce((s, sc) => s + (parseFloat(sc[SC.PAID])||0), 0);
     const todayRevenue = todayScheds.reduce((s, sc) => s + (parseFloat(sc[SC.TOTAL])||0), 0);
@@ -667,12 +853,12 @@ function getDashboardStats(userId, role) {
     const dailyData = [];
     for (let i = 29; i >= 0; i--) {
       const d = new Date(now); d.setDate(now.getDate() - i);
-      const ds = d.toISOString().split('T')[0];
+      const ds = Utilities.formatDate(d, tz, 'yyyy-MM-dd');
       const dayAmt = activeScheds.filter(s => fmtDate(s[SC.DATE]) === ds).reduce((s, sc) => s + (parseFloat(sc[SC.TOTAL])||0), 0);
       dailyData.push({ date: ds.substring(5), amount: dayAmt });
     }
 
-    const siData = getSheetData(SHEETS.SCHEDULE_ITEMS);
+    const siData = getSheetDataClient(SHEETS.SCHEDULE_ITEMS);
     const monthSchedIds = new Set(monthScheds.map(s => s[SC.ID]));
     const trBreakdown = {};
     siData.filter(si => monthSchedIds.has(si[SI.SCHED_ID])).forEach(si => {
@@ -689,7 +875,7 @@ function getDashboardStats(userId, role) {
       .map(c => ({ name: c[CU.NAME], total: parseFloat(c[CU.TOTAL])||0 }))
       .sort((a, b) => b.total - a.total).slice(0, 5);
 
-    const uData = getSheetData(SHEETS.USERS);
+    const uData = getSheetDataClient(SHEETS.USERS);
     const uMap = {}; uData.forEach(u => { uMap[u[U.ID]] = u[U.NAME]; });
     const cuMap = {}; cuData.forEach(c => { cuMap[c[CU.ID]] = c[CU.NAME]; });
 
@@ -705,7 +891,7 @@ function getDashboardStats(userId, role) {
 
     const upcomingToday = todayScheds.map(s => ({
       id: s[SC.ID], invoice_no: s[SC.INV_NO], customer: cuMap[s[SC.CUST_ID]]||'Walk-in',
-      time: s[SC.TIME]||'', location: s[SC.LOCATION]||'',
+      time: fmtTime(timeById[s[SC.ID]] || s[SC.TIME]), location: s[SC.LOCATION]||'',
       therapist: uMap[s[SC.THERAPIST_ID]]||'', status: s[SC.STATUS]||''
     }));
 
@@ -740,7 +926,7 @@ function getReportsData(reportType, filters, userId, role) {
     };
 
     if (reportType === 'monthly') {
-      const scData = getSheetData(SHEETS.SCHEDULES).filter(r => r[SC.STATUS] !== 'cancelled' && inRange(r[SC.DATE]));
+      const scData = getSheetDataClient(SHEETS.SCHEDULES).filter(r => r[SC.STATUS] !== 'cancelled' && inRange(r[SC.DATE]));
       const gMap = {};
       scData.forEach(r => {
         const d = toD(r[SC.DATE]); if (isNaN(d)) return;
@@ -757,9 +943,9 @@ function getReportsData(reportType, filters, userId, role) {
     }
 
     if (reportType === 'treatments') {
-      const scData = getSheetData(SHEETS.SCHEDULES).filter(r => r[SC.STATUS] !== 'cancelled' && inRange(r[SC.DATE]));
+      const scData = getSheetDataClient(SHEETS.SCHEDULES).filter(r => r[SC.STATUS] !== 'cancelled' && inRange(r[SC.DATE]));
       const schedIds = new Set(scData.map(r => r[SC.ID]));
-      const siData = getSheetData(SHEETS.SCHEDULE_ITEMS).filter(si => schedIds.has(si[SI.SCHED_ID]));
+      const siData = getSheetDataClient(SHEETS.SCHEDULE_ITEMS).filter(si => schedIds.has(si[SI.SCHED_ID]));
       const tMap = {};
       siData.forEach(si => {
         const name = si[SI.TR_NAME]||'Unknown';
@@ -773,8 +959,8 @@ function getReportsData(reportType, filters, userId, role) {
     }
 
     if (reportType === 'customers') {
-      const scData = getSheetData(SHEETS.SCHEDULES).filter(r => r[SC.STATUS] !== 'cancelled' && inRange(r[SC.DATE]));
-      const cuData = getSheetData(SHEETS.CUSTOMERS);
+      const scData = getSheetDataClient(SHEETS.SCHEDULES).filter(r => r[SC.STATUS] !== 'cancelled' && inRange(r[SC.DATE]));
+      const cuData = getSheetDataClient(SHEETS.CUSTOMERS);
       const cuMap = {}; cuData.forEach(c => { cuMap[c[CU.ID]] = { name: c[CU.NAME], phone: c[CU.PHONE]||'' }; });
       const agg = {};
       scData.forEach(r => {
@@ -797,9 +983,9 @@ function getReportsData(reportType, filters, userId, role) {
 // ─── Payments ─────────────────────────────────────────────────────────────────
 function getPayments(userId, role, filters) {
   try {
-    const data = getSheetData(SHEETS.PAYMENTS);
-    const scData = getSheetData(SHEETS.SCHEDULES);
-    const cuData = getSheetData(SHEETS.CUSTOMERS);
+    const data = getSheetDataClient(SHEETS.PAYMENTS);
+    const scData = getSheetDataClient(SHEETS.SCHEDULES);
+    const cuData = getSheetDataClient(SHEETS.CUSTOMERS);
     const scMap = {}; scData.forEach(r => { scMap[r[SC.ID]] = r[SC.INV_NO]; });
     const cuMap = {}; cuData.forEach(r => { cuMap[r[CU.ID]] = r[CU.NAME]; });
     const f = filters || {};
@@ -818,7 +1004,7 @@ function getPayments(userId, role, filters) {
 // ─── Settings ─────────────────────────────────────────────────────────────────
 function getSettings() {
   try {
-    const data = getSheetData(SHEETS.SETTINGS);
+    const data = getSheetDataClient(SHEETS.SETTINGS);
     const settings = {};
     data.forEach(r => { settings[r[ST.KEY]] = r[ST.VAL]; });
     return { success: true, data: settings };
@@ -828,16 +1014,21 @@ function getSettings() {
 function saveAllSettings(settingsObj, userId, role) {
   try {
     if (role !== 'admin') return { success: false, message: 'Hanya admin yang bisa mengubah pengaturan' };
-    Object.entries(settingsObj).forEach(([key, value]) => {
-      const r = findRowByValue(SHEETS.SETTINGS, ST.KEY, key);
-      if (r) {
-        const row = r.data.slice();
-        row[ST.VAL] = value; row[ST.UPDATED_BY] = userId; row[ST.UPDATED] = ts();
-        getSheet(SHEETS.SETTINGS).getRange(r.row, 1, 1, row.length).setValues([row]);
-      } else {
-        getSheet(SHEETS.SETTINGS).appendRow([getNextId(SHEETS.SETTINGS), key, value, userId, ts()]);
-      }
-    });
+    const allowed = ['business_name','business_tagline','business_phone','business_address','business_instagram','business_tiktok','payment_info','currency_symbol','invoice_prefix','transport_rate_per_km','invoice_footer'];
+    const lock = LockService.getScriptLock(); lock.waitLock(10000);
+    try {
+      Object.entries(settingsObj || {}).forEach(([key, value]) => {
+        if (allowed.indexOf(String(key)) === -1) return;
+        const r = findRowByValue(SHEETS.SETTINGS, ST.KEY, key);
+        if (r) {
+          const row = r.data.slice();
+          row[ST.VAL] = value; row[ST.UPDATED_BY] = userId; row[ST.UPDATED] = ts();
+          getSheet(SHEETS.SETTINGS).getRange(r.row, 1, 1, row.length).setValues([row]);
+        } else {
+          getSheet(SHEETS.SETTINGS).appendRow([getNextId(SHEETS.SETTINGS), key, value, userId, ts()]);
+        }
+      });
+    } finally { lock.releaseLock(); }
     logActivity(userId, '', 'UPDATE', 'Settings', '', 'Settings updated');
     return { success: true, message: 'Pengaturan berhasil disimpan' };
   } catch(e) { return { success: false, message: 'Gagal menyimpan pengaturan' }; }
@@ -847,7 +1038,7 @@ function saveAllSettings(settingsObj, userId, role) {
 function getLogs(userId, role, limit) {
   try {
     if (role !== 'admin') return { success: false, message: 'Akses ditolak' };
-    const data = getSheetData(SHEETS.LOGS);
+    const data = getSheetDataClient(SHEETS.LOGS);
     const lim = Math.min(parseInt(limit)||200, 500);
     return {
       success: true,
@@ -863,8 +1054,15 @@ function getLogs(userId, role, limit) {
 function logActivity(uid, uname, action, table, rid, details) {
   try {
     const sh = getSheet(SHEETS.LOGS);
+    if (!sh) return;
     const name = uname || getUsernameById(uid);
-    sh.appendRow([getNextId(SHEETS.LOGS), uid, name, action, table, rid||'', details||'', ts()]);
+    const lock = LockService.getScriptLock();
+    // Hindari kunci bersarang: kalau eksekusi ini sudah memegang lock, jangan ambil/lepas lagi
+    const alreadyLocked = lock.hasLock();
+    if (!alreadyLocked) lock.waitLock(10000);
+    try {
+      sh.appendRow([getNextId(SHEETS.LOGS), uid, name, action, table, rid||'', details||'', ts()]);
+    } finally { if (!alreadyLocked) lock.releaseLock(); }
   } catch(e) { console.error('logActivity:', e); }
 }
 
