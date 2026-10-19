@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<base target="_top">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DaisafaCare — Management System</title>
+<meta name="description" content="Sistem manajemen jadwal dan invoice Daisafacare Mom & Baby Treatment">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   DESIGN SYSTEM — DAISAFACARE BRAND
+   Palette: #85957A (sage green) | #B8C2AA (light sage)
+            #A6B3A5 (slate) | #D4C2AA (beige) | #FCF7F1 (cream)
+═══════════════════════════════════════════════════════════ */
+:root {
+  --sage: #85957A;
+  --sage-dark: #6e7d65;
+  --sage-light: #B8C2AA;
+  --slate: #A6B3A5;
+  --beige: #D4C2AA;
+  --beige-dark: #C4AE96;
+  --cream: #FCF7F1;
+  --cream-dark: #F5EDE2;
+  --white: #FFFFFF;
+  --text: #2D3A2E;
+  --text-sec: #6B7A6C;
+  --text-muted: #9AA69B;
+  --border: #E2EBE2;
+  --border-light: #EFF5EF;
+  --success: #4CAF7D;
+  --success-bg: #E8F5EE;
+  --warning: #F59E0B;
+  --warning-bg: #FEF3C7;
+  --danger: #E05252;
+  --danger-bg: #FEECEC;
+  --info: #5B8FB9;
+  --info-bg: #EAF2FB;
+  --shadow-sm: 0 1px 3px rgba(45,58,46,0.06);
+  --shadow-md: 0 4px 16px rgba(45,58,46,0.10);
+  --shadow-lg: 0 12px 40px rgba(45,58,46,0.14);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --sidebar-w: 260px;
+  --font: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Playfair Display', serif;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--cream); color: var(--text); -webkit-tap-highlight-color: transparent; }
+input, select, textarea, button { font-family: var(--font); font-size: 15px; }
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; }
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--sage-light); border-radius: 6px; }
+
+/* ─── LOGIN ─── */
+.login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; background: linear-gradient(135deg, var(--sage-dark) 0%, var(--sage) 50%, #7a8e70 100%); position: relative; overflow: hidden; }
+.login-page::before { content: ''; position: absolute; top: -100px; right: -80px; width: 380px; height: 380px; border-radius: 50%; background: rgba(255,255,255,0.07); }
+.login-page::after { content: ''; position: absolute; bottom: -120px; left: -100px; width: 450px; height: 450px; border-radius: 50%; background: rgba(255,255,255,0.05); }
+.login-card { background: var(--white); border-radius: var(--radius-xl); padding: 48px 44px 40px; max-width: 420px; width: 100%; box-shadow: var(--shadow-lg); position: relative; z-index: 1; animation: slideUp 0.5s cubic-bezier(0.16,1,0.3,1); }
+@keyframes slideUp { from { opacity:0; transform: translateY(32px); } to { opacity:1; transform: translateY(0); } }
+.login-logo { text-align: center; margin-bottom: 28px; }
+.login-logo-icon { width: 80px; height: 80px; background: linear-gradient(135deg, var(--sage), var(--sage-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 36px; box-shadow: 0 8px 24px rgba(133,149,122,0.35); }
+.login-logo h1 { font-family: var(--font-display); font-size: 26px; color: var(--sage-dark); font-weight: 700; margin-bottom: 4px; }
+.login-logo p { color: var(--text-sec); font-size: 13px; font-weight: 500; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 600; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.5px; }
+.form-group input { width: 100%; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; color: var(--text); background: var(--cream); transition: all 0.2s; }
+.form-group input:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(133,149,122,0.15); background: var(--white); }
+.pwd-wrap { position: relative; }
+.pwd-wrap input { padding-right: 46px; }
+.pwd-eye { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 15px; transition: color 0.2s; }
+.pwd-eye:hover { color: var(--sage); }
+.btn-login { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--sage), var(--sage-dark)); color: var(--white); border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.25s; margin-top: 8px; letter-spacing: 0.3px; box-shadow: 0 4px 14px rgba(133,149,122,0.35); }
+.btn-login:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(133,149,122,0.45); }
+.btn-login:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+.login-error { background: var(--danger-bg); color: var(--danger); padding: 11px 14px; border-radius: var(--radius-sm); margin-top: 16px; font-size: 13px; font-weight: 500; border-left: 3px solid var(--danger); display: flex; align-items: center; gap: 8px; }
+.login-footer { text-align: center; margin-top: 24px; font-size: 11px; color: var(--text-muted); }
+
+/* ─── APP LAYOUT ─── */
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ─── SIDEBAR ─── */
+.sidebar { width: var(--sidebar-w); background: linear-gradient(180deg, var(--sage-dark) 0%, #5e6f56 100%); color: var(--white); display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; box-shadow: 2px 0 12px rgba(45,58,46,0.15); scrollbar-width: none; }
+.sidebar::-webkit-scrollbar { display: none; }
+.sidebar-brand { padding: 26px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.12); }
+.sidebar-brand-name { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: 0.3px; }
+.sidebar-brand-tag { font-size: 11px; opacity: 0.75; margin-top: 2px; letter-spacing: 0.5px; }
+.sidebar-user { padding: 16px 20px; background: rgba(0,0,0,0.15); margin: 0; display: flex; align-items: center; gap: 12px; }
+.sidebar-avatar { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.3); }
+.sidebar-uname { font-size: 13.5px; font-weight: 600; line-height: 1.3; }
+.sidebar-urole { font-size: 11px; opacity: 0.7; text-transform: capitalize; margin-top: 1px; }
+.sidebar-nav { flex: 1; padding: 14px 12px; }
+.sidebar-section-title { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.5); padding: 12px 8px 6px; }
+.nav-item { width: 100%; text-align: left; padding: 11px 12px; background: transparent; border: none; color: rgba(255,255,255,0.85); cursor: pointer; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: all 0.2s; margin-bottom: 2px; }
+.nav-item:hover { background: rgba(255,255,255,0.12); color: var(--white); }
+.nav-item.active { background: rgba(255,255,255,0.2); color: var(--white); font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.nav-item i { width: 20px; text-align: center; font-size: 16px; opacity: 0.9; }
+.sidebar-bottom { padding: 14px 12px; border-top: 1px solid rgba(255,255,255,0.12); }
+.btn-logout { width: 100%; padding: 11px 12px; background: rgba(224,82,82,0.18); border: 1px solid rgba(224,82,82,0.35); color: rgba(255,255,255,0.9); cursor: pointer; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+.btn-logout:hover { background: rgba(224,82,82,0.35); color: var(--white); }
+
+/* ─── MAIN ─── */
+.main { flex: 1; overflow-y: auto; background: var(--cream); display: flex; flex-direction: column; }
+.topbar { background: var(--white); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); }
+.topbar-title { font-size: 20px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.topbar-date { font-size: 13px; color: var(--text-muted); background: var(--cream); padding: 7px 14px; border-radius: 20px; font-weight: 500; }
+.page-content { padding: 24px 28px; flex: 1; }
+
+/* ─── BUTTONS ─── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 20px; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important; }
+.btn-primary { background: var(--sage); color: var(--white); box-shadow: 0 2px 8px rgba(133,149,122,0.3); }
+.btn-primary:hover:not(:disabled) { background: var(--sage-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(133,149,122,0.4); }
+.btn-beige { background: var(--beige); color: var(--text); }
+.btn-beige:hover:not(:disabled) { background: var(--beige-dark); transform: translateY(-1px); }
+.btn-danger { background: var(--danger); color: var(--white); }
+.btn-danger:hover:not(:disabled) { background: #c94444; transform: translateY(-1px); }
+.btn-outline { background: transparent; color: var(--sage); border: 1.5px solid var(--sage); }
+.btn-outline:hover:not(:disabled) { background: var(--sage); color: var(--white); }
+.btn-ghost { background: transparent; color: var(--text-sec); border: 1.5px solid var(--border); }
+.btn-ghost:hover:not(:disabled) { border-color: var(--sage); color: var(--sage); }
+.btn-sm { padding: 7px 14px; font-size: 13px; }
+.btn-icon { padding: 8px; width: 36px; height: 36px; }
+
+/* ─── CARDS ─── */
+.card { background: var(--white); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); }
+.card-header { padding: 18px 22px 0; display: flex; align-items: center; justify-content: space-between; }
+.card-title { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.card-body { padding: 18px 22px; }
+
+/* ─── KPI CARDS ─── */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 16px; margin-bottom: 22px; }
+.kpi-card { background: var(--white); border-radius: var(--radius-md); padding: 20px 22px; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); transition: all 0.2s; position: relative; overflow: hidden; }
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+.kpi-card.green::before { background: linear-gradient(90deg, var(--sage), var(--sage-light)); }
+.kpi-card.beige::before { background: linear-gradient(90deg, var(--beige), var(--beige-dark)); }
+.kpi-card.success::before { background: linear-gradient(90deg, var(--success), #3da867); }
+.kpi-card.danger::before { background: linear-gradient(90deg, var(--danger), #c94444); }
+.kpi-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.kpi-ico { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 14px; }
+.kpi-ico.green { background: linear-gradient(135deg,var(--sage),var(--sage-dark)); color: var(--white); }
+.kpi-ico.beige { background: linear-gradient(135deg,var(--beige),var(--beige-dark)); color: var(--text); }
+.kpi-ico.success { background: linear-gradient(135deg,var(--success),#3da867); color: var(--white); }
+.kpi-ico.danger { background: linear-gradient(135deg,var(--danger),#c94444); color: var(--white); }
+.kpi-val { font-size: 26px; font-weight: 800; color: var(--text); line-height: 1.1; margin-bottom: 4px; }
+.kpi-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ─── DASHBOARD HERO ─── */
+.dash-hero { background: linear-gradient(135deg, var(--sage-dark) 0%, var(--sage) 60%, #96a88b 100%); border-radius: var(--radius-lg); padding: 28px 32px; color: var(--white); margin-bottom: 22px; position: relative; overflow: hidden; }
+.dash-hero::before { content: ''; position: absolute; top: -60px; right: -40px; width: 220px; height: 220px; border-radius: 50%; background: rgba(255,255,255,0.07); }
+.dash-hero::after { content: ''; position: absolute; bottom: -50px; right: 100px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255,255,255,0.05); }
+.dash-hero-top { display: flex; justify-content: space-between; align-items: flex-start; position: relative; z-index: 1; }
+.dash-hero-greet { font-family: var(--font-display); font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+.dash-hero-sub { font-size: 13px; opacity: 0.85; }
+.dash-hero-badge { background: rgba(255,255,255,0.18); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.dash-hero-stats { display: flex; gap: 36px; padding-top: 20px; margin-top: 18px; border-top: 1px solid rgba(255,255,255,0.2); position: relative; z-index: 1; }
+.dash-stat-val { font-size: 22px; font-weight: 800; line-height: 1; }
+.dash-stat-lbl { font-size: 11px; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.6px; margin-top: 4px; }
+
+/* ─── GRID LAYOUTS ─── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-bottom: 18px; }
+.grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 18px; margin-bottom: 18px; }
+.grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 18px; margin-bottom: 18px; }
+@media(max-width:1100px){.grid-2,.grid-3,.grid-1-2,.grid-2-1{grid-template-columns:1fr;}}
+
+/* ─── TABLE ─── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+thead th { background: var(--cream-dark); color: var(--text-sec); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 14px; text-align: left; border-bottom: 2px solid var(--border); white-space: nowrap; }
+tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border-light); color: var(--text); vertical-align: middle; }
+tbody tr:hover td { background: var(--cream); }
+tbody tr:last-child td { border-bottom: none; }
+.table-empty { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+.table-empty i { font-size: 36px; display: block; margin-bottom: 10px; opacity: 0.4; }
+
+/* ─── STATUS BADGES ─── */
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.badge-scheduled { background: var(--info-bg); color: var(--info); }
+.badge-done { background: var(--success-bg); color: var(--success); }
+.badge-cancelled { background: var(--danger-bg); color: var(--danger); }
+.badge-lunas { background: var(--success-bg); color: var(--success); }
+.badge-belum { background: var(--warning-bg); color: var(--warning); }
+.badge-dp { background: var(--info-bg); color: var(--info); }
+.badge-admin { background: var(--danger-bg); color: var(--danger); }
+.badge-therapist { background: linear-gradient(135deg,#e8f0e8,#d0ddd0); color: var(--sage-dark); }
+.badge-receptionist { background: var(--info-bg); color: var(--info); }
+
+/* ─── FORMS ─── */
+.form-section { background: var(--white); border-radius: var(--radius-md); padding: 24px; border: 1px solid var(--border-light); margin-bottom: 18px; }
+.form-section-title { font-size: 14px; font-weight: 700; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px; }
+.form-row { display: grid; gap: 16px; margin-bottom: 16px; }
+.form-row.cols-2 { grid-template-columns: 1fr 1fr; }
+.form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.fg { display: flex; flex-direction: column; gap: 6px; }
+.fg label { font-size: 13px; font-weight: 600; color: var(--text-sec); }
+.fg input, .fg select, .fg textarea { padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; color: var(--text); background: var(--cream); transition: all 0.2s; }
+.fg input:focus, .fg select:focus, .fg textarea:focus { outline: none; border-color: var(--sage); box-shadow: 0 0 0 3px rgba(133,149,122,0.12); background: var(--white); }
+.fg textarea { resize: vertical; min-height: 80px; }
+.form-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+
+/* ─── MODAL ─── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; animation: fadeIn 0.18s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal { background: var(--white); border-radius: var(--radius-lg); width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); animation: slideUp 0.25s cubic-bezier(0.16,1,0.3,1); }
+.modal.modal-lg { max-width: 860px; }
+.modal.modal-sm { max-width: 440px; }
+.modal-header { padding: 22px 26px; background: linear-gradient(135deg, var(--sage-dark), var(--sage)); color: var(--white); border-radius: var(--radius-lg) var(--radius-lg) 0 0; display: flex; align-items: center; justify-content: space-between; }
+.modal-header h3 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.modal-close { background: rgba(255,255,255,0.2); border: none; color: var(--white); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.modal-close:hover { background: rgba(255,255,255,0.35); transform: rotate(90deg); }
+.modal-body { padding: 24px 26px; }
+.modal-footer { padding: 16px 26px; border-top: 1px solid var(--border-light); display: flex; gap: 10px; justify-content: flex-end; }
+
+/* ─── TOAST ─── */
+.toast-stack { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.toast { background: var(--white); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); padding: 14px 18px; display: flex; align-items: center; gap: 12px; pointer-events: auto; animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1); border-left: 4px solid var(--sage); min-width: 280px; max-width: 380px; }
+.toast.success { border-left-color: var(--success); }
+.toast.error { border-left-color: var(--danger); }
+.toast.warning { border-left-color: var(--warning); }
+.toast-icon { font-size: 18px; flex-shrink: 0; }
+.toast.success .toast-icon { color: var(--success); }
+.toast.error .toast-icon { color: var(--danger); }
+.toast.warning .toast-icon { color: var(--warning); }
+.toast-msg { flex: 1; font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.4; }
+.toast-close { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 2px 6px; }
+@keyframes toastIn { from { opacity:0; transform: translateX(40px); } to { opacity:1; transform: translateX(0); } }
+.toast.leaving { animation: toastOut 0.2s ease forwards; }
+@keyframes toastOut { to { opacity:0; transform: translateX(40px); } }
+
+/* ─── LOADING ─── */
+.loading-ov { position: fixed; inset: 0; background: rgba(255,255,255,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9000; gap: 16px; }
+.spinner { width: 44px; height: 44px; border: 4px solid var(--border); border-top-color: var(--sage); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-txt { font-size: 14px; color: var(--text-sec); font-weight: 500; }
+.skeleton { background: linear-gradient(90deg, var(--cream-dark) 25%, var(--cream) 50%, var(--cream-dark) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 6px; }
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* ─── SCHEDULE ITEMS BUILDER ─── */
+.item-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 10px; padding: 12px; background: var(--cream); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.item-total { font-weight: 700; color: var(--sage-dark); font-size: 14px; padding-top: 4px; }
+.add-item-btn { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--cream-dark); border: 1.5px dashed var(--sage-light); border-radius: var(--radius-sm); color: var(--sage-dark); cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; width: 100%; justify-content: center; }
+.add-item-btn:hover { border-color: var(--sage); background: var(--white); }
+
+/* ─── SUMMARY ROW ─── */
+.summary-box { background: linear-gradient(135deg, var(--cream-dark), var(--cream)); border: 1px solid var(--beige); border-radius: var(--radius-md); padding: 16px 20px; }
+.summary-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 14px; color: var(--text-sec); }
+.summary-row.total { font-size: 17px; font-weight: 800; color: var(--sage-dark); border-top: 2px solid var(--beige); padding-top: 12px; margin-top: 4px; }
+
+/* ─── INVOICE PRINT ─── */
+.invoice-print-wrap { background: var(--white); border-radius: var(--radius-md); padding: 24px; border: 1px solid var(--border); margin-bottom: 18px; }
+#invoice-template { background: #FCF7F1; min-height: 1000px; padding: 40px; font-family: var(--font); max-width: 700px; margin: 0 auto; position: relative; }
+.inv-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 28px; }
+.inv-brand { display: flex; align-items: center; gap: 14px; }
+.inv-brand-ico { width: 70px; height: 70px; background: linear-gradient(135deg,var(--sage),var(--sage-dark)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 28px; }
+.inv-brand-name { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--sage-dark); line-height: 1.1; }
+.inv-brand-sub { font-size: 12px; color: var(--text-sec); margin-top: 3px; }
+.inv-brand-tagline { font-size: 11px; color: var(--text-muted); font-style: italic; margin-top: 2px; }
+.inv-title-block { text-align: right; }
+.inv-title { font-family: var(--font-display); font-size: 32px; font-weight: 700; color: var(--sage-dark); }
+.inv-no-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.inv-no-val { font-size: 14px; font-weight: 700; color: var(--sage); }
+.inv-divider { height: 2px; background: linear-gradient(90deg,var(--sage),var(--beige)); border-radius: 2px; margin: 18px 0; }
+.inv-info-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; margin-bottom: 24px; }
+.inv-info-box { background: var(--white); border-radius: var(--radius-sm); padding: 16px; border: 1px solid var(--beige); }
+.inv-info-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: var(--sage); margin-bottom: 12px; }
+.inv-info-row { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 13px; }
+.inv-info-label { color: var(--text-muted); min-width: 80px; }
+.inv-info-val { font-weight: 600; color: var(--text); }
+.inv-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+.inv-table thead th { background: var(--sage); color: var(--white); padding: 11px 14px; font-size: 13px; font-weight: 700; text-align: left; }
+.inv-table thead th:first-child { border-radius: 4px 0 0 0; }
+.inv-table thead th:last-child { border-radius: 0 4px 0 0; text-align: right; }
+.inv-table tbody td { padding: 10px 14px; border-bottom: 1px dashed var(--beige); font-size: 13px; }
+.inv-table tbody td:last-child { text-align: right; font-weight: 600; }
+.inv-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 10px; }
+.inv-notes-box { background: var(--white); border-radius: var(--radius-sm); padding: 14px; border: 1px solid var(--beige); font-size: 12px; }
+.inv-notes-title { font-weight: 700; color: var(--sage); margin-bottom: 8px; font-size: 12px; }
+.inv-totals { }
+.inv-total-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px dashed var(--beige); }
+.inv-total-row:last-child { border-bottom: none; }
+.inv-total-row.grand { font-size: 16px; font-weight: 800; color: var(--sage-dark); background: var(--sage-light); padding: 10px 14px; border-radius: var(--radius-sm); margin-top: 4px; }
+.inv-footer { text-align: center; margin-top: 28px; }
+.inv-footer-thanks { font-family: var(--font-display); font-size: 18px; color: var(--sage-dark); margin-bottom: 4px; }
+.inv-footer-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
+.inv-signature { display: flex; justify-content: center; margin-bottom: 18px; }
+.inv-sig-line { text-align: center; min-width: 160px; }
+.inv-sig-dot { height: 50px; border-bottom: 1.5px solid var(--text-sec); margin-bottom: 6px; }
+.inv-sig-label { font-size: 12px; color: var(--text-sec); }
+.inv-contacts { display: flex; justify-content: center; gap: 20px; padding-top: 16px; border-top: 1px solid var(--beige); font-size: 11px; color: var(--text-sec); }
+.inv-contact-item { display: flex; align-items: center; gap: 5px; }
+.inv-contact-item i { color: var(--sage); }
+
+/* ─── CALENDAR ─── */
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-day-hdr { text-align: center; font-size: 12px; font-weight: 700; color: var(--text-muted); padding: 8px 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.cal-day { background: var(--white); border-radius: var(--radius-sm); padding: 8px; min-height: 80px; border: 1px solid var(--border-light); transition: all 0.15s; cursor: pointer; }
+.cal-day:hover { border-color: var(--sage-light); box-shadow: var(--shadow-sm); }
+.cal-day.today { border-color: var(--sage); background: rgba(133,149,122,0.05); }
+.cal-day.other-month { background: var(--cream); opacity: 0.6; }
+.cal-day-num { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.cal-day.today .cal-day-num { background: var(--sage); color: var(--white); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.cal-event { background: var(--sage-light); color: var(--sage-dark); border-radius: 4px; padding: 2px 5px; font-size: 10px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cal-event.done { background: var(--success-bg); color: var(--success); }
+.cal-event.cancelled { background: var(--danger-bg); color: var(--danger); }
+.cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.cal-month-title { font-size: 18px; font-weight: 700; color: var(--text); }
+
+/* ─── FILTER BAR ─── */
+.filter-bar { background: var(--white); border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 16px; border: 1px solid var(--border-light); display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.filter-bar .fg { min-width: 160px; }
+
+/* ─── SECTION HEADER ─── */
+.section-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.section-hdr h2 { font-size: 18px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 10px; }
+
+/* ─── PRICELIST ─── */
+.price-category { margin-bottom: 24px; }
+.price-cat-title { font-size: 14px; font-weight: 800; color: var(--sage-dark); text-transform: uppercase; letter-spacing: 1px; padding: 8px 14px; background: linear-gradient(90deg,var(--cream-dark),var(--cream)); border-left: 4px solid var(--sage); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+.price-item { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; background: var(--white); border-radius: var(--radius-sm); margin-bottom: 6px; border: 1px solid var(--border-light); transition: all 0.15s; }
+.price-item:hover { border-color: var(--sage-light); box-shadow: var(--shadow-sm); }
+.price-item-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.price-item-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.price-item-right { display: flex; align-items: center; gap: 14px; }
+.price-item-amt { font-size: 15px; font-weight: 800; color: var(--sage-dark); }
+.price-item-dur { font-size: 11px; color: var(--text-muted); background: var(--cream); padding: 3px 8px; border-radius: 10px; }
+
+/* ─── CUSTOMER CARD ─── */
+.cust-card { background: var(--white); border-radius: var(--radius-md); padding: 18px 20px; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 16px; transition: all 0.2s; cursor: pointer; }
+.cust-card:hover { border-color: var(--sage-light); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.cust-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg,var(--sage-light),var(--sage)); display: flex; align-items: center; justify-content: center; font-size: 19px; font-weight: 700; color: var(--white); flex-shrink: 0; }
+.cust-info { flex: 1; min-width: 0; }
+.cust-name { font-size: 15px; font-weight: 700; color: var(--text); }
+.cust-phone { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+.cust-baby { font-size: 12px; color: var(--sage-dark); margin-top: 3px; font-weight: 500; }
+.cust-due { text-align: right; }
+.cust-due-amt { font-size: 15px; font-weight: 800; color: var(--danger); }
+.cust-due-lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
+
+/* ─── REPORTS ─── */
+.report-card { background: var(--white); border-radius: var(--radius-md); padding: 22px; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); }
+.report-card-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light); }
+.chart-wrap { position: relative; height: 280px; }
+
+/* ─── SETTINGS TABS ─── */
+.settings-tabs { display: flex; gap: 4px; background: var(--cream-dark); padding: 4px; border-radius: var(--radius-md); margin-bottom: 20px; }
+.settings-tab { flex: 1; padding: 10px 14px; background: transparent; border: none; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all 0.2s; text-align: center; }
+.settings-tab.active { background: var(--white); color: var(--sage-dark); box-shadow: var(--shadow-sm); }
+
+/* ─── MOBILE SIDEBAR ─── */
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 199; }
+.menu-toggle { display: none; background: none; border: none; color: var(--text); font-size: 22px; cursor: pointer; padding: 4px 8px; }
+@media(max-width:900px){
+  .sidebar { position: fixed; left: -280px; top: 0; bottom: 0; z-index: 200; transition: left 0.3s cubic-bezier(0.16,1,0.3,1); }
+  .sidebar.open { left: 0; }
+  .sidebar-overlay.show { display: block; }
+  .menu-toggle { display: flex; }
+  .page-content { padding: 16px; }
+  .form-row.cols-2, .form-row.cols-3 { grid-template-columns: 1fr; }
+  .item-row { grid-template-columns: 1fr 1fr; }
+}
+@media(max-width:600px){
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .inv-info-grid { grid-template-columns: 1fr; }
+  .inv-bottom { grid-template-columns: 1fr; }
+  .dash-hero-stats { flex-wrap: wrap; gap: 16px; }
+}
+
+/* ─── POPUP/CONFIRM ─── */
+.popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; animation: fadeIn 0.18s ease; }
+.popup { background: var(--white); border-radius: var(--radius-lg); padding: 32px 28px; max-width: 400px; width: 100%; box-shadow: var(--shadow-lg); text-align: center; animation: slideUp 0.25s cubic-bezier(0.16,1,0.3,1); }
+.popup-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 16px; }
+.popup-icon.warning { background: var(--warning-bg); color: var(--warning); }
+.popup-icon.danger { background: var(--danger-bg); color: var(--danger); }
+.popup-icon.success { background: var(--success-bg); color: var(--success); }
+.popup-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.popup-msg { font-size: 14px; color: var(--text-sec); line-height: 1.5; margin-bottom: 20px; }
+.popup-actions { display: flex; gap: 10px; justify-content: center; }
+.popup-actions .btn { min-width: 110px; }
+
+/* ─── WA BUTTON ─── */
+.wa-btn { background: #25D366; color: var(--white) !important; border: none; border-radius: 20px; padding: 6px 12px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+.wa-btn:hover { background: #1da851; transform: scale(1.05); }
+
+/* ─── UPCOMING TODAY LIST ─── */
+.today-list { display: flex; flex-direction: column; gap: 10px; }
+.today-item { background: var(--cream); border-radius: var(--radius-sm); padding: 12px 14px; border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+.today-time { font-size: 14px; font-weight: 800; color: var(--sage-dark); min-width: 48px; }
+.today-info { flex: 1; }
+.today-cust { font-size: 14px; font-weight: 700; color: var(--text); }
+.today-loc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.today-therapist { font-size: 12px; color: var(--sage-dark); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- Toast Stack -->
+<div class="toast-stack" id="toastStack"></div>
+
+<!-- ═══ LOGIN PAGE ═══ -->
+<div id="loginPage" class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">🌸</div>
+      <h1>Daisafacare</h1>
+      <p>Mom & Baby Treatment — Management System</p>
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="admin@daisafacare.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <div class="pwd-wrap">
+        <input type="password" id="loginPwd" placeholder="••••••••" autocomplete="current-password">
+        <button class="pwd-eye" onclick="togglePwd('loginPwd',this)" type="button"><i class="fa fa-eye"></i></button>
+      </div>
+    </div>
+    <button class="btn-login" id="loginBtn" onclick="doLogin()"><i class="fa fa-leaf"></i> Masuk</button>
+    <div id="loginErr" class="login-error" style="display:none"><i class="fa fa-circle-exclamation"></i><span></span></div>
+    <div class="login-footer">DaisafaCare &copy; 2026 — Homecare Baby Spa</div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app" class="app" style="display:none">
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div style="font-size:20px;margin-bottom:6px">🌸</div>
+      <div class="sidebar-brand-name">Daisafacare</div>
+      <div class="sidebar-brand-tag">Mom &amp; Baby Treatment</div>
+    </div>
+    <div class="sidebar-user">
+      <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+      <div>
+        <div class="sidebar-uname" id="sidebarName">Admin</div>
+        <div class="sidebar-urole" id="sidebarRole">admin</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-title">Menu Utama</div>
+      <button class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard">
+        <i class="fa fa-gauge-high"></i> Dashboard
+      </button>
+      <button class="nav-item" onclick="navigate('jadwal')" id="nav-jadwal">
+        <i class="fa fa-calendar-days"></i> Jadwal
+      </button>
+      <button class="nav-item" onclick="navigate('pelanggan')" id="nav-pelanggan">
+        <i class="fa fa-users"></i> Pelanggan
+      </button>
+      <button class="nav-item" onclick="navigate('pricelist')" id="nav-pricelist">
+        <i class="fa fa-tags"></i> Pricelist
+      </button>
+      <button class="nav-item" onclick="navigate('invoice')" id="nav-invoice">
+        <i class="fa fa-file-invoice"></i> Invoice
+      </button>
+      <div class="sidebar-section-title" style="margin-top:8px">Keuangan</div>
+      <button class="nav-item" onclick="navigate('pembayaran')" id="nav-pembayaran">
+        <i class="fa fa-money-bill-wave"></i> Pembayaran
+      </button>
+      <button class="nav-item" onclick="navigate('laporan')" id="nav-laporan">
+        <i class="fa fa-chart-line"></i> Laporan
+      </button>
+      <div class="sidebar-section-title" id="adminNav" style="margin-top:8px">Manajemen</div>
+      <button class="nav-item" onclick="navigate('settings')" id="nav-settings">
+        <i class="fa fa-gear"></i> Pengaturan
+      </button>
+      <button class="nav-item" id="nav-logs" onclick="navigate('logs')" style="display:none">
+        <i class="fa fa-list-check"></i> Log Aktivitas
+      </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="btn-logout" onclick="doLogout()"><i class="fa fa-right-from-bracket"></i> Keluar</button>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN ─── -->
+  <main class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="menu-toggle" onclick="openSidebar()"><i class="fa fa-bars"></i></button>
+        <div class="topbar-title" id="topbarTitle"><i class="fa fa-gauge-high"></i> Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbarDate"></div>
+        <button class="btn btn-sm btn-primary" id="topbarAction" style="display:none" onclick="topbarActionClick()">
+          <i class="fa fa-plus"></i> <span id="topbarActionLabel">Tambah</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="page-content" id="pageContent">
+      <!-- Pages rendered here -->
+    </div>
+  </main>
+</div>
+
+<!-- ═══ MODALS ═══ -->
+<div id="modalContainer"></div>
+<div id="popupContainer"></div>
+<div id="loadingOv" class="loading-ov" style="display:none">
+  <div class="spinner"></div>
+  <div class="loading-txt" id="loadingTxt">Memuat data...</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+const S = {
+  user: null,
+  page: 'dashboard',
+  settings: {},
+  data: { schedules:[], customers:[], treatments:[], payments:[] },
+  calYear: new Date().getFullYear(),
+  calMonth: new Date().getMonth(),
+  invoiceData: null,
+  editingScheduleId: null,
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const fmtRp = v => 'Rp ' + (parseFloat(v)||0).toLocaleString('id-ID');
+const fmtDate = s => { if(!s)return''; const d=new Date(s); if(isNaN(d))return s; return d.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}); };
+const fmtDateInput = s => { if(!s)return''; const d=new Date(s); if(isNaN(d))return''; return d.toISOString().split('T')[0]; };
+const today = () => new Date().toISOString().split('T')[0];
+const sanitize = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function ga(fn, args, cb) {
+  // Google Apps Script call
+  if (typeof google !== 'undefined' && google.script) {
+    google.script.run.withSuccessHandler(cb).withFailureHandler(e => { toast('Error: '+e.message,'error'); loading(false); })[fn](...(args||[]));
+  } else {
+    // Demo/local mode mock
+    console.log('GAS call:', fn, args);
+    setTimeout(() => cb({ success: false, message: 'GAS not available in local mode' }), 300);
+  }
+}
+
+function loading(show, txt) {
+  $('loadingOv').style.display = show ? 'flex' : 'none';
+  if(txt) $('loadingTxt').textContent = txt;
+}
+
+function toast(msg, type='info', dur=3500) {
+  const icons = { success:'fa-circle-check', error:'fa-circle-xmark', warning:'fa-triangle-exclamation', info:'fa-circle-info' };
+  const el = document.createElement('div');
+  el.className = 'toast '+type;
+  el.innerHTML = `<i class="fa ${icons[type]||icons.info} toast-icon"></i><div class="toast-msg">${sanitize(msg)}</div><button class="toast-close" onclick="this.parentElement.remove()"><i class="fa fa-xmark"></i></button>`;
+  $('toastStack').appendChild(el);
+  setTimeout(() => { el.classList.add('leaving'); setTimeout(()=>el.remove(), 220); }, dur);
+}
+
+function confirm(title, msg, type, onOk, okLabel='Ya, Lanjutkan') {
+  const icons = { danger:'fa-trash danger', warning:'fa-triangle-exclamation warning' };
+  $('popupContainer').innerHTML = `
+  <div class="popup-overlay" id="popupOv">
+    <div class="popup">
+      <div class="popup-icon ${type||'warning'}"><i class="fa ${icons[type]||'fa-circle-question'}"></i></div>
+      <div class="popup-title">${sanitize(title)}</div>
+      <div class="popup-msg">${sanitize(msg)}</div>
+      <div class="popup-actions">
+        <button class="btn btn-ghost" onclick="closePopup()">Batal</button>
+        <button class="btn btn-${type==='danger'?'danger':'primary'}" onclick="popupOk()">${sanitize(okLabel)}</button>
+      </div>
+    </div>
+  </div>`;
+  window._popupOk = onOk;
+}
+function popupOk() { closePopup(); if(window._popupOk) window._popupOk(); }
+function closePopup() { $('popupContainer').innerHTML = ''; }
+
+function closeModal() { $('modalContainer').innerHTML = ''; }
+
+function togglePwd(id, btn) {
+  const inp = $(id);
+  if(inp.type==='password'){inp.type='text';btn.innerHTML='<i class="fa fa-eye-slash"></i>';}
+  else{inp.type='password';btn.innerHTML='<i class="fa fa-eye"></i>';}
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════════════════════════
+function doLogin() {
+  const email = $('loginEmail').value.trim();
+  const pwd = $('loginPwd').value;
+  const err = $('loginErr');
+  if(!email||!pwd){ showLoginErr('Email dan password wajib diisi'); return; }
+  const btn = $('loginBtn');
+  btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Masuk...';
+  ga('login', [email, pwd], res => {
+    btn.disabled = false; btn.innerHTML = '<i class="fa fa-leaf"></i> Masuk';
+    if(res.success) {
+      S.user = res.data;
+      try { localStorage.setItem('dsf_user', JSON.stringify(res.data)); } catch(e){}
+      startApp();
+    } else { showLoginErr(res.message||'Login gagal'); }
+  });
+}
+
+function showLoginErr(msg) {
+  const el = $('loginErr');
+  el.style.display = 'flex';
+  el.querySelector('span').textContent = msg;
+}
+
+$('loginPwd').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+$('loginEmail').addEventListener('keydown', e => { if(e.key==='Enter') $('loginPwd').focus(); });
+
+function doLogout() {
+  confirm('Keluar?','Anda yakin ingin keluar?','warning',()=>{
+    S.user = null;
+    try { localStorage.removeItem('dsf_user'); } catch(e){}
+    $('app').style.display = 'none';
+    $('loginPage').style.display = 'flex';
+    $('loginPwd').value = '';
+    $('loginErr').style.display = 'none';
+  },'Ya, Keluar');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  APP INIT
+// ═══════════════════════════════════════════════════════════════
+function startApp() {
+  $('loginPage').style.display = 'none';
+  $('app').style.display = 'flex';
+  $('sidebarName').textContent = S.user.full_name;
+  $('sidebarRole').textContent = S.user.role;
+  $('sidebarAvatar').textContent = S.user.full_name.charAt(0).toUpperCase();
+  if(S.user.role==='admin') {
+    $('nav-logs').style.display = 'flex';
+  }
+  updateTopbarDate();
+  setInterval(updateTopbarDate, 60000);
+  loadSettings(() => navigate('dashboard'));
+}
+
+function updateTopbarDate() {
+  const d = new Date();
+  $('topbarDate').textContent = d.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+}
+
+function loadSettings(cb) {
+  ga('getSettings', [], res => {
+    if(res.success) S.settings = res.data;
+    if(cb) cb();
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+const pages = {
+  dashboard: { title: '<i class="fa fa-gauge-high"></i> Dashboard', load: renderDashboard },
+  jadwal:    { title: '<i class="fa fa-calendar-days"></i> Jadwal', load: renderJadwal },
+  pelanggan: { title: '<i class="fa fa-users"></i> Pelanggan', load: renderPelanggan },
+  pricelist: { title: '<i class="fa fa-tags"></i> Pricelist Treatment', load: renderPricelist },
+  invoice:   { title: '<i class="fa fa-file-invoice"></i> Invoice', load: renderInvoice },
+  pembayaran:{ title: '<i class="fa fa-money-bill-wave"></i> Pembayaran', load: renderPembayaran },
+  laporan:   { title: '<i class="fa fa-chart-line"></i> Laporan', load: renderLaporan },
+  settings:  { title: '<i class="fa fa-gear"></i> Pengaturan', load: renderSettings },
+  logs:      { title: '<i class="fa fa-list-check"></i> Log Aktivitas', load: renderLogs },
+};
+
+function navigate(page) {
+  S.page = page;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const navEl = $('nav-'+page);
+  if(navEl) navEl.classList.add('active');
+  $('topbarTitle').innerHTML = pages[page]?.title || page;
+  $('topbarAction').style.display = 'none';
+  $('pageContent').innerHTML = '';
+  closeModal(); closePopup();
+  closeSidebar();
+  if(pages[page]) pages[page].load();
+}
+
+function openSidebar() { $('sidebar').classList.add('open'); $('sidebarOverlay').classList.add('show'); }
+function closeSidebar() { $('sidebar').classList.remove('open'); $('sidebarOverlay').classList.remove('show'); }
+
+// ─── Topbar Action ───
+function topbarActionClick() {
+  if(S.page==='jadwal') openScheduleModal();
+  else if(S.page==='pelanggan') openCustomerModal();
+  else if(S.page==='pricelist') openTreatmentModal();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+function renderDashboard() {
+  $('pageContent').innerHTML = `
+  <div class="dash-hero">
+    <div class="dash-hero-top">
+      <div>
+        <div class="dash-hero-greet">Selamat datang, ${sanitize(S.user.full_name)} 🌿</div>
+        <div class="dash-hero-sub">${S.settings.business_name||'Daisafacare'} — ${S.settings.business_tagline||'Mom & Baby Treatment'}</div>
+      </div>
+      <div class="dash-hero-badge"><i class="fa fa-leaf"></i> gentle care, happy baby</div>
+    </div>
+    <div class="dash-hero-stats" id="heroStats">
+      <div><div class="dash-stat-val skeleton" style="width:80px;height:28px;border-radius:6px"></div><div class="dash-stat-lbl">Jadwal Hari Ini</div></div>
+      <div><div class="dash-stat-val skeleton" style="width:120px;height:28px;border-radius:6px"></div><div class="dash-stat-lbl">Pendapatan Bulan Ini</div></div>
+      <div><div class="dash-stat-val skeleton" style="width:100px;height:28px;border-radius:6px"></div><div class="dash-stat-lbl">Piutang</div></div>
+    </div>
+  </div>
+  <div class="kpi-grid" id="kpiGrid">
+    ${[1,2,3,4].map(()=>`<div class="kpi-card"><div class="skeleton" style="width:42px;height:42px;border-radius:10px;margin-bottom:14px"></div><div class="skeleton" style="width:100px;height:28px;margin-bottom:6px"></div><div class="skeleton" style="width:80px;height:14px"></div></div>`).join('')}
+  </div>
+  <div class="grid-2-1">
+    <div class="report-card">
+      <div class="report-card-title"><i class="fa fa-chart-line" style="color:var(--sage)"></i> Pendapatan 30 Hari Terakhir</div>
+      <div class="chart-wrap"><canvas id="dashChart"></canvas></div>
+    </div>
+    <div class="report-card">
+      <div class="report-card-title"><i class="fa fa-pie-chart" style="color:var(--sage)"></i> Status Jadwal</div>
+      <div class="chart-wrap"><canvas id="statusChart"></canvas></div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fa fa-calendar-day" style="color:var(--sage)"></i> Jadwal Hari Ini</div></div>
+      <div class="card-body" id="todayList"><div class="table-empty"><i class="fa fa-calendar"></i>Memuat...</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fa fa-clock-rotate-left" style="color:var(--sage)"></i> Jadwal Terbaru</div></div>
+      <div class="card-body" id="recentList"><div class="table-empty"><i class="fa fa-list"></i>Memuat...</div></div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fa fa-warning" style="color:var(--warning)"></i> Piutang Belum Lunas</div></div>
+      <div class="card-body" id="overdueList"><div class="table-empty"><i class="fa fa-check-circle"></i>Tidak ada piutang</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fa fa-star" style="color:var(--beige-dark)"></i> Top 5 Pelanggan</div></div>
+      <div class="card-body" id="topCustList"><div class="table-empty"><i class="fa fa-users"></i>Memuat...</div></div>
+    </div>
+  </div>`;
+
+  ga('getDashboardStats', [S.user.id, S.user.role], res => {
+    if(!res.success) { toast(res.message,'error'); return; }
+    const d = res.data;
+    // Hero stats
+    $('heroStats').innerHTML = `
+      <div><div class="dash-stat-val">${d.todayCount}</div><div class="dash-stat-lbl">Jadwal Hari Ini</div></div>
+      <div><div class="dash-stat-val">${fmtRp(d.monthRevenue)}</div><div class="dash-stat-lbl">Pendapatan Bulan Ini</div></div>
+      <div><div class="dash-stat-val">${fmtRp(d.totalCustDue)}</div><div class="dash-stat-lbl">Total Piutang</div></div>`;
+    // KPIs
+    $('kpiGrid').innerHTML = `
+      <div class="kpi-card green"><div class="kpi-ico green"><i class="fa fa-calendar-check"></i></div><div class="kpi-val">${d.todayCount}</div><div class="kpi-label">Jadwal Hari Ini</div></div>
+      <div class="kpi-card beige"><div class="kpi-ico beige"><i class="fa fa-money-bill-trend-up"></i></div><div class="kpi-val">${fmtRp(d.monthRevenue)}</div><div class="kpi-label">Pendapatan Bulan Ini</div></div>
+      <div class="kpi-card success"><div class="kpi-ico success"><i class="fa fa-hand-holding-dollar"></i></div><div class="kpi-val">${fmtRp(d.monthCollected)}</div><div class="kpi-label">Terkumpul Bulan Ini</div></div>
+      <div class="kpi-card danger"><div class="kpi-ico danger"><i class="fa fa-triangle-exclamation"></i></div><div class="kpi-val">${fmtRp(d.totalCustDue)}</div><div class="kpi-label">Total Piutang</div></div>`;
+    // Line Chart
+    const ctx = document.getElementById('dashChart').getContext('2d');
+    new Chart(ctx, { type:'line', data: { labels: d.dailyData.map(x=>x.date), datasets:[{ label:'Pendapatan (Rp)', data: d.dailyData.map(x=>x.amount), borderColor:'#85957A', backgroundColor:'rgba(133,149,122,0.12)', tension:0.4, fill:true, pointRadius:2, pointHoverRadius:5 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx => fmtRp(ctx.raw) } } }, scales:{ y:{ ticks:{ callback: v => 'Rp '+v.toLocaleString('id-ID') } } } } });
+    // Donut Chart
+    const ctx2 = document.getElementById('statusChart').getContext('2d');
+    const sd = d.statusDist;
+    new Chart(ctx2, { type:'doughnut', data: { labels:['Terjadwal','Selesai','Dibatalkan'], datasets:[{ data:[sd.scheduled,sd.done,sd.cancelled], backgroundColor:['#5B8FB9','#4CAF7D','#E05252'], borderWidth:0, hoverOffset:4 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ padding:16, font:{ size:12 } } } } } });
+    // Today list
+    $('todayList').innerHTML = d.upcomingToday.length ? `<div class="today-list">${d.upcomingToday.map(s=>`<div class="today-item"><div class="today-time">${sanitize(s.time)||'--:--'}</div><div class="today-info"><div class="today-cust">${sanitize(s.customer)}</div><div class="today-loc"><i class="fa fa-location-dot"></i> ${sanitize(s.location)||'—'}</div></div><div class="today-therapist">${sanitize(s.therapist)}</div><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></div>`).join('')}</div>` : '<div class="table-empty"><i class="fa fa-calendar-xmark"></i>Tidak ada jadwal hari ini</div>';
+    // Recent
+    $('recentList').innerHTML = d.recentSchedules.length ? `<div style="display:flex;flex-direction:column;gap:8px">${d.recentSchedules.map(s=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light)"><div><div style="font-size:13.5px;font-weight:700">${sanitize(s.invoice_no)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(s.customer)} · ${fmtDate(s.date)}</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:700;color:var(--sage-dark)">${fmtRp(s.total)}</div><span class="badge badge-${s.status}" style="font-size:10px">${statusLabel(s.status)}</span></div></div>`).join('')}</div>` : '<div class="table-empty"><i class="fa fa-list"></i>Belum ada jadwal</div>';
+    // Overdue
+    $('overdueList').innerHTML = d.overdueCustomers.length ? d.overdueCustomers.map(c=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-light)"><div><div style="font-size:14px;font-weight:700">${sanitize(c.name)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(c.phone)}</div></div><div style="text-align:right"><div style="font-size:14px;font-weight:800;color:var(--danger)">${fmtRp(c.due)}</div><a href="https://wa.me/${sanitize(c.phone)}" target="_blank" class="wa-btn" style="margin-top:4px"><i class="fab fa-whatsapp"></i> WA</a></div></div>`).join('') : '<div class="table-empty"><i class="fa fa-circle-check" style="color:var(--success)"></i>Semua lunas!</div>';
+    // Top customers
+    $('topCustList').innerHTML = d.topCustomers.length ? d.topCustomers.map((c,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border-light)"><div style="width:28px;height:28px;border-radius:50%;background:${i<3?['#FFD700','#C0C0C0','#CD7F32'][i]:'var(--cream-dark)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">${i+1}</div><div style="flex:1;font-size:13.5px;font-weight:600">${sanitize(c.name)}</div><div style="font-size:13.5px;font-weight:700;color:var(--success)">${fmtRp(c.total)}</div></div>`).join('') : '<div class="table-empty"><i class="fa fa-users"></i>Belum ada data</div>';
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  JADWAL (SCHEDULE)
+// ═══════════════════════════════════════════════════════════════
+function renderJadwal() {
+  $('topbarAction').style.display = 'flex';
+  $('topbarActionLabel').textContent = 'Tambah Jadwal';
+  $('pageContent').innerHTML = `
+  <div class="filter-bar">
+    <div class="fg"><label>Status</label><select class="fg" id="fStatus" onchange="loadSchedules()"><option value="">Semua</option><option value="scheduled">Terjadwal</option><option value="done">Selesai</option><option value="cancelled">Dibatalkan</option></select></div>
+    <div class="fg"><label>Dari Tanggal</label><input type="date" id="fFrom" onchange="loadSchedules()"></div>
+    <div class="fg"><label>Sampai</label><input type="date" id="fTo" onchange="loadSchedules()"></div>
+    <div class="fg"><label>&nbsp;</label><button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i class="fa fa-rotate-left"></i> Reset</button></div>
+    <div class="fg" style="margin-left:auto"><label>&nbsp;</label>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-sm" id="viewList" onclick="setView('list')" style="background:var(--sage);color:#fff"><i class="fa fa-list"></i></button>
+        <button class="btn btn-ghost btn-sm" id="viewCal" onclick="setView('cal')"><i class="fa fa-calendar"></i></button>
+      </div>
+    </div>
+  </div>
+  <div id="jadwalContent"></div>`;
+  loadSchedules();
+}
+
+let currentView = 'list';
+function setView(v) {
+  currentView = v;
+  $('viewList').style.cssText = v==='list' ? 'background:var(--sage);color:#fff' : '';
+  $('viewCal').style.cssText = v==='cal' ? 'background:var(--sage);color:#fff' : '';
+  loadSchedules();
+}
+function resetFilters() {
+  $('fStatus').value=''; $('fFrom').value=''; $('fTo').value='';
+  loadSchedules();
+}
+function loadSchedules() {
+  const filters = { status:$('fStatus').value, dateFrom:$('fFrom').value, dateTo:$('fTo').value };
+  ga('getSchedules', [S.user.id, S.user.role, filters], res => {
+    if(!res.success){toast(res.message,'error');return;}
+    S.data.schedules = res.data;
+    if(currentView==='cal') renderCalendar(res.data);
+    else renderScheduleList(res.data);
+  });
+}
+
+function renderScheduleList(data) {
+  if(!data.length){ $('jadwalContent').innerHTML = '<div class="table-empty" style="background:var(--white);border-radius:var(--radius-md);padding:48px"><i class="fa fa-calendar-plus"></i>Belum ada jadwal. Klik + Tambah Jadwal untuk mulai.</div>'; return; }
+  $('jadwalContent').innerHTML = `
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Invoice</th><th>Tanggal & Waktu</th><th>Pelanggan</th><th>Treatment</th><th>Terapis</th><th>Total</th><th>Status</th><th>Keterangan</th><th>Aksi</th></tr></thead>
+        <tbody>${data.map(s=>`<tr>
+          <td><span style="font-family:monospace;font-weight:700;font-size:12px">${sanitize(s.invoice_no)}</span></td>
+          <td><div style="font-weight:600">${fmtDate(s.schedule_date)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(s.schedule_time)}</div></td>
+          <td><div style="font-weight:600">${sanitize(s.customer_name)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(s.customer_phone)}</div></td>
+          <td><div style="font-size:12px;color:var(--text-sec)">${sanitize(s.location)}</div></td>
+          <td>${sanitize(s.therapist_name)||'—'}</td>
+          <td style="font-weight:700;color:var(--sage-dark)">${fmtRp(s.grand_total)}</td>
+          <td><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></td>
+          <td><span class="badge badge-${keteranganClass(s.keterangan)}" style="font-size:10px">${sanitize(s.keterangan)||'—'}</span></td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-sm btn-outline" onclick="viewSchedule(${s.id})" title="Lihat"><i class="fa fa-eye"></i></button>
+            <button class="btn btn-sm btn-beige" onclick="printInvoiceById(${s.id})" title="Invoice"><i class="fa fa-file-invoice"></i></button>
+            ${s.due_amount>0?`<button class="btn btn-sm btn-primary" onclick="openPayModal(${s.id},${s.due_amount},'${sanitize(s.customer_id)}','${sanitize(s.invoice_no)}')" title="Bayar"><i class="fa fa-money-bill"></i></button>`:''}
+            ${S.user.role==='admin'?`<button class="btn btn-sm btn-danger" onclick="deleteSchedule(${s.id})" title="Hapus"><i class="fa fa-trash"></i></button>`:''}
+          </td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderCalendar(data) {
+  const y = S.calYear, m = S.calMonth;
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  const todayStr = today();
+
+  // Build event map
+  const evtMap = {};
+  data.forEach(s => {
+    const d = s.schedule_date;
+    if(!evtMap[d]) evtMap[d] = [];
+    evtMap[d].push(s);
+  });
+
+  let cells = '';
+  for(let i=0;i<firstDay;i++) cells += `<div class="cal-day other-month"></div>`;
+  for(let d=1;d<=daysInMonth;d++) {
+    const ds = y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const isToday = ds===todayStr;
+    const evts = evtMap[ds]||[];
+    cells += `<div class="cal-day ${isToday?'today':''}" onclick="calDayClick('${ds}')">
+      <div class="cal-day-num">${isToday?`<span>${d}</span>`:d}</div>
+      ${evts.slice(0,3).map(e=>`<div class="cal-event ${e.status}" title="${sanitize(e.customer_name)}">${sanitize(e.schedule_time)?sanitize(e.schedule_time)+' ':''}${sanitize(e.customer_name)}</div>`).join('')}
+      ${evts.length>3?`<div style="font-size:10px;color:var(--text-muted)">+${evts.length-3} lainnya</div>`:''}
+    </div>`;
+  }
+
+  $('jadwalContent').innerHTML = `
+  <div class="card">
+    <div class="card-body">
+      <div class="cal-nav">
+        <button class="btn btn-ghost btn-sm" onclick="changeMonth(-1)"><i class="fa fa-chevron-left"></i></button>
+        <div class="cal-month-title">${months[m]} ${y}</div>
+        <button class="btn btn-ghost btn-sm" onclick="changeMonth(1)"><i class="fa fa-chevron-right"></i></button>
+      </div>
+      <div class="cal-grid">
+        ${['Min','Sen','Sel','Rab','Kam','Jum','Sab'].map(d=>`<div class="cal-day-hdr">${d}</div>`).join('')}
+        ${cells}
+      </div>
+    </div>
+  </div>`;
+}
+
+function changeMonth(d) {
+  S.calMonth += d;
+  if(S.calMonth<0){S.calMonth=11;S.calYear--;}
+  if(S.calMonth>11){S.calMonth=0;S.calYear++;}
+  loadSchedules();
+}
+
+function calDayClick(ds) {
+  const evts = S.data.schedules.filter(s=>s.schedule_date===ds);
+  if(!evts.length) { openScheduleModal(ds); return; }
+  // Show day events list
+  $('modalContainer').innerHTML = `
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal modal-sm">
+      <div class="modal-header"><h3><i class="fa fa-calendar-day"></i> ${fmtDate(ds)}</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+      <div class="modal-body">
+        ${evts.map(s=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-light)">
+          <div><div style="font-weight:700">${sanitize(s.customer_name)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(s.schedule_time)} · ${sanitize(s.location)}</div></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm btn-outline" onclick="closeModal();viewSchedule(${s.id})"><i class="fa fa-eye"></i></button>
+            <button class="btn btn-sm btn-beige" onclick="closeModal();printInvoiceById(${s.id})"><i class="fa fa-print"></i></button>
+          </div>
+        </div>`).join('')}
+        <div style="margin-top:14px"><button class="btn btn-primary" onclick="closeModal();openScheduleModal('${ds}')"><i class="fa fa-plus"></i> Tambah Jadwal Hari Ini</button></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function statusLabel(s) { return {scheduled:'Terjadwal',done:'Selesai',cancelled:'Dibatalkan'}[s]||s; }
+function keteranganClass(k) { if(!k)return''; k=k.toLowerCase(); if(k.includes('lunas'))return'lunas'; if(k.includes('belum'))return'belum'; if(k.includes('dp'))return'dp'; return''; }
+
+// ─── SCHEDULE MODAL ───
+function openScheduleModal(preDate) {
+  let treatmentOpts = '';
+  ga('getTreatmentsForDropdown', [], res => {
+    if(res.success) S.data.treatments = res.data;
+    treatmentOpts = (res.data||[]).map(t=>`<option value="${t.id}" data-price="${t.price}" data-name="${sanitize(t.category)} - ${sanitize(t.name)} | Rp ${(t.price/1000).toFixed(0)}K">${sanitize(t.category)} - ${sanitize(t.name)} | Rp ${(t.price/1000).toFixed(0)}K</option>`).join('');
+    ga('getCustomersForDropdown', [], cres => {
+      ga('getTherapistsForDropdown', [], tres => {
+        const custOpts = (cres.data||[]).map(c=>`<option value="${c.id}">${sanitize(c.name)} - ${sanitize(c.phone)}</option>`).join('');
+        const therapOpts = (tres.data||[]).map(t=>`<option value="${t.id}">${sanitize(t.name)}</option>`).join('');
+        $('modalContainer').innerHTML = `
+        <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+          <div class="modal modal-lg">
+            <div class="modal-header"><h3><i class="fa fa-calendar-plus"></i> Tambah Jadwal Baru</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+            <div class="modal-body">
+              <div class="form-section">
+                <div class="form-section-title"><i class="fa fa-user"></i> Info Pelanggan & Terapis</div>
+                <div class="form-row cols-2">
+                  <div class="fg"><label>Pelanggan <span style="color:var(--text-muted);font-weight:400">(kosongkan untuk walk-in)</span></label><select id="fCust"><option value="">— Walk-in —</option>${custOpts}</select></div>
+                  <div class="fg"><label>Terapis</label><select id="fTherapist"><option value="">— Pilih Terapis —</option>${therapOpts}</select></div>
+                </div>
+              </div>
+              <div class="form-section">
+                <div class="form-section-title"><i class="fa fa-calendar"></i> Info Jadwal</div>
+                <div class="form-row cols-3">
+                  <div class="fg"><label>Tanggal *</label><input type="date" id="fDate" value="${preDate||today()}"></div>
+                  <div class="fg"><label>Waktu</label><input type="time" id="fTime" value="09:00"></div>
+                  <div class="fg"><label>Metode Bayar</label><select id="fMethod"><option>TF/QRIS</option><option>Cash</option><option>Transfer</option></select></div>
+                </div>
+                <div class="form-row cols-2">
+                  <div class="fg"><label>Lokasi / Alamat</label><input type="text" id="fLoc" placeholder="Nama wilayah atau alamat lengkap"></div>
+                  <div class="fg"><label>Jarak (km)</label><input type="number" id="fKm" value="0" min="0" step="0.5" onchange="calcTransport()"></div>
+                </div>
+              </div>
+              <div class="form-section">
+                <div class="form-section-title"><i class="fa fa-spa"></i> Treatment</div>
+                <div id="itemsContainer"></div>
+                <button class="add-item-btn" onclick="addItemRow()"><i class="fa fa-plus"></i> Tambah Treatment</button>
+              </div>
+              <div class="form-section">
+                <div class="form-section-title"><i class="fa fa-calculator"></i> Pembayaran</div>
+                <div class="form-row cols-3">
+                  <div class="fg"><label>Transport (Rp)</label><input type="number" id="fTransport" value="0" min="0" step="1000" oninput="calcSummary()"></div>
+                  <div class="fg"><label>Diskon (Rp)</label><input type="number" id="fDiscount" value="0" min="0" step="1000" oninput="calcSummary()"></div>
+                  <div class="fg"><label>Dibayar (Rp)</label><input type="number" id="fPaid" value="0" min="0" step="1000" oninput="calcSummary()"></div>
+                </div>
+                <div id="summaryBox" class="summary-box" style="margin-top:4px">
+                  <div class="summary-row"><span>Fee Treatment</span><span id="sumFee">Rp 0</span></div>
+                  <div class="summary-row"><span>Transport</span><span id="sumTransport">Rp 0</span></div>
+                  <div class="summary-row"><span>Subtotal</span><span id="sumSubtotal">Rp 0</span></div>
+                  <div class="summary-row"><span>Diskon</span><span id="sumDiscount">Rp 0</span></div>
+                  <div class="summary-row total"><span>TOTAL</span><span id="sumTotal">Rp 0</span></div>
+                  <div class="summary-row" style="color:var(--danger);font-weight:700"><span>Sisa Bayar</span><span id="sumDue">Rp 0</span></div>
+                </div>
+                <div class="fg" style="margin-top:14px"><label>Keterangan Bayar</label><input type="text" id="fKet" placeholder="Cth: LUNAS TF/QRIS, DP 50%, BELUM BAYAR"></div>
+                <div class="fg" style="margin-top:10px"><label>Catatan</label><textarea id="fNotes" rows="2" placeholder="Catatan tambahan..."></textarea></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+              <button class="btn btn-primary" onclick="saveSchedule()"><i class="fa fa-floppy-disk"></i> Simpan Jadwal</button>
+            </div>
+          </div>
+        </div>`;
+        addItemRow(); // add first row
+      });
+    });
+  });
+}
+
+let itemCount = 0;
+function addItemRow() {
+  itemCount++;
+  const id = 'item_'+itemCount;
+  const treatments = S.data.treatments||[];
+  const opts = treatments.map(t=>`<option value="${t.id}" data-price="${t.price}">${sanitize(t.category)} - ${sanitize(t.name)} | Rp ${(t.price/1000).toFixed(0)}K</option>`).join('');
+  const row = document.createElement('div');
+  row.className = 'item-row'; row.id = id;
+  row.innerHTML = `
+    <div class="fg"><label>Treatment</label><select onchange="itemTrSelect(this,'${id}')"><option value="">— Pilih —</option>${opts}</select></div>
+    <div class="fg"><label>Harga (Rp)</label><input type="number" id="${id}_price" value="0" min="0" step="1000" oninput="calcItemRow('${id}');calcSummary()"></div>
+    <div class="fg"><label>Qty</label><input type="number" id="${id}_qty" value="1" min="1" oninput="calcItemRow('${id}');calcSummary()"></div>
+    <div style="padding-top:26px"><button class="btn btn-danger btn-icon" onclick="document.getElementById('${id}').remove();calcSummary()" title="Hapus"><i class="fa fa-trash"></i></button></div>`;
+  $('itemsContainer').appendChild(row);
+}
+
+function itemTrSelect(sel, id) {
+  const opt = sel.options[sel.selectedIndex];
+  const price = parseFloat(opt.dataset.price)||0;
+  $(id+'_price').value = price;
+  sel.dataset.trId = sel.value;
+  sel.dataset.trName = opt.text;
+  calcItemRow(id); calcSummary();
+}
+
+function calcItemRow(id) {
+  const price = parseFloat($(id+'_price').value)||0;
+  const qty = parseInt($(id+'_qty').value)||1;
+  // find/create subtotal display
+  let st = document.querySelector('#'+id+' .item-total');
+  if(!st){ st=document.createElement('div'); st.className='item-total'; document.getElementById(id).appendChild(st); }
+  st.textContent = fmtRp(price*qty);
+}
+
+function calcTransport() {
+  const km = parseFloat($('fKm').value)||0;
+  const rate = parseFloat(S.settings.transport_rate_per_km)||2000;
+  $('fTransport').value = Math.round(km*rate);
+  calcSummary();
+}
+
+function calcSummary() {
+  let fee = 0;
+  document.querySelectorAll('.item-row').forEach(row => {
+    const priceEl = row.querySelector('input[type=number]');
+    const qtyEl = row.querySelectorAll('input[type=number]')[1];
+    if(priceEl&&qtyEl) fee += (parseFloat(priceEl.value)||0)*(parseInt(qtyEl.value)||1);
+  });
+  const transport = parseFloat($('fTransport').value)||0;
+  const discount = parseFloat($('fDiscount').value)||0;
+  const paid = parseFloat($('fPaid').value)||0;
+  const subtotal = fee + transport;
+  const total = Math.max(0, subtotal - discount);
+  const due = Math.max(0, total - paid);
+  $('sumFee').textContent = fmtRp(fee);
+  $('sumTransport').textContent = fmtRp(transport);
+  $('sumSubtotal').textContent = fmtRp(subtotal);
+  $('sumDiscount').textContent = fmtRp(discount);
+  $('sumTotal').textContent = fmtRp(total);
+  $('sumDue').textContent = fmtRp(due);
+}
+
+function saveSchedule() {
+  const items = [];
+  document.querySelectorAll('.item-row').forEach(row => {
+    const sel = row.querySelector('select');
+    const inputs = row.querySelectorAll('input[type=number]');
+    const price = parseFloat(inputs[0]?.value)||0;
+    const qty = parseInt(inputs[1]?.value)||1;
+    if(sel && sel.value) items.push({ treatment_id: sel.value, treatment_name: sel.options[sel.selectedIndex].text, price, qty, subtotal: price*qty });
+  });
+  if(!$('fDate').value) { toast('Tanggal wajib diisi','warning'); return; }
+  if(!items.length) { toast('Tambahkan minimal satu treatment','warning'); return; }
+  const scData = {
+    customer_id: $('fCust').value||null, therapist_id: $('fTherapist').value||null,
+    schedule_date: $('fDate').value, schedule_time: $('fTime').value,
+    location: $('fLoc').value, km: parseFloat($('fKm').value)||0,
+    items, transport_fee: parseFloat($('fTransport').value)||0,
+    discount: parseFloat($('fDiscount').value)||0,
+    paid_amount: parseFloat($('fPaid').value)||0,
+    payment_method: $('fMethod').value,
+    keterangan: $('fKet').value || (parseFloat($('fPaid').value)>0?'LUNAS TF/QRIS':'BELUM BAYAR'),
+    notes: $('fNotes').value
+  };
+  loading(true,'Menyimpan jadwal...');
+  ga('addSchedule', [scData, S.user.id, S.user.role], res => {
+    loading(false);
+    if(res.success) { toast('Jadwal berhasil disimpan!','success'); closeModal(); loadSchedules(); if(res.data) setTimeout(()=>printInvoiceById(res.data.id),400); }
+    else toast(res.message,'error');
+  });
+}
+
+function viewSchedule(id) {
+  loading(true,'Memuat detail...');
+  ga('getScheduleDetail', [id, S.user.id, S.user.role], res => {
+    loading(false);
+    if(!res.success){toast(res.message,'error');return;}
+    const s = res.data;
+    $('modalContainer').innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal modal-lg">
+        <div class="modal-header"><h3><i class="fa fa-eye"></i> Detail Jadwal — ${sanitize(s.invoice_no)}</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+        <div class="modal-body">
+          <div class="grid-2" style="margin-bottom:14px">
+            <div class="form-section" style="margin-bottom:0">
+              <div class="form-section-title"><i class="fa fa-user"></i> Pelanggan</div>
+              <div style="font-size:15px;font-weight:700">${sanitize(s.customer_name)}</div>
+              <div style="font-size:13px;color:var(--text-muted);margin-top:4px"><i class="fa fa-phone"></i> ${sanitize(s.customer_phone)||'—'}</div>
+              ${s.baby_name?`<div style="font-size:13px;color:var(--sage-dark);margin-top:4px"><i class="fa fa-baby"></i> ${sanitize(s.baby_name)} (${sanitize(s.baby_age)})</div>`:''}
+              <div style="font-size:13px;color:var(--text-muted);margin-top:4px"><i class="fa fa-location-dot"></i> ${sanitize(s.location)||'—'}</div>
+            </div>
+            <div class="form-section" style="margin-bottom:0">
+              <div class="form-section-title"><i class="fa fa-calendar"></i> Jadwal</div>
+              <div style="font-size:15px;font-weight:700">${fmtDate(s.schedule_date)} ${sanitize(s.schedule_time)}</div>
+              <div style="font-size:13px;color:var(--text-muted);margin-top:4px"><i class="fa fa-person-walking"></i> Terapis: ${sanitize(s.therapist_name)||'—'}</div>
+              <div style="margin-top:10px"><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title"><i class="fa fa-spa"></i> Treatment</div>
+            <table style="width:100%;font-size:14px">
+              <thead><tr><th style="text-align:left;padding:8px;background:var(--cream-dark)">Layanan</th><th style="text-align:right;padding:8px;background:var(--cream-dark)">Harga</th><th style="text-align:center;padding:8px;background:var(--cream-dark)">Qty</th><th style="text-align:right;padding:8px;background:var(--cream-dark)">Subtotal</th></tr></thead>
+              <tbody>${s.items.map(i=>`<tr><td style="padding:8px;border-bottom:1px solid var(--border-light)">${sanitize(i.treatment_name)}</td><td style="text-align:right;padding:8px;border-bottom:1px solid var(--border-light)">${fmtRp(i.price)}</td><td style="text-align:center;padding:8px;border-bottom:1px solid var(--border-light)">${i.qty}</td><td style="text-align:right;padding:8px;border-bottom:1px solid var(--border-light);font-weight:700">${fmtRp(i.subtotal)}</td></tr>`).join('')}</tbody>
+            </table>
+          </div>
+          <div class="summary-box">
+            <div class="summary-row"><span>Fee Treatment</span><span>${fmtRp(s.fee_treatment)}</span></div>
+            <div class="summary-row"><span>Transport (${s.km} km)</span><span>${fmtRp(s.transport_fee)}</span></div>
+            <div class="summary-row"><span>Diskon</span><span>-${fmtRp(s.discount)}</span></div>
+            <div class="summary-row total"><span>TOTAL</span><span>${fmtRp(s.grand_total)}</span></div>
+            <div class="summary-row" style="color:var(--success);font-weight:700"><span>Sudah Dibayar</span><span>${fmtRp(s.paid_amount)}</span></div>
+            <div class="summary-row" style="color:${s.due_amount>0?'var(--danger)':'var(--success)'};font-weight:700"><span>Sisa</span><span>${fmtRp(s.due_amount)}</span></div>
+          </div>
+          ${s.payments.length?`<div class="form-section" style="margin-top:14px"><div class="form-section-title"><i class="fa fa-receipt"></i> Riwayat Pembayaran</div>${s.payments.map(p=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:13px"><div>${fmtDate(p.date)} · ${sanitize(p.method)}</div><div style="font-weight:700;color:var(--success)">${fmtRp(p.amount)}</div></div>`).join('')}</div>`:''}
+          ${s.keterangan?`<div style="margin-top:10px;font-size:13px"><span class="badge badge-${keteranganClass(s.keterangan)}">${sanitize(s.keterangan)}</span></div>`:''}
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal()">Tutup</button>
+          ${s.due_amount>0?`<button class="btn btn-primary" onclick="closeModal();openPayModal(${s.id},${s.due_amount},'${s.customer_id}','${sanitize(s.invoice_no)}')"><i class="fa fa-money-bill"></i> Catat Pembayaran</button>`:''}
+          <button class="btn btn-beige" onclick="printInvoiceById(${s.id})"><i class="fa fa-print"></i> Print Invoice</button>
+        </div>
+      </div>
+    </div>`;
+  });
+}
+
+function openPayModal(schedId, due, custId, invNo) {
+  $('modalContainer').innerHTML = `
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal modal-sm">
+      <div class="modal-header"><h3><i class="fa fa-money-bill"></i> Catat Pembayaran</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+      <div class="modal-body">
+        <div style="background:var(--cream);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;font-size:13px">
+          Invoice: <strong>${sanitize(invNo)}</strong> · Sisa: <strong style="color:var(--danger)">${fmtRp(due)}</strong>
+        </div>
+        <div class="form-row">
+          <div class="fg"><label>Jumlah Bayar (Rp) *</label><input type="number" id="payAmt" value="${due}" min="1" step="1000"></div>
+          <div class="fg"><label>Metode</label><select id="payMethod"><option>TF/QRIS</option><option>Cash</option><option>Transfer</option></select></div>
+        </div>
+        <div class="form-row cols-2">
+          <div class="fg"><label>Tanggal</label><input type="date" id="payDate" value="${today()}"></div>
+          <div class="fg"><label>No. Referensi</label><input type="text" id="payRef" placeholder="Opsional"></div>
+        </div>
+        <div class="fg"><label>Catatan</label><input type="text" id="payNotes" placeholder="Opsional"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+        <button class="btn btn-primary" onclick="savePayment(${schedId},'${custId}')"><i class="fa fa-check"></i> Simpan</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function savePayment(schedId, custId) {
+  const amt = parseFloat($('payAmt').value)||0;
+  if(amt<=0){toast('Jumlah pembayaran harus > 0','warning');return;}
+  const payData = { schedule_id:schedId, customer_id:custId||null, amount:amt, method:$('payMethod').value, reference_no:$('payRef').value, payment_date:$('payDate').value, notes:$('payNotes').value };
+  loading(true,'Menyimpan pembayaran...');
+  ga('addSchedulePayment',[payData,S.user.id,S.user.role],res=>{
+    loading(false);
+    if(res.success){toast('Pembayaran berhasil dicatat!','success');closeModal();loadSchedules();}
+    else toast(res.message,'error');
+  });
+}
+
+function deleteSchedule(id) {
+  confirm('Hapus Jadwal?','Jadwal dan semua data terkait akan dihapus permanen.','danger',()=>{
+    loading(true,'Menghapus...');
+    ga('deleteSchedule',[id,S.user.id,S.user.role],res=>{
+      loading(false);
+      if(res.success){toast('Jadwal berhasil dihapus','success');loadSchedules();}
+      else toast(res.message,'error');
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PELANGGAN
+// ═══════════════════════════════════════════════════════════════
+function renderPelanggan() {
+  $('topbarAction').style.display = 'flex';
+  $('topbarActionLabel').textContent = 'Tambah Pelanggan';
+  $('pageContent').innerHTML = `
+  <div class="filter-bar">
+    <div class="fg"><label>Cari</label><input type="text" id="custSearch" placeholder="Nama atau nomor HP..." oninput="filterCustomers()"></div>
+  </div>
+  <div id="custGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px"></div>`;
+  loading(true,'Memuat pelanggan...');
+  ga('getCustomers',[S.user.id,S.user.role],res=>{
+    loading(false);
+    if(!res.success){toast(res.message,'error');return;}
+    S.data.customers = res.data;
+    filterCustomers();
+  });
+}
+
+function filterCustomers() {
+  const q = ($('custSearch')?.value||'').toLowerCase();
+  const filtered = S.data.customers.filter(c => c.name.toLowerCase().includes(q) || (c.phone||'').includes(q));
+  $('custGrid').innerHTML = filtered.length ? filtered.map(c=>`
+  <div class="cust-card" onclick="viewCustomer(${c.id})">
+    <div class="cust-avatar">${c.name.charAt(0).toUpperCase()}</div>
+    <div class="cust-info">
+      <div class="cust-name">${sanitize(c.name)}</div>
+      <div class="cust-phone"><i class="fa fa-phone"></i> ${sanitize(c.phone)||'—'}</div>
+      ${c.baby_name?`<div class="cust-baby"><i class="fa fa-baby"></i> ${sanitize(c.baby_name)} (${sanitize(c.baby_age)})</div>`:''}
+    </div>
+    <div class="cust-due">
+      ${c.total_due>0?`<div class="cust-due-amt">${fmtRp(c.total_due)}</div><div class="cust-due-lbl">Piutang</div>`:`<div style="color:var(--success);font-size:13px;font-weight:700"><i class="fa fa-check-circle"></i> Lunas</div>`}
+    </div>
+  </div>`).join('') : '<div class="table-empty" style="grid-column:1/-1"><i class="fa fa-users"></i>Tidak ada pelanggan ditemukan</div>';
+}
+
+function openCustomerModal(cust) {
+  $('modalContainer').innerHTML = `
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-header"><h3><i class="fa fa-user-plus"></i> ${cust?'Edit':'Tambah'} Pelanggan</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+      <div class="modal-body">
+        <div class="form-section" style="margin-bottom:14px">
+          <div class="form-section-title"><i class="fa fa-user"></i> Data Ibu/Pelanggan</div>
+          <div class="form-row cols-2">
+            <div class="fg"><label>Nama Lengkap *</label><input type="text" id="cName" value="${sanitize(cust?.name||'')}"></div>
+            <div class="fg"><label>No. HP / WhatsApp</label><input type="text" id="cPhone" value="${sanitize(cust?.phone||'')}"></div>
+          </div>
+          <div class="fg"><label>Alamat</label><textarea id="cAddr" rows="2">${sanitize(cust?.address||'')}</textarea></div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title"><i class="fa fa-baby"></i> Data Bayi/Anak (Opsional)</div>
+          <div class="form-row cols-2">
+            <div class="fg"><label>Nama Bayi</label><input type="text" id="cBabyName" value="${sanitize(cust?.baby_name||'')}"></div>
+            <div class="fg"><label>Usia Bayi</label><input type="text" id="cBabyAge" value="${sanitize(cust?.baby_age||'')}" placeholder="Cth: 3 bulan, 1 tahun"></div>
+          </div>
+          <div class="fg"><label>Catatan</label><textarea id="cNotes" rows="2">${sanitize(cust?.notes||'')}</textarea></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveCustomer(${cust?.id||null})"><i class="fa fa-floppy-disk"></i> Simpan</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function saveCustomer(id) {
+  const name = $('cName').value.trim();
+  if(!name){toast('Nama pelanggan wajib diisi','warning');return;}
+  const cuData = { name, phone:$('cPhone').value, address:$('cAddr').value, baby_name:$('cBabyName').value, baby_age:$('cBabyAge').value, notes:$('cNotes').value, is_active:1 };
+  if(id) cuData.id = id;
+  loading(true,'Menyimpan...');
+  ga(id?'updateCustomer':'addCustomer', [cuData, S.user.id, S.user.role], res=>{
+    loading(false);
+    if(res.success){toast(res.message,'success');closeModal();renderPelanggan();}
+    else toast(res.message,'error');
+  });
+}
+
+function viewCustomer(id) {
+  loading(true,'Memuat data pelanggan...');
+  ga('getCustomerLedger',[id,S.user.id,S.user.role],res=>{
+    loading(false);
+    if(!res.success){toast(res.message,'error');return;}
+    const {customer:c,schedules,payments}=res.data;
+    $('modalContainer').innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal modal-lg">
+        <div class="modal-header"><h3><i class="fa fa-user"></i> ${sanitize(c.name)}</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+        <div class="modal-body">
+          <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;align-items:flex-start">
+            <div class="cust-avatar" style="width:60px;height:60px;font-size:24px;flex-shrink:0">${c.name.charAt(0)}</div>
+            <div style="flex:1">
+              <div style="font-size:18px;font-weight:800">${sanitize(c.name)}</div>
+              <div style="font-size:13px;color:var(--text-muted);margin-top:3px"><i class="fa fa-phone"></i> ${sanitize(c.phone)||'—'}</div>
+              ${c.baby_name?`<div style="font-size:13px;color:var(--sage-dark);margin-top:3px"><i class="fa fa-baby"></i> ${sanitize(c.baby_name)} · ${sanitize(c.baby_age)}</div>`:''}
+              <div style="font-size:13px;color:var(--text-muted);margin-top:3px"><i class="fa fa-location-dot"></i> ${sanitize(c.address)||'—'}</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0">
+              ${c.phone?`<a href="https://wa.me/${c.phone}" target="_blank" class="wa-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>`:''}
+              <button class="btn btn-beige btn-sm" onclick="closeModal();openCustomerModal(${JSON.stringify(c).replace(/"/g,'&quot;')})"><i class="fa fa-edit"></i> Edit</button>
+            </div>
+          </div>
+          <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px">
+            <div class="kpi-card beige"><div class="kpi-val" style="font-size:18px">${fmtRp(c.total_purchase)}</div><div class="kpi-label">Total Transaksi</div></div>
+            <div class="kpi-card success"><div class="kpi-val" style="font-size:18px;color:var(--success)">${fmtRp(c.total_paid)}</div><div class="kpi-label">Sudah Bayar</div></div>
+            <div class="kpi-card danger"><div class="kpi-val" style="font-size:18px;color:var(--danger)">${fmtRp(c.total_due)}</div><div class="kpi-label">Sisa Piutang</div></div>
+          </div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--text-sec)">Riwayat Jadwal (${schedules.length})</div>
+          ${schedules.length?`<div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Tanggal</th><th>Lokasi</th><th>Total</th><th>Status</th></tr></thead><tbody>${schedules.map(s=>`<tr><td style="font-weight:700;font-size:12px;font-family:monospace">${sanitize(s.invoice_no)}</td><td>${fmtDate(s.date)} ${sanitize(s.time)}</td><td>${sanitize(s.location)||'—'}</td><td style="font-weight:700">${fmtRp(s.grand_total)}</td><td><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></td></tr>`).join('')}</tbody></table></div>` : '<div class="table-empty"><i class="fa fa-calendar"></i>Belum ada jadwal</div>'}
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeModal()">Tutup</button>
+          ${S.user.role==='admin'?`<button class="btn btn-danger btn-sm" onclick="closeModal();deleteCustomer(${c.id})"><i class="fa fa-trash"></i> Hapus</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  });
+}
+
+function deleteCustomer(id) {
+  confirm('Hapus Pelanggan?','Pelanggan akan dihapus permanen. Tidak bisa dilakukan jika ada jadwal terkait.','danger',()=>{
+    loading(true,'Menghapus...');
+    ga('deleteCustomer',[id,S.user.id,S.user.role],res=>{
+      loading(false);
+      if(res.success){toast('Pelanggan berhasil dihapus','success');renderPelanggan();}
+      else toast(res.message,'error');
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PRICELIST
+// ═══════════════════════════════════════════════════════════════
+function renderPricelist() {
+  if(S.user.role==='admin'){ $('topbarAction').style.display='flex'; $('topbarActionLabel').textContent='Tambah Treatment'; }
+  $('pageContent').innerHTML = '<div id="pricelistContent"><div class="table-empty"><i class="fa fa-spinner fa-spin"></i> Memuat...</div></div>';
+  ga('getTreatments',[S.user.id,S.user.role],res=>{
+    if(!res.success){toast(res.message,'error');return;}
+    const cats = {};
+    res.data.forEach(t => { if(!cats[t.category])cats[t.category]=[]; cats[t.category].push(t); });
+    const catOrder = ['Baby','Kids','Mom','Jaga'];
+    const sortedCats = [...catOrder, ...Object.keys(cats).filter(c=>!catOrder.includes(c))].filter(c=>cats[c]);
+    $('pricelistContent').innerHTML = sortedCats.map(cat=>`
+    <div class="price-category">
+      <div class="price-cat-title"><span><i class="fa fa-spa"></i> ${sanitize(cat)}</span><span style="font-size:13px;color:var(--text-muted);font-weight:400">${cats[cat].length} treatment</span></div>
+      ${cats[cat].map(t=>`
+      <div class="price-item">
+        <div>
+          <div class="price-item-name">${sanitize(t.name)}</div>
+          ${t.description?`<div class="price-item-desc">${sanitize(t.description)}</div>`:''}
+        </div>
+        <div class="price-item-right">
+          <span class="price-item-dur"><i class="fa fa-clock"></i> ${t.duration_min} mnt</span>
+          <span class="price-item-amt">${fmtRp(t.price)}</span>
+          ${S.user.role==='admin'?`<button class="btn btn-sm btn-outline" onclick="openTreatmentModal(${JSON.stringify(t).replace(/"/g,'&quot;')})"><i class="fa fa-edit"></i></button><button class="btn btn-sm btn-danger" onclick="deleteTreatment(${t.id})"><i class="fa fa-trash"></i></button>`:''}
+        </div>
+      </div>`).join('')}
+    </div>`).join('');
+  });
+}
+
+function openTreatmentModal(tr) {
+  $('modalContainer').innerHTML = `
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal modal-sm">
+      <div class="modal-header"><h3><i class="fa fa-spa"></i> ${tr?'Edit':'Tambah'} Treatment</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+      <div class="modal-body">
+        <div class="form-row cols-2">
+          <div class="fg"><label>Kategori *</label><select id="tCat"><option>Baby</option><option>Kids</option><option>Mom</option><option>Jaga</option></select></div>
+          <div class="fg"><label>Durasi (menit)</label><input type="number" id="tDur" value="${tr?.duration_min||60}" min="0"></div>
+        </div>
+        <div class="fg" style="margin-bottom:12px"><label>Nama Treatment *</label><input type="text" id="tName" value="${sanitize(tr?.name||'')}"></div>
+        <div class="fg" style="margin-bottom:12px"><label>Harga (Rp) *</label><input type="number" id="tPrice" value="${tr?.price||0}" min="0" step="1000"></div>
+        <div class="fg"><label>Deskripsi</label><textarea id="tDesc" rows="3">${sanitize(tr?.description||'')}</textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveTreatment(${tr?.id||null})"><i class="fa fa-floppy-disk"></i> Simpan</button>
+      </div>
+    </div>
+  </div>`;
+  if(tr) $('tCat').value = tr.category;
+}
+
+function saveTreatment(id) {
+  const trData = { category:$('tCat').value, name:$('tName').value.trim(), description:$('tDesc').value, price:parseFloat($('tPrice').value)||0, duration_min:parseInt($('tDur').value)||60, is_active:1 };
+  if(!trData.name||!trData.price){toast('Nama dan harga wajib diisi','warning');return;}
+  if(id) trData.id = id;
+  loading(true,'Menyimpan...');
+  ga(id?'updateTreatment':'addTreatment',[trData,S.user.id,S.user.role],res=>{
+    loading(false);
+    if(res.success){toast(res.message,'success');closeModal();renderPricelist();}
+    else toast(res.message,'error');
+  });
+}
+
+function deleteTreatment(id) {
+  confirm('Hapus Treatment?','Treatment akan dihapus permanen.','danger',()=>{
+    loading(true);
+    ga('deleteTreatment',[id,S.user.id,S.user.role],res=>{
+      loading(false);
+      if(res.success){toast('Treatment dihapus','success');renderPricelist();}
+      else toast(res.message,'error');
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INVOICE PAGE
+// ═══════════════════════════════════════════════════════════════
+function renderInvoice() {
+  $('pageContent').innerHTML = `
+  <div class="filter-bar" style="align-items:center">
+    <div class="fg"><label>Cari No. Invoice / Pelanggan</label><input type="text" id="invSearch" placeholder="DSF-... atau nama pelanggan..." oninput="filterInvoices()"></div>
+    <div class="fg"><label>Status</label><select id="invStatus" onchange="filterInvoices()"><option value="">Semua</option><option value="done">Selesai</option><option value="scheduled">Terjadwal</option></select></div>
+  </div>
+  <div id="invoiceList"><div class="table-empty"><i class="fa fa-spinner fa-spin"></i> Memuat...</div></div>`;
+  ga('getSchedules',[S.user.id,S.user.role,{}],res=>{
+    if(!res.success){toast(res.message,'error');return;}
+    S.data.schedules = res.data;
+    filterInvoices();
+  });
+}
+
+function filterInvoices() {
+  const q = ($('invSearch')?.value||'').toLowerCase();
+  const st = $('invStatus')?.value||'';
+  const filtered = S.data.schedules.filter(s => (!q||(s.invoice_no||'').toLowerCase().includes(q)||(s.customer_name||'').toLowerCase().includes(q)) && (!st||s.status===st));
+  $('invoiceList').innerHTML = `
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>No. Invoice</th><th>Tanggal</th><th>Pelanggan</th><th>Treatment</th><th>Total</th><th>Dibayar</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody>${filtered.length ? filtered.map(s=>`<tr>
+          <td><span style="font-family:monospace;font-size:12px;font-weight:700">${sanitize(s.invoice_no)}</span></td>
+          <td>${fmtDate(s.schedule_date)}</td>
+          <td>${sanitize(s.customer_name)}</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${sanitize(s.location)}</td>
+          <td style="font-weight:700">${fmtRp(s.grand_total)}</td>
+          <td style="font-weight:700;color:var(--success)">${fmtRp(s.paid_amount)}</td>
+          <td><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></td>
+          <td><button class="btn btn-sm btn-primary" onclick="printInvoiceById(${s.id})"><i class="fa fa-print"></i> Print</button></td>
+        </tr>`).join('') : '<tr><td colspan="8" class="table-empty"><i class="fa fa-file-invoice"></i>Tidak ada invoice ditemukan</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function printInvoiceById(id) {
+  loading(true,'Memuat invoice...');
+  ga('getScheduleDetail',[id,S.user.id,S.user.role],res=>{
+    loading(false);
+    if(!res.success){toast(res.message,'error');return;}
+    renderInvoiceModal(res.data);
+  });
+}
+
+function renderInvoiceModal(s) {
+  const bizName = S.settings.business_name||'Daisafacare';
+  const bizTagline = S.settings.business_tagline||'Mom & Baby Treatment';
+  const bizPhone = S.settings.business_phone||'0822-3212-1081';
+  const bizIG = S.settings.business_instagram||'@daisafacare';
+  const bizTT = S.settings.business_tiktok||'daisafacare';
+  const payInfo = S.settings.payment_info||'BCA 3530674729 a.n Syifa Rasalhague or QRIS';
+  const footer = S.settings.invoice_footer||'Terima kasih atas kepercayaan Anda kepada kami.';
+
+  $('modalContainer').innerHTML = `
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()" style="background:rgba(0,0,0,0.7)">
+    <div class="modal modal-lg" style="max-width:760px">
+      <div class="modal-header"><h3><i class="fa fa-file-invoice"></i> Invoice ${sanitize(s.invoice_no)}</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+      <div style="padding:20px 24px">
+        <div style="display:flex;gap:10px;margin-bottom:16px;justify-content:flex-end">
+          <button class="btn btn-primary" onclick="printInv()"><i class="fa fa-print"></i> Print</button>
+          <button class="btn btn-beige" onclick="saveInvImg()"><i class="fa fa-image"></i> Simpan Gambar</button>
+          <button class="btn btn-ghost" onclick="closeModal()"><i class="fa fa-xmark"></i> Tutup</button>
+        </div>
+        <div id="invoice-template">
+          <!-- Header -->
+          <div class="inv-header">
+            <div class="inv-brand">
+              <div class="inv-brand-ico">🌸</div>
+              <div>
+                <div class="inv-brand-name">${sanitize(bizName).toUpperCase()}</div>
+                <div class="inv-brand-sub">${sanitize(bizTagline)}</div>
+                <div class="inv-brand-tagline">gentle care, happy baby, peaceful family ♥</div>
+              </div>
+            </div>
+            <div class="inv-title-block">
+              <div class="inv-title">INVOICE ✦</div>
+              <div class="inv-no-label">No.</div>
+              <div class="inv-no-val">${sanitize(s.invoice_no)}</div>
+            </div>
+          </div>
+          <div class="inv-divider"></div>
+          <!-- Info Grid -->
+          <div class="inv-info-grid">
+            <div class="inv-info-box">
+              <div class="inv-info-title">Data Pelanggan</div>
+              <div class="inv-info-row"><i class="fa fa-user" style="color:var(--sage);width:16px"></i><div><div class="inv-info-label">Nama</div><div class="inv-info-val">${sanitize(s.customer_name)}</div></div></div>
+              <div class="inv-info-row"><i class="fa fa-phone" style="color:var(--sage);width:16px"></i><div><div class="inv-info-label">Telepon</div><div class="inv-info-val">${sanitize(s.customer_phone)||'—'}</div></div></div>
+              <div class="inv-info-row"><i class="fa fa-location-dot" style="color:var(--sage);width:16px"></i><div><div class="inv-info-label">Alamat</div><div class="inv-info-val">${sanitize(s.location||s.customer_address||'—')}</div></div></div>
+              ${s.baby_name?`<div class="inv-info-row"><i class="fa fa-baby" style="color:var(--sage);width:16px"></i><div><div class="inv-info-label">Bayi</div><div class="inv-info-val">${sanitize(s.baby_name)} (${sanitize(s.baby_age)})</div></div></div>`:''}
+            </div>
+            <div class="inv-info-box">
+              <div class="inv-info-title">Detail Jadwal</div>
+              <div class="inv-info-row"><i class="fa fa-calendar" style="color:var(--sage);width:16px"></i><div><div class="inv-info-label">Tanggal</div><div class="inv-info-val">${fmtDate(s.schedule_date)}</div></div></div>
+              <div class="inv-info-row"><i class="fa fa-clock" style="color:var(--sage);width:16px"></i><div><div class="inv-info-label">Waktu</div><div class="inv-info-val">${sanitize(s.schedule_time)||'—'}</div></div></div>
+              <div class="inv-info-row"><i class="fa fa-spa" style="color:var(--sage);width:16px"></i><div><div class="inv-info-label">Layanan</div><div class="inv-info-val">${sanitize(s.therapist_name)||'—'}</div></div></div>
+            </div>
+          </div>
+          <!-- Table -->
+          <table class="inv-table">
+            <thead><tr><th>No.</th><th>Deskripsi Layanan</th><th>Harga</th><th>Qty</th><th>Total</th></tr></thead>
+            <tbody>
+              ${s.items.map((it,i)=>`<tr><td>${i+1}.</td><td>${sanitize(it.treatment_name)}</td><td>Rp ${(it.price||0).toLocaleString('id-ID')}</td><td>${it.qty}</td><td>Rp ${(it.subtotal||0).toLocaleString('id-ID')}</td></tr>`).join('')}
+              ${s.transport_fee>0?`<tr><td></td><td>Transport (${s.km} km)</td><td>—</td><td>—</td><td>Rp ${s.transport_fee.toLocaleString('id-ID')}</td></tr>`:''}
+            </tbody>
+          </table>
+          <!-- Bottom -->
+          <div class="inv-bottom">
+            <div class="inv-notes-box">
+              <div class="inv-notes-title">Catatan: ♥</div>
+              <div style="font-size:12px;color:var(--text-sec);margin-bottom:10px">${sanitize(s.notes||'')}</div>
+              <div style="font-size:11px;font-weight:700;color:var(--sage-dark);margin-bottom:4px">Payment Method:</div>
+              <div style="font-size:12px;font-weight:700">${sanitize(payInfo)}</div>
+            </div>
+            <div class="inv-totals">
+              <div class="inv-total-row"><span>Subtotal</span><span>Rp ${(s.subtotal||s.fee_treatment+s.transport_fee||0).toLocaleString('id-ID')}</span></div>
+              ${s.discount>0?`<div class="inv-total-row"><span>Diskon</span><span>- Rp ${(s.discount||0).toLocaleString('id-ID')}</span></div>`:''}
+              <div class="inv-total-row grand"><span>TOTAL</span><span>Rp ${(s.grand_total||0).toLocaleString('id-ID')}</span></div>
+            </div>
+          </div>
+          <!-- Footer -->
+          <div class="inv-footer">
+            <div class="inv-footer-thanks">Terima kasih ♥</div>
+            <div class="inv-footer-sub">${sanitize(footer)}</div>
+            <div style="height:24px;border-bottom:1px dashed var(--beige);margin:0 auto 16px;width:60px"></div>
+            <div class="inv-signature">
+              <div class="inv-sig-line"><div class="inv-sig-dot"></div><div class="inv-sig-label">Tanda Tangan</div></div>
+            </div>
+            <div class="inv-contacts">
+              <div class="inv-contact-item"><i class="fa fa-location-dot"></i> ${sanitize(bizName)} Homecare Baby Spa</div>
+              <div class="inv-contact-item"><i class="fab fa-whatsapp"></i> ${sanitize(bizPhone)}</div>
+              <div class="inv-contact-item"><i class="fab fa-instagram"></i> ${sanitize(bizIG)}</div>
+              <div class="inv-contact-item"><i class="fab fa-tiktok"></i> ${sanitize(bizTT)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function printInv() {
+  const tmpl = $('invoice-template');
+  const printWin = window.open('','_blank','width=800,height=1000');
+  printWin.document.write(`<!DOCTYPE html><html><head><title>Invoice</title><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"><style>body{margin:0;font-family:'Plus Jakarta Sans',sans-serif;background:#FCF7F1;}${document.querySelector('style').textContent}</style></head><body>${tmpl.outerHTML}</body></html>`);
+  printWin.document.close();
+  setTimeout(()=>printWin.print(),800);
+}
+
+function saveInvImg() {
+  const tmpl = $('invoice-template');
+  toast('Membuat gambar invoice...','info',2000);
+  html2canvas(tmpl,{scale:2,backgroundColor:'#FCF7F1',useCORS:true}).then(canvas=>{
+    const a=document.createElement('a');
+    a.download='invoice-daisafacare.png';
+    a.href=canvas.toDataURL('image/png');
+    a.click();
+    toast('Gambar invoice berhasil disimpan!','success');
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PEMBAYARAN
+// ═══════════════════════════════════════════════════════════════
+function renderPembayaran() {
+  $('pageContent').innerHTML = `
+  <div class="filter-bar">
+    <div class="fg"><label>Dari</label><input type="date" id="pfFrom" onchange="loadPayments()"></div>
+    <div class="fg"><label>Sampai</label><input type="date" id="pfTo" onchange="loadPayments()"></div>
+    <div class="fg"><label>&nbsp;</label><button class="btn btn-ghost btn-sm" onclick="$('pfFrom').value='';$('pfTo').value='';loadPayments()"><i class="fa fa-rotate-left"></i></button></div>
+  </div>
+  <div class="card" id="payTable"><div class="table-empty"><i class="fa fa-spinner fa-spin"></i></div></div>`;
+  loadPayments();
+}
+
+function loadPayments() {
+  const f = { dateFrom:$('pfFrom')?.value, dateTo:$('pfTo')?.value };
+  ga('getPayments',[S.user.id,S.user.role,f],res=>{
+    if(!res.success){toast(res.message,'error');return;}
+    const data = res.data;
+    const total = data.reduce((s,p)=>s+(p.amount||0),0);
+    $('payTable').innerHTML = `
+    <div style="padding:16px 20px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-weight:700">Total: <span style="color:var(--success)">${fmtRp(total)}</span></div>
+      <div style="font-size:13px;color:var(--text-muted)">${data.length} transaksi</div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Tanggal</th><th>Invoice</th><th>Pelanggan</th><th>Metode</th><th>Jumlah</th><th>Referensi</th></tr></thead>
+      <tbody>${data.length?data.map(p=>`<tr>
+        <td>${fmtDate(p.date)}</td>
+        <td style="font-family:monospace;font-size:12px;font-weight:700">${sanitize(p.invoice_no)||'—'}</td>
+        <td>${sanitize(p.customer_name)}</td>
+        <td><span class="badge" style="background:var(--info-bg);color:var(--info)">${sanitize(p.method)}</span></td>
+        <td style="font-weight:700;color:var(--success)">${fmtRp(p.amount)}</td>
+        <td style="font-size:12px;color:var(--text-muted)">${sanitize(p.reference)||'—'}</td>
+      </tr>`).join(''):'<tr><td colspan="6" class="table-empty"><i class="fa fa-money-bill"></i>Belum ada pembayaran</td></tr>'}</tbody>
+    </table></div>`;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  LAPORAN
+// ═══════════════════════════════════════════════════════════════
+function renderLaporan() {
+  $('pageContent').innerHTML = `
+  <div class="filter-bar">
+    <div class="fg"><label>Dari</label><input type="date" id="rfFrom"></div>
+    <div class="fg"><label>Sampai</label><input type="date" id="rfTo"></div>
+    <div class="fg"><label>&nbsp;</label><button class="btn btn-primary btn-sm" onclick="loadReport()"><i class="fa fa-chart-bar"></i> Tampilkan</button></div>
+  </div>
+  <div class="settings-tabs">
+    <button class="settings-tab active" id="rtab-monthly" onclick="switchReport('monthly')"><i class="fa fa-calendar"></i> Bulanan</button>
+    <button class="settings-tab" id="rtab-treatments" onclick="switchReport('treatments')"><i class="fa fa-spa"></i> Treatment</button>
+    <button class="settings-tab" id="rtab-customers" onclick="switchReport('customers')"><i class="fa fa-users"></i> Pelanggan</button>
+  </div>
+  <div id="reportContent"><div class="table-empty"><i class="fa fa-chart-line"></i>Pilih rentang tanggal dan klik Tampilkan</div></div>`;
+}
+
+let activeReport = 'monthly';
+function switchReport(t) {
+  activeReport = t;
+  document.querySelectorAll('.settings-tab').forEach(el=>el.classList.remove('active'));
+  $('rtab-'+t).classList.add('active');
+  loadReport();
+}
+function loadReport() {
+  const f = { dateFrom:$('rfFrom').value, dateTo:$('rfTo').value };
+  loading(true,'Memuat laporan...');
+  ga('getReportsData',[activeReport,f,S.user.id,S.user.role],res=>{
+    loading(false);
+    if(!res.success){toast(res.message,'error');return;}
+    renderReportContent(activeReport, res.data);
+  });
+}
+
+function renderReportContent(type, data) {
+  if(type==='monthly') {
+    const d = data;
+    $('reportContent').innerHTML = `
+    <div class="kpi-grid" style="margin-bottom:18px">
+      <div class="kpi-card green"><div class="kpi-val">${fmtRp(d.totalRevenue)}</div><div class="kpi-label">Total Pendapatan</div></div>
+      <div class="kpi-card success"><div class="kpi-val">${fmtRp(d.totalCollected)}</div><div class="kpi-label">Terkumpul</div></div>
+      <div class="kpi-card beige"><div class="kpi-val">${d.totalCount}</div><div class="kpi-label">Total Jadwal</div></div>
+    </div>
+    <div class="report-card">
+      <div class="report-card-title"><i class="fa fa-chart-bar" style="color:var(--sage)"></i> Pendapatan Bulanan</div>
+      <div class="chart-wrap"><canvas id="rChart"></canvas></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="table-wrap"><table>
+        <thead><tr><th>Bulan</th><th>Pendapatan</th><th>Terkumpul</th><th>Jumlah Jadwal</th></tr></thead>
+        <tbody>${d.monthlyData.map(m=>`<tr><td>${m.label}</td><td style="font-weight:700">${fmtRp(m.revenue)}</td><td style="color:var(--success);font-weight:700">${fmtRp(m.collected)}</td><td>${m.count}</td></tr>`).join('')}</tbody>
+      </table></div>
+    </div>`;
+    const ctx = $('rChart').getContext('2d');
+    new Chart(ctx,{type:'bar',data:{labels:d.monthlyData.map(m=>m.label),datasets:[{label:'Pendapatan',data:d.monthlyData.map(m=>m.revenue),backgroundColor:'rgba(133,149,122,0.7)',borderColor:'#85957A',borderWidth:1,borderRadius:4},{label:'Terkumpul',data:d.monthlyData.map(m=>m.collected),backgroundColor:'rgba(76,175,125,0.6)',borderColor:'#4CAF7D',borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:v=>'Rp '+v.toLocaleString('id-ID')}}}}});
+  }
+  else if(type==='treatments') {
+    $('reportContent').innerHTML = `
+    <div class="grid-2">
+      <div class="report-card">
+        <div class="report-card-title"><i class="fa fa-chart-pie" style="color:var(--sage)"></i> Distribusi Treatment</div>
+        <div class="chart-wrap"><canvas id="trChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="table-wrap"><table>
+          <thead><tr><th>Treatment</th><th>Qty</th><th>Pendapatan</th></tr></thead>
+          <tbody>${data.treatments.map(t=>`<tr><td style="font-weight:600">${sanitize(t.name)}</td><td>${t.qty}</td><td style="font-weight:700;color:var(--sage-dark)">${fmtRp(t.revenue)}</td></tr>`).join('')}</tbody>
+        </table></div>
+      </div>
+    </div>`;
+    const ctx = $('trChart').getContext('2d');
+    const colors = ['#85957A','#B8C2AA','#D4C2AA','#A6B3A5','#4CAF7D','#5B8FB9','#E05252','#F59E0B'];
+    new Chart(ctx,{type:'doughnut',data:{labels:data.treatments.map(t=>t.name),datasets:[{data:data.treatments.map(t=>t.revenue),backgroundColor:colors,borderWidth:2,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10}}}}});
+  }
+  else if(type==='customers') {
+    $('reportContent').innerHTML = `
+    <div class="card">
+      <div class="table-wrap"><table>
+        <thead><tr><th>Peringkat</th><th>Pelanggan</th><th>No. HP</th><th>Jumlah Jadwal</th><th>Total Transaksi</th><th>Rata-rata</th></tr></thead>
+        <tbody>${data.customers.map((c,i)=>`<tr>
+          <td><span style="background:${i<3?['#FFD700','#C0C0C0','#CD7F32'][i]:'var(--cream-dark)'};padding:4px 10px;border-radius:10px;font-weight:700;font-size:12px">${i+1}</span></td>
+          <td style="font-weight:700">${sanitize(c.name)}</td>
+          <td style="font-size:12px">${sanitize(c.phone)}</td>
+          <td>${c.count}</td>
+          <td style="font-weight:700;color:var(--sage-dark)">${fmtRp(c.totalRevenue)}</td>
+          <td style="color:var(--text-muted)">${fmtRp(c.avgTicket)}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+    </div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════════════════════════════
+function renderSettings() {
+  $('pageContent').innerHTML = `
+  <div class="settings-tabs">
+    <button class="settings-tab active" id="stab-bisnis" onclick="switchSettings('bisnis')"><i class="fa fa-building"></i> Info Bisnis</button>
+    <button class="settings-tab" id="stab-users" onclick="switchSettings('users')"><i class="fa fa-users-gear"></i> Pengguna</button>
+    <button class="settings-tab" id="stab-profile" onclick="switchSettings('profile')"><i class="fa fa-user-circle"></i> Profil Saya</button>
+  </div>
+  <div id="settingsContent"></div>`;
+  loadSettingsTab('bisnis');
+}
+
+function switchSettings(tab) {
+  document.querySelectorAll('.settings-tab').forEach(el=>el.classList.remove('active'));
+  $('stab-'+tab).classList.add('active');
+  loadSettingsTab(tab);
+}
+
+function loadSettingsTab(tab) {
+  if(tab==='bisnis') {
+    const s = S.settings;
+    $('settingsContent').innerHTML = `
+    <div class="form-section">
+      <div class="form-section-title"><i class="fa fa-store"></i> Informasi Bisnis</div>
+      <div class="form-row cols-2">
+        <div class="fg"><label>Nama Bisnis</label><input id="sBizName" value="${sanitize(s.business_name||'Daisafacare')}"></div>
+        <div class="fg"><label>Tagline</label><input id="sBizTag" value="${sanitize(s.business_tagline||'Mom & Baby Treatment')}"></div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="fg"><label>No. HP</label><input id="sBizPhone" value="${sanitize(s.business_phone||'')}"></div>
+        <div class="fg"><label>Alamat</label><input id="sBizAddr" value="${sanitize(s.business_address||'')}"></div>
+      </div>
+      <div class="form-row cols-2">
+        <div class="fg"><label>Instagram</label><input id="sBizIG" value="${sanitize(s.business_instagram||'')}"></div>
+        <div class="fg"><label>TikTok</label><input id="sBizTT" value="${sanitize(s.business_tiktok||'')}"></div>
+      </div>
+      <div class="fg" style="margin-bottom:12px"><label>Info Pembayaran (untuk Invoice)</label><textarea id="sBizPay" rows="2">${sanitize(s.payment_info||'')}</textarea></div>
+      <div class="form-row cols-2">
+        <div class="fg"><label>Transport per KM (Rp)</label><input type="number" id="sTransRate" value="${sanitize(s.transport_rate_per_km||'2000')}"></div>
+        <div class="fg"><label>Footer Invoice</label><input id="sInvFooter" value="${sanitize(s.invoice_footer||'')}"></div>
+      </div>
+      <button class="btn btn-primary" onclick="saveBizSettings()"><i class="fa fa-floppy-disk"></i> Simpan Pengaturan</button>
+    </div>`;
+  } else if(tab==='users') {
+    $('settingsContent').innerHTML = `<div class="section-hdr"><h2><i class="fa fa-users"></i> Manajemen Pengguna</h2><button class="btn btn-primary" onclick="openUserModal()"><i class="fa fa-plus"></i> Tambah</button></div><div id="userTable"><div class="table-empty"><i class="fa fa-spinner fa-spin"></i></div></div>`;
+    ga('getUsers',[S.user.id,S.user.role],res=>{
+      if(!res.success){$('userTable').innerHTML=`<div class="table-empty">${res.message}</div>`;return;}
+      $('userTable').innerHTML = `<div class="card"><div class="table-wrap"><table><thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead><tbody>${res.data.map(u=>`<tr>
+        <td style="font-weight:700">${sanitize(u.full_name)}</td>
+        <td style="font-size:13px">${sanitize(u.email)}</td>
+        <td><span class="badge badge-${u.role}">${sanitize(u.role)}</span></td>
+        <td><span class="badge" style="background:${u.is_active?'var(--success-bg)':'var(--danger-bg)'};color:${u.is_active?'var(--success)':'var(--danger)'}">${u.is_active?'Aktif':'Nonaktif'}</span></td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-sm btn-outline" onclick='openUserModal(${JSON.stringify(u).replace(/'/g,"&#39;")})'><i class="fa fa-edit"></i></button>
+          ${u.id!==S.user.id?`<button class="btn btn-sm btn-danger" onclick="deleteUser(${u.id})"><i class="fa fa-trash"></i></button>`:''}
+        </td>
+      </tr>`).join('')}</tbody></table></div></div>`;
+    });
+  } else if(tab==='profile') {
+    const u = S.user;
+    $('settingsContent').innerHTML = `
+    <div class="form-section">
+      <div class="form-section-title"><i class="fa fa-user"></i> Profil Saya</div>
+      <div class="form-row cols-2">
+        <div class="fg"><label>Nama Lengkap</label><input id="pName" value="${sanitize(u.full_name)}"></div>
+        <div class="fg"><label>No. HP</label><input id="pPhone" value="${sanitize(u.phone||'')}"></div>
+      </div>
+      <div class="fg" style="margin-bottom:10px"><label>Email</label><input value="${sanitize(u.email)}" disabled style="opacity:0.6;background:var(--cream-dark)"></div>
+      <button class="btn btn-primary" onclick="saveProfile()"><i class="fa fa-floppy-disk"></i> Simpan</button>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title"><i class="fa fa-lock"></i> Ganti Password</div>
+      <div class="form-row cols-3">
+        <div class="fg"><label>Password Lama</label><input type="password" id="pwdOld"></div>
+        <div class="fg"><label>Password Baru</label><input type="password" id="pwdNew"></div>
+        <div class="fg"><label>Konfirmasi</label><input type="password" id="pwdCon"></div>
+      </div>
+      <button class="btn btn-outline" onclick="savePwd()"><i class="fa fa-key"></i> Ganti Password</button>
+    </div>`;
+  }
+}
+
+function saveBizSettings() {
+  const settings = { business_name:$('sBizName').value, business_tagline:$('sBizTag').value, business_phone:$('sBizPhone').value, business_address:$('sBizAddr').value, business_instagram:$('sBizIG').value, business_tiktok:$('sBizTT').value, payment_info:$('sBizPay').value, transport_rate_per_km:$('sTransRate').value, invoice_footer:$('sInvFooter').value };
+  loading(true,'Menyimpan...');
+  ga('saveAllSettings',[settings,S.user.id,S.user.role],res=>{
+    loading(false);
+    if(res.success){Object.assign(S.settings,settings);toast('Pengaturan disimpan!','success');}
+    else toast(res.message,'error');
+  });
+}
+
+function saveProfile() {
+  const d = { full_name:$('pName').value.trim(), phone:$('pPhone').value };
+  if(!d.full_name){toast('Nama wajib diisi','warning');return;}
+  loading(true);
+  ga('updateProfile',[d,S.user.id],res=>{
+    loading(false);
+    if(res.success){S.user.full_name=d.full_name;S.user.phone=d.phone;$('sidebarName').textContent=d.full_name;$('sidebarAvatar').textContent=d.full_name.charAt(0);toast('Profil diperbarui!','success');}
+    else toast(res.message,'error');
+  });
+}
+
+function savePwd() {
+  const old=$('pwdOld').value, nw=$('pwdNew').value, cn=$('pwdCon').value;
+  if(!old||!nw){toast('Semua field wajib diisi','warning');return;}
+  if(nw!==cn){toast('Konfirmasi password tidak cocok','warning');return;}
+  if(nw.length<6){toast('Password minimal 6 karakter','warning');return;}
+  loading(true);
+  ga('changePassword',[S.user.id,old,nw],res=>{
+    loading(false);
+    if(res.success){toast('Password berhasil diubah!','success');$('pwdOld').value='';$('pwdNew').value='';$('pwdCon').value='';}
+    else toast(res.message,'error');
+  });
+}
+
+function openUserModal(u) {
+  $('modalContainer').innerHTML = `
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal modal-sm">
+      <div class="modal-header"><h3><i class="fa fa-user-gear"></i> ${u?'Edit':'Tambah'} Pengguna</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+      <div class="modal-body">
+        <div class="fg" style="margin-bottom:12px"><label>Nama Lengkap *</label><input id="uName" value="${sanitize(u?.full_name||'')}"></div>
+        <div class="fg" style="margin-bottom:12px"><label>Email *</label><input type="email" id="uEmail" value="${sanitize(u?.email||'')}"></div>
+        <div class="form-row cols-2">
+          <div class="fg"><label>No. HP</label><input id="uPhone" value="${sanitize(u?.phone||'')}"></div>
+          <div class="fg"><label>Role</label><select id="uRole"><option value="admin">Admin</option><option value="therapist">Terapis</option><option value="receptionist">Resepsionis</option></select></div>
+        </div>
+        <div class="fg" style="margin-bottom:12px"><label>Password ${u?'(kosongkan jika tidak diubah)':' *'}</label><input type="password" id="uPwd" placeholder="${u?'Kosongkan jika tidak diubah':'Minimal 6 karakter'}"></div>
+        ${u?`<div class="fg"><label>Status</label><select id="uActive"><option value="1">Aktif</option><option value="0">Nonaktif</option></select></div>`:''}
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+        <button class="btn btn-primary" onclick="saveUser(${u?.id||null})"><i class="fa fa-floppy-disk"></i> Simpan</button>
+      </div>
+    </div>
+  </div>`;
+  if(u){ $('uRole').value=u.role; if($('uActive')) $('uActive').value=u.is_active; }
+}
+
+function saveUser(id) {
+  const d = { full_name:$('uName').value.trim(), email:$('uEmail').value.trim(), phone:$('uPhone').value, userRole:$('uRole').value, password:$('uPwd').value };
+  if(id){d.id=id;d.is_active=$('uActive').value;}
+  loading(true);
+  ga(id?'updateUser':'addUser',[d,S.user.id,S.user.role],res=>{
+    loading(false);
+    if(res.success){toast(res.message,'success');closeModal();loadSettingsTab('users');}
+    else toast(res.message,'error');
+  });
+}
+
+function deleteUser(id) {
+  confirm('Hapus Pengguna?','Pengguna akan dihapus permanen.','danger',()=>{
+    loading(true);
+    ga('deleteUser',[id,S.user.id,S.user.role],res=>{
+      loading(false);
+      if(res.success){toast('Pengguna dihapus','success');loadSettingsTab('users');}
+      else toast(res.message,'error');
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  LOGS
+// ═══════════════════════════════════════════════════════════════
+function renderLogs() {
+  $('pageContent').innerHTML = '<div class="card" id="logsWrap"><div class="table-empty"><i class="fa fa-spinner fa-spin"></i></div></div>';
+  ga('getLogs',[S.user.id,S.user.role,200],res=>{
+    if(!res.success){toast(res.message,'error');return;}
+    const logIcons = { LOGIN:'fa-right-to-bracket', CREATE:'fa-plus', UPDATE:'fa-pen', DELETE:'fa-trash', CANCEL:'fa-ban' };
+    $('logsWrap').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Waktu</th><th>Pengguna</th><th>Aksi</th><th>Tabel</th><th>Detail</th></tr></thead>
+      <tbody>${res.data.length?res.data.map(l=>`<tr>
+        <td style="font-size:12px;white-space:nowrap">${new Date(l.created_at).toLocaleString('id-ID')}</td>
+        <td style="font-weight:600">${sanitize(l.username)}</td>
+        <td><span class="badge" style="background:var(--cream-dark);color:var(--sage-dark)"><i class="fa ${logIcons[l.action]||'fa-circle'}"></i> ${sanitize(l.action)}</span></td>
+        <td style="font-size:12px">${sanitize(l.table_name)}</td>
+        <td style="font-size:12px;color:var(--text-muted)">${sanitize(l.details)}</td>
+      </tr>`).join(''):'<tr><td colspan="5" class="table-empty"><i class="fa fa-list"></i>Belum ada log</td></tr>'}</tbody>
+    </table></div>`;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  AUTO-LOGIN (remember session)
+// ═══════════════════════════════════════════════════════════════
+(function init() {
+  try {
+    const saved = localStorage.getItem('dsf_user');
+    if(saved) {
+      const user = JSON.parse(saved);
+      if(user && user.id && user.email) {
+        S.user = user;
+        startApp();
+        return;
+      }
+    }
+  } catch(e){}
+  // Default: show login
+  $('loginPage').style.display = 'flex';
+  $('app').style.display = 'none';
+})();
+</script>
+</body>
+</html>

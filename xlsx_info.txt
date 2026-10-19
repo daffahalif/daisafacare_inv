@@ -1,0 +1,25 @@
+﻿Sheet: 'PRICELIST'
+  R1: ['', '', 'Treatment', 'Price', '']
+  R2: ['Baby', 'Sleep Booster', 'Baby - Sleep Booster | Rp 85K', '85000', '85K']
+  R3: ['Baby', 'GTM', 'Baby - GTM | Rp 100K', '100000', '100K']
+
+Sheet: '­ƒî©JULI­ƒî©(tes fitur baru)'
+  R1: ['TANGGAL', 'NAMA BUNDA', 'HP', 'LOKASI', 'TREATMENT', 'FEE TREATMENT', 'TRANSPORT', 'TOTAL INVOICE', 'KETERANGAN', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  R2: ['46206', 'Jessica Nyoman', '628113108969', 'Kalisari Dharma', 'Jaga - 6 Jam | Rp 200K', '200000', '24000', '224000', 'LUNAS TF/QRIS', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  R3: ['46206', 'Jessica Nyoman', '628113108969', 'Kalisari Dharma', 'Baby - Sleep Booster | Rp 85K, Kids - Sleep Booster | Rp 100K', '185000', '0', '185000', 'LUNAS TF/QRIS', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+Sheet: '­ƒî©AGUSTUS­ƒî©'
+  R1: ['TANGGAL', 'NAMA BUNDA', 'HP', 'LOKASI', 'TREATMENT', 'FEE TREATMENT', 'TRANSPORT', 'TOTAL INVOICE', 'KETERANGAN', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  R2: ['46237.520833333336', 'Vira Amalia', '6282257502725', 'Jalan Bogangin Baru Blok I No.14a', 'Baby - Sleep Booster | Rp 85K', '85000', '0', '85000', 'LUNAS TF/QRIS', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  R3: ['46238.625', 'Chyntia', '6285173270177', 'Educity Apartemen', 'Baby - Sleep Booster | Rp 85K', '85000', '0', '85000', 'LUNAS TF/QRIS', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+Sheet: 'SEPTEMBER'
+  R1: ['TANGGAL', 'NAMA BUNDA', 'HP', 'LOKASI', 'TREATMENT', 'FEE TREATMENT', 'TRANSPORT', 'TOTAL INVOICE', 'KETERANGAN', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  R2: ['46266.354166666664', 'Happy', '6281318662217', 'Semolowaru', 'Baby - Sleep Booster | Rp 85K', '85000', '0', '85000', 'LUNAS TF/QRIS', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  R3: ['46273.375', 'Stephilia', '6282216627605', 'Margorejo Indah B-619', 'Baby - Sleep Booster | Rp 85K', '85000', '0', '85000', 'LUNAS TF/QRIS', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
+Sheet: 'OKTOBER'
+  R1: ['TANGGAL', 'NAMA BUNDA', 'HP', 'LOKASI', 'TREATMENT', 'FEE TREATMENT', 'KM', 'TRANSPORT', 'TOTAL INVOICE', 'KETERANGAN', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  R2: ['46296', 'Dinda', '6285258988480', 'Tropodo', 'Baby - Sleep Booster | Rp 85K, Kids - Sleep Booster | Rp 100K', '185000', '0', '0', '185000', 'LUNAS TF/QRIS', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+  R3: ['46300', 'Jessica Nyoman', '628113108969', 'Kalisari Dharma', 'Jaga - 8 Jam | Rp 250K', '250000', '0', '0', '250000', 'LUNAS TF/QRIS', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
+
