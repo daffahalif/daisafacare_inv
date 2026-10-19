@@ -8,3 +8,4 @@ next todo:
 - the mobile phone view handling
 - auto count the baby age (optional), so, can enter the baby age or date of birth. if i type the age without the date of birth, then increment next month for the baby age
 - add logo for web info
+- add pricelist Generator
