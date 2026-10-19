@@ -1,40 +1,10 @@
-1. Users, Customers, Treatments, Schedules, Schedule_Items, Payments, Settings, Activity_Logs
-2. yes, it writtens:
-
-Schedules
-ID	Invoice No	Customer ID	Therapist ID	Schedule Date	Schedule Time	Location	KM Distance	Fee Treatment	Transport Fee	Subtotal	Discount	Grand Total	Paid Amount	Due Amount	Payment Method	Status	Keterangan	Notes	Created By	Created At	Updated At
-4	DSF-20261019-001	1	1	2026-10-20	09:00	aksjkajs	10	335000	20000	355000	0	355000	0	355000	TF/QRIS	scheduled	BELUM BAYAR		1	2026-10-19T13:51:14.714Z	2026-10-19T13:51:14.714Z
-5	DSF-20261019-002		1	2026-10-20	07:00		10	185000	20000	205000	0	205000	0	205000	TF/QRIS	scheduled	BELUM BAYAR		1	2026-10-19T14:04:23.345Z	2026-10-19T14:04:23.345Z
-
-Activity_Logs
-ID	User ID	Username	Action	Table	Record ID	Details	Created At
-9	1	Admin Daisafa	CREATE	Schedules	4	DSF-20261019-001 Rp355000	2026-10-19T13:51:18.344Z
-13	1	Admin Daisafa	CREATE	Schedules	5	DSF-20261019-002 Rp205000	2026-10-19T14:04:24.723Z
-
-3. on right corner, yes it says "tersimpan" or saved
-
-paste result:
-const p=(n,r)=>console.log(n, JSON.stringify(r).slice(0,1200));
-google.script.run.withSuccessHandler(r=>p('getSchedules',r)).withFailureHandler(e=>p('getSchedules FAIL',e.message)).getSchedules(S.user.id,S.user.role,{});
-google.script.run.withSuccessHandler(r=>p('getDashboardStats',r)).withFailureHandler(e=>p('getDashboardStats FAIL',e.message)).getDashboardStats(S.user.id,S.user.role);
-google.script.run.withSuccessHandler(r=>p('getCustomers',r)).withFailureHandler(e=>p('getCustomers FAIL',e.message)).getCustomers(S.user.id,S.user.role);
-VM418:2 Uncaught ReferenceError: google is not defined
-    at <anonymous>:2:1
-(anonymous) @ VM418:2
-
-this is the console when i open "Jadwal" tab:
-519722910-mae_html_user_bin_i18n_mae_html_user__id.js:273 Uncaught Tr {message: "Error in protected function: Cannot read properties of null (reading 'success')", cause: TypeError: Cannot read properties of null (reading 'success')
-    at <anonymous>:270:18
-    at Ft (…, j: true, stack: 'TypeError: Cannot read properties of null (reading…e_html_user_bin_i18n_mae_html_user__id.js:193:52)'}
-Tr @ 519722910-mae_html_user_bin_i18n_mae_html_user__id.js:273
-Sr @ 519722910-mae_html_user_bin_i18n_mae_html_user__id.js:271
-c @ 519722910-mae_html_user_bin_i18n_mae_html_user__id.js:270
-a @ 519722910-mae_html_user_bin_i18n_mae_html_user__id.js:193
-472645793-warden_bin_i18n_warden__en_gb.js:177 Net state changed from BUSY to IDLE
-519722910-mae_html_user_bin_i18n_mae_html_user__id.js:273 Uncaught Tr {message: "Error in protected function: Cannot read properties of null (reading 'success')", cause: TypeError: Cannot read properties of null (reading 'success')
-    at <anonymous>:342:18
-    at Ft (…, j: true, stack: 'TypeError: Cannot read properties of null (reading…e_html_user_bin_i18n_mae_html_user__id.js:193:52)'}
-Tr @ 519722910-mae_html_user_bin_i18n_mae_html_user__id.js:273
-Sr @ 519722910-mae_html_user_bin_i18n_mae_html_user__id.js:271
-c @ 519722910-mae_html_user_bin_i18n_mae_html_user__id.js:270
-a @ 519722910-mae_html_user_bin_i18n_mae_html_user__id.js:193
+next todo:
+- read the new spreadsheet to understand and implement Database
+- the newborn treatment handling.the treatment is not once, but every day based on how long the customer orders (1 day, 1 week, or 2 weeks)
+- the transport fee roundup and roundown handling 
+- the google maps handling
+- daisafa logo
+- invoice signature handling
+- the mobile phone view handling
+- auto count the baby age (optional), so, can enter the baby age or date of birth. if i type the age without the date of birth, then increment next month for the baby age
+- add logo for web info
