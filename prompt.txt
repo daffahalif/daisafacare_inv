@@ -1,10 +1,13 @@
 Here are the updates for this version:
-- can add maps, map link shown as buka maps (work)
-- newborn 2x should add morning and evening schedule (such as 07.00 and 15.30)
-- the newborn 2x still marked only on the book date, not increment every day (i tried add for 2 weeks newborn treatment)
-- the login not removed, still there.
-- need a down payment invoice, not just auto detect the 20% down payment.
-- on Jadwal Page list, there is one column wrong. the header is "Treatment" but the data is the address of the cust. the treatment not listed there. 
+- can add maps, map link shown as buka maps (work). but i need the link also accessible in jadwal dashboard so i can easily open maps.
+- newborn 2x should add morning and evening schedule (such as 07.00 and 15.30) - works. 
+- the newborn 2x still marked only on the book date, not increment every day (i tried add for 2 weeks newborn treatment) - works.
+- also, if i delete the parent of newborn, all the rests is deleted. perfect.
+- the login was removed - handled
+- need a down payment invoice, not just auto detect the 20% down payment. - works
+- on Jadwal Page list, there is one column wrong. the header is "Treatment" but the data is the address of the cust. the treatment not listed there. - handled, but also need the maps link like the dashboard jadwal.
+- the dashboard positioning is a bit not neat. jadwal hari ini and jadwal besok is good, side by side. but, jadwal baru on left, right container is blank, instead, the other container is below it. is it okay? actually this is minor, the phone UI is fine.
+- the jadwal calendar is not sorted. the 15.30 is shown first, then the 07.00. there is a case: 1. 15.30, 2. 07.00, 3. 09.00 (not sorted properly)
 
 our update list (for reference):
 - read the new spreadsheet to understand and implement Database: DAISAFACARE - INVOICE WEB APP.xlsx. this new sheet is an implemented and a real data of my recent sheet. 
@@ -18,4 +21,8 @@ our update list (for reference):
 - add pricelist generator. some new moms need a pricelist. sometimes i cannot find the pricelist or maybe I have no time to send updated PL, so we need the pricelist generator with pretty background
 - add edit Jadwal, especially the walk-in moms. the case is when suddenly there are a mom edit or maybe wrong input treatment, I need to edit the Schedule.
 - delete login, no need that login because only me uses this page. cuts the bussiness process and lighten the app.
-- [new] need the tomorrow schedule also for dashboard. 
+- need the tomorrow schedule also for dashboard.
+- [new] add map link (if available) in jadwal dashboard, so I can easily open the google maps
+- [new] sort option for jadwal list
+- [new] search for moms, in case the mom data is too many.
+- [new] I wonder, is it possible to add jadwal + add new customer? because it will be easy if the step is one way, not add customer first then add schedule separately.

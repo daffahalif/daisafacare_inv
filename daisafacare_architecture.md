@@ -212,3 +212,54 @@ One rule, enforced in `calcTransportFee()` on the server and `hitungTransport()`
 ### Invoice numbers
 
 `genInvoiceNo()` uses the Settings key `last_invoice_no` as a high-water mark, so deleting the newest invoice can no longer free its number for reuse.
+
+## 10. Brand assets (logo + QRIS)
+
+Both images live on Cloudinary and are addressed through Settings keys, so the owner can replace them from the Pengaturan page without re-pasting code.
+
+| Settings key | Used for |
+|---|---|
+| `logo_url` | sidebar brand, invoice header, print window |
+| `qris_url` | QRIS block inside the invoice payment box |
+
+Rules:
+
+- `saveAllSettings()` whitelists both keys; `setupSheets()` seeds the Cloudinary defaults. `index.html` keeps the same defaults in `DEFAULT_LOGO_URL` / `DEFAULT_QRIS_URL` (built from `URLBASE`, never a literal `https://`) for a sheet that does not have the keys yet.
+- Every URL is passed through `attrUrl()`, so only `http`/`https`/`data:` reach an `src`. An empty value means "use the default", never `src=""`.
+- The sidebar and settings previews fall back to 🌸 when the image fails to load.
+- The QRIS is shown only while the invoice still has an outstanding amount; a fully paid invoice shows `✓ Sudah dibayar` instead.
+- Because the invoice is exported with html2canvas, images are fetched once at boot into a data URI (`prefetchBrandAssets` → `S.brand`), carry `crossorigin="anonymous"` (Cloudinary sends `Access-Control-Allow-Origin: *`), and `saveInvImg()` waits for them with `waitInvImages()` (2.5 s cap) before drawing.
+
+---
+
+## 11. Pricelist image generator (WhatsApp slides)
+
+The Pricelist page carries a `Buat Gambar Pricelist` button. It opens a generator that turns the catalog into **1080 × 1350 px (4:5) PNG slides** for WhatsApp, so the owner sends images instead of a screenshot of the page.
+
+Nothing new was added on the server: the page already loaded `getTreatments`, and the generator only re-arranges `S.data.treatments` in the browser. No new endpoint, no new sheet, nothing stored.
+
+### Themes and type
+
+| Theme | Background | Accent / hairline | Used for |
+|---|---|---|---|
+| `cream` | `#FCF7F1` | `#85957A` / `#D4C2AA` | light slides (default) |
+| `sage` | `#6F7D64` | `#D4C2AA` / `rgba(252,247,241,.28)` | darker, high-contrast slides |
+
+Both themes are built from the brand palette. `Playfair Display` is used only on the hero line (the `Pricelist` wordmark); everything else is `Plus Jakarta Sans`: category name 31 px / 800, item name 25 px / 700, price 27 px / 800 flush right, duration chip 20 px muted, dotted leader in between. These two sizes are what makes a category read as a heading instead of another row.
+
+### Content rules
+
+- Source = **active `Treatments` rows only** (`isActiveVal`), grouped by category.
+- Categories follow `KATEGORI_BAKU` (`Baby`, `Kids`, `Mom`, `Jaga`, `NB 1x`, `NB 2x`, `Selapan`); categories found in the data but missing from that list are appended alphabetically.
+- Duration reads `{n} jam` when it is a whole multiple of 60 minutes and at least 120, otherwise `{n} mnt`. The chip is dropped when the item name already states it (`6 Jam` with 360 min), so a row never prints `6 Jam 6 jam`; `7 Hari` with 60 min still shows `60 mnt`.
+- Pagination is measured, not guessed: an offscreen staging element (`.pl-stage`, fixed 1080 px wide) is filled with the real slide markup, and `plMeasure` moves items to the next slide until `scrollHeight` fits the body box. On the last slide `plSeimbangkan` spreads leftover space between categories (max +48 px per gap), or centres a single category.
+- The contact card (phone / Instagram / address) appears **only on the last slide**. Earlier slides carry a slim continuation line (`phone · instagram · lanjutan`) plus a `page/total` indicator, so a set of shared images reads as a series.
+
+### Export path
+
+The generator reuses the invoice's image-safe path, which matters because html2canvas cannot fetch a cross-origin logo while drawing:
+
+1. `prefetchBrandAssets()` has already stored the Cloudinary logo as a data URI (`S.brand.logo`), and every `<img>` is written with `crossorigin="anonymous"`.
+2. Each slide is built into the offscreen `.pl-ex-host` (rendered, but 20 000 px to the left) and awaited with `waitInvImages()` before the capture, so no logo is missing from the PNG.
+3. One `html2canvas` call per slide, `scale: 2` → 2160 × 2700 px, with `backgroundColor` matching the chosen theme.
+4. iPhone (`navigator.canShare({ files })`) shares every slide at once via `navigator.share`; other devices get `showPlImgPreview`, an overlay with a preview and a download link per slide.

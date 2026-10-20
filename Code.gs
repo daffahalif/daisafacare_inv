@@ -1494,21 +1494,26 @@ function getDashboardStats(userId, role) {
       .map(c => ({ name: c[CU.NAME], phone: formatPhone(c[CU.PHONE]), phone_wa: normalizePhoneWa(c[CU.PHONE]), due: parseFloat(c[CU.DUE])||0 }))
       .sort((a, b) => b.due - a.due).slice(0, 5);
 
-    // Urut jam dari pagi; jadwal yang belum punya jam ditaruh paling bawah
+    // Urut jam dari pagi; jadwal yang belum punya jam ditaruh paling bawah, lalu urut nama pelanggan
     const byTime = (a, b) => {
-      if (a.time === b.time) return 0;
-      if (!a.time) return 1;
-      if (!b.time) return -1;
-      return a.time < b.time ? -1 : 1;
+      const ta = String(a.time || '').trim(), tb = String(b.time || '').trim();
+      if (ta !== tb) {
+        if (!ta) return 1;
+        if (!tb) return -1;
+        return ta < tb ? -1 : 1;
+      }
+      const ca = a.customer || '', cb = b.customer || '';
+      return ca < cb ? -1 : (ca > cb ? 1 : 0);
     };
     const schedBrief = s => ({
       id: s[SC.ID], invoice_no: s[SC.INV_NO], customer: cuMap[s[SC.CUST_ID]]||'Walk-in',
       time: fmtTime(timeById[s[SC.ID]] || s[SC.TIME]), location: s[SC.LOCATION]||'',
       therapist: uMap[s[SC.THERAPIST_ID]]||'', status: s[SC.STATUS]||'',
-      treatments: joinTreatmentText(itemMap[String(s[SC.ID])], s[SC.PKG_NAME])
+      treatments: joinTreatmentText(itemMap[String(s[SC.ID])], s[SC.PKG_NAME]),
+      maps_link: s[SC.MAPS_LINK] || ''
     });
 
-    const upcomingToday = todayScheds.map(schedBrief);
+    const upcomingToday = todayScheds.map(schedBrief).sort(byTime);
     const upcomingTomorrow = tomorrowScheds.map(schedBrief).sort(byTime);
 
     return {
@@ -1640,7 +1645,7 @@ function getSettings() {
 function saveAllSettings(settingsObj, userId, role) {
   try {
     if (role !== 'admin') return { success: false, message: 'Hanya admin yang bisa mengubah pengaturan' };
-    const allowed = ['business_name','business_tagline','business_phone','business_address','business_instagram','business_tiktok','payment_info','currency_symbol','invoice_prefix','transport_rate_per_km','invoice_footer','last_invoice_no'];
+    const allowed = ['business_name','business_tagline','business_phone','business_address','business_instagram','business_tiktok','payment_info','currency_symbol','invoice_prefix','transport_rate_per_km','invoice_footer','last_invoice_no','logo_url','qris_url'];
     const lock = LockService.getScriptLock(); lock.waitLock(10000);
     try {
       Object.entries(settingsObj || {}).forEach(([key, value]) => {
@@ -1767,7 +1772,9 @@ function setupSheets() {
    [9,'invoice_prefix','DSF',1,now],
    [10,'transport_rate_per_km','2000',1,now],
    [11,'invoice_footer','Terima kasih atas kepercayaan Anda kepada kami.',1,now],
-   [12,'last_invoice_no','',1,now]
+   [12,'last_invoice_no','',1,now],
+   [13,'logo_url','https:' + String.fromCharCode(47, 47) + 'res.cloudinary.com/dlrxxfy7f/image/upload/w_320,q_auto:good,f_png/v1792500542/LOGO_DAISAFACARE_NO_TEXT-removebg-preview_yyopiu.png',1,now],
+   [14,'qris_url','https:' + String.fromCharCode(47, 47) + 'res.cloudinary.com/dlrxxfy7f/image/upload/w_500,q_auto:best,f_png/v1792500651/QRIS_DAISAFA_CARE_srnnbg.png',1,now]
   ].forEach(s => stsh.appendRow(s));
 
   mkSheet(SHEETS.LOGS, ['ID','User ID','Username','Action','Table','Record ID','Details','Created At']);

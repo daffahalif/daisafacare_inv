@@ -838,6 +838,32 @@
       margin-bottom: 18px;
     }
 
+    /* Kartu terakhir yang ganjil (tanpa pasangan) memakai lebar penuh */
+    .grid-2>.card:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+    }
+
+    /* Tombol Maps bulat kecil di daftar jadwal dashboard */
+    .today-maps {
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--white);
+      color: var(--sage-dark);
+      text-decoration: none;
+    }
+
+    .today-maps:hover {
+      background: var(--sage);
+      color: var(--white);
+    }
+
     .grid-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1558,6 +1584,44 @@
       color: var(--sage);
       margin-bottom: 8px;
       font-size: 12px;
+    }
+
+    /* QRIS di kotak pembayaran invoice */
+    .inv-qris-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+      max-width: 100%;
+    }
+
+    .inv-qris-row img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .inv-qris-cap {
+      flex: 1 1 110px;
+      min-width: 0;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .inv-qris-cap-title {
+      font-weight: 700;
+      color: var(--sage-dark);
+    }
+
+    .inv-qris-cap-sub {
+      color: var(--text-muted);
+    }
+
+    .inv-paid-line {
+      margin-top: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--sage);
     }
 
     .inv-totals {}
@@ -2476,6 +2540,12 @@
         font-size: 13px
       }
 
+      .today-maps {
+        width: 24px;
+        height: 24px;
+        font-size: 11px
+      }
+
       .cust-card {
         padding: 14px;
         gap: 12px
@@ -2672,6 +2742,679 @@
         margin: 0 !important
       }
     }
+
+    /* ─── PRICELIST IMAGE GENERATOR ─── */
+    /* Tombol pembuka di halaman Pricelist */
+    .pl-entry {
+      margin-bottom: 18px
+    }
+
+    .pl-entry-btn {
+      width: 100%
+    }
+
+    /* Modal generator */
+    .pl-modal.modal-lg {
+      max-width: 960px
+    }
+
+    .pl-hint {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: -6px 0 16px
+    }
+
+    .pl-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px
+    }
+
+    .pl-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0
+    }
+
+    .pl-label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-sec);
+      margin-bottom: 6px;
+      letter-spacing: .01em
+    }
+
+    .pl-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: var(--font);
+      background: var(--white);
+      color: var(--text)
+    }
+
+    .pl-input:focus {
+      outline: none;
+      border-color: var(--sage)
+    }
+
+    .pl-seg {
+      display: flex;
+      gap: 8px
+    }
+
+    .pl-seg-btn {
+      flex: 1 1 0;
+      padding: 9px 8px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: var(--white);
+      color: var(--text-sec);
+      font-size: 13.5px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: all .18s
+    }
+
+    .pl-seg-btn.on {
+      background: var(--sage);
+      border-color: var(--sage);
+      color: var(--white)
+    }
+
+    .pl-cats,
+    .pl-togs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px
+    }
+
+    .pl-chk {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      background: var(--white);
+      color: var(--text-sec);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none
+    }
+
+    .pl-chk input {
+      width: 15px;
+      height: 15px;
+      margin: 0;
+      accent-color: var(--sage);
+      cursor: pointer
+    }
+
+    .pl-chk.on {
+      border-color: var(--sage);
+      color: var(--sage-dark);
+      background: rgba(133, 149, 122, 0.10)
+    }
+
+    .pl-preview {
+      min-width: 0;
+      order: -1
+    }
+
+    .pl-frame {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+      aspect-ratio: 4 / 5;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #FCF7F1;
+      box-shadow: 0 6px 24px rgba(45, 58, 46, 0.18)
+    }
+
+    .pl-frame .pls-slide {
+      transform-origin: top left
+    }
+
+    .pl-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 10px
+    }
+
+    .pl-nav-btn {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid var(--border);
+      border-radius: 50%;
+      background: var(--white);
+      color: var(--sage-dark);
+      cursor: pointer;
+      font-size: 13px
+    }
+
+    .pl-nav-btn:disabled {
+      opacity: .4;
+      cursor: not-allowed
+    }
+
+    .pl-nav-txt {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      min-width: 48px;
+      text-align: center
+    }
+
+    .pl-empty {
+      padding: 46px 16px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted)
+    }
+
+    .pl-empty i {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 8px;
+      color: var(--beige)
+    }
+
+    .pl-modal .modal-footer {
+      flex-wrap: wrap
+    }
+
+    @media (max-width:600px) {
+      .pl-modal .modal-footer .btn {
+        flex: 1 1 auto;
+        justify-content: center;
+        padding: 11px 10px;
+        font-size: 13px
+      }
+
+      /* Baris aksi menempel di bawah modal supaya tombol Simpan selalu terjangkau */
+      .pl-modal .modal-footer {
+        position: sticky;
+        bottom: 0;
+        z-index: 3;
+        background: var(--white);
+        border-top: 1px solid var(--border)
+      }
+
+      /* Ruang ekstra di ujung area gulir agar isian terakhir tidak tertutup baris aksi */
+      .pl-modal .modal-body {
+        padding-bottom: 40px
+      }
+
+      .pl-preview {
+        align-self: center;
+        width: 100%;
+        max-width: 360px
+      }
+    }
+
+    @media (min-width:601px) {
+      .pl-entry {
+        display: flex;
+        justify-content: flex-end
+      }
+
+      .pl-entry-btn {
+        width: auto
+      }
+    }
+
+    @media (min-width:880px) {
+      .pl-grid {
+        grid-template-columns: minmax(0, 1fr) 420px;
+        gap: 24px
+      }
+
+      .pl-preview {
+        order: 0
+      }
+
+      .pl-frame {
+        max-width: 420px
+      }
+    }
+
+    /* ─── Kartu slide 1080 × 1350 (dipakai pratinjau + ekspor) ─── */
+    .pl-stage {
+      position: fixed;
+      left: -10000px;
+      top: 0;
+      width: 1080px;
+      height: 1350px;
+      overflow: hidden;
+      visibility: hidden;
+      pointer-events: none;
+      z-index: -1
+    }
+
+    /* Wadah ekspor: di luar layar, tapi tetap dianggap terlihat oleh html2canvas */
+    .pl-ex-host {
+      position: fixed;
+      top: 0;
+      left: -20000px;
+      width: 1080px;
+      height: 1350px;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1
+    }
+
+    .pls-slide {
+      position: relative;
+      width: 1080px;
+      height: 1350px;
+      padding: 70px 72px 58px;
+      box-sizing: border-box;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+      -webkit-font-smoothing: antialiased
+    }
+
+    .pls-cream {
+      background: #FCF7F1;
+      color: #3F3A34;
+      --pls-muted: #8A8279;
+      --pls-accent: #85957A;
+      --pls-hair: #D4C2AA;
+      --pls-hair-soft: rgba(212, 194, 170, 0.55)
+    }
+
+    .pls-sage {
+      background: #6F7D64;
+      color: #FCF7F1;
+      --pls-muted: #DCD3C4;
+      --pls-accent: #D4C2AA;
+      --pls-hair: rgba(252, 247, 241, 0.28);
+      --pls-hair-soft: rgba(252, 247, 241, 0.18)
+    }
+
+    /* Motif latar: tiga lingkaran lembut di kanan atas saja (tanpa bentuk lain) */
+    .pls-motif {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none
+    }
+
+    .pls-motif span {
+      position: absolute;
+      display: block;
+      border-radius: 50%
+    }
+
+    .pls-dot-a {
+      width: 300px;
+      height: 300px;
+      top: -108px;
+      right: -86px;
+      background: var(--pls-accent);
+      opacity: .07
+    }
+
+    .pls-dot-b {
+      width: 224px;
+      height: 224px;
+      top: 46px;
+      right: -128px;
+      background: var(--pls-accent);
+      opacity: .06
+    }
+
+    .pls-dot-c {
+      width: 156px;
+      height: 156px;
+      top: -76px;
+      right: -162px;
+      background: var(--pls-accent);
+      opacity: .08
+    }
+
+    .pls-head,
+    .pls-body,
+    .pls-foot {
+      position: relative;
+      z-index: 1
+    }
+
+    .pls-head {
+      flex: none
+    }
+
+    .pls-brand {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px
+    }
+
+    .pls-logo-tile {
+      width: 116px;
+      height: 116px;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #FCF7F1;
+      border-radius: 18px
+    }
+
+    .pls-logo {
+      width: 84px;
+      height: 84px;
+      flex: none;
+      display: block;
+      object-fit: contain
+    }
+
+    .pls-brand-txt {
+      min-width: 0;
+      flex: 1 1 auto;
+      padding-top: 4px
+    }
+
+    .pls-mark {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      line-height: 1.15;
+      white-space: nowrap
+    }
+
+    .pls-brand-sub {
+      font-size: 21px;
+      letter-spacing: .04em;
+      color: var(--pls-muted);
+      margin-top: 8px
+    }
+
+    .pls-city {
+      flex: none;
+      font-size: 18px;
+      letter-spacing: .3em;
+      color: var(--pls-muted);
+      padding-top: 10px
+    }
+
+    .pls-hero {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 96px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.01em;
+      margin: 50px 0 0;
+      overflow-wrap: anywhere
+    }
+
+    .pls-rule {
+      width: 96px;
+      height: 3px;
+      background: var(--pls-accent);
+      border-radius: 2px;
+      margin: 26px 0 20px
+    }
+
+    .pls-tagline {
+      font-size: 23px;
+      line-height: 1.35;
+      color: var(--pls-muted);
+      letter-spacing: .01em
+    }
+
+    .pls-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      padding-top: 40px
+    }
+
+    .pls-cat {
+      padding-top: 30px
+    }
+
+    .pls-cat:first-child {
+      padding-top: 0
+    }
+
+    .pls-cat-head {
+      display: flex;
+      align-items: center;
+      gap: 16px
+    }
+
+    .pls-dot {
+      width: 9px;
+      height: 9px;
+      flex: none;
+      border-radius: 50%;
+      background: var(--pls-accent);
+      margin-top: 0
+    }
+
+    /* Nama kategori pakai sans 800 (bukan Playfair) supaya angka seperti "1x" tetap jelas */
+    .pls-cat-name {
+      font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+      font-size: 31px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: 0.01em;
+      color: inherit;
+      white-space: nowrap
+    }
+
+    .pls-cat-line {
+      flex: 1 1 auto;
+      height: 1px;
+      min-width: 24px;
+      align-self: center;
+      background: var(--pls-hair)
+    }
+
+    .pls-it {
+      padding-left: 25px
+    }
+
+    .pls-cat-head+.pls-it {
+      margin-top: 20px
+    }
+
+    .pls-it+.pls-it {
+      margin-top: 26px
+    }
+
+    .pls-item {
+      display: flex;
+      align-items: center
+    }
+
+    .pls-nm {
+      flex: 0 1 auto;
+      min-width: 0;
+      font-size: 25px;
+      font-weight: 700;
+      line-height: 1.25
+    }
+
+    .pls-dur {
+      flex: none;
+      font-size: 20px;
+      color: var(--pls-muted);
+      margin-left: 14px;
+      white-space: nowrap
+    }
+
+    .pls-lead {
+      flex: 1 1 40px;
+      min-width: 20px;
+      align-self: center;
+      height: 0;
+      border-bottom: 2px dotted var(--pls-hair);
+      margin: 0 14px
+    }
+
+    .pls-amt {
+      flex: none;
+      font-size: 27px;
+      font-weight: 800;
+      text-align: right;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em
+    }
+
+    .pls-desc {
+      font-size: 20px;
+      color: var(--pls-muted);
+      margin-top: 5px;
+      max-width: 780px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .pls-foot {
+      flex: none;
+      padding-top: 36px
+    }
+
+    .pls-card {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 30px;
+      padding: 30px 34px;
+      border-radius: 26px;
+      background: #85957A;
+      color: #FCF7F1
+    }
+
+    .pls-sage .pls-card {
+      background: #FCF7F1;
+      color: #4A5540
+    }
+
+    .pls-card-l {
+      min-width: 0
+    }
+
+    .pls-card-label {
+      font-size: 20px;
+      letter-spacing: .14em;
+      opacity: .7;
+      line-height: 1.2
+    }
+
+    .pls-card-phone {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-top: 8px;
+      letter-spacing: -0.01em;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap
+    }
+
+    .pls-card-phone i {
+      font-size: 30px;
+      opacity: .92
+    }
+
+    .pls-card-r {
+      flex: none;
+      max-width: 340px;
+      text-align: right
+    }
+
+    .pls-card-ig {
+      font-size: 23px;
+      font-weight: 700;
+      line-height: 1.2
+    }
+
+    .pls-card-addr {
+      font-size: 19px;
+      line-height: 1.32;
+      opacity: .8;
+      margin-top: 7px;
+      max-height: 50px;
+      overflow: hidden
+    }
+
+    .pls-note {
+      font-size: 19px;
+      line-height: 1.35;
+      text-align: center;
+      color: var(--pls-muted);
+      margin-top: 26px
+    }
+
+    .pls-endline {
+      border-top: 1px solid var(--pls-hair);
+      padding-top: 18px;
+      font-size: 18px;
+      text-align: center;
+      color: var(--pls-muted)
+    }
+
+    .pls-page {
+      font-size: 16px;
+      text-align: right;
+      color: var(--pls-muted);
+      margin-top: 14px;
+      letter-spacing: .06em;
+      font-variant-numeric: tabular-nums
+    }
+
+    /* Pratinjau gambar hasil ekspor (bisa lebih dari satu) */
+    .pl-img-ov {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 3000;
+      background: rgba(20, 20, 20, 0.92);
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px
+    }
+
+    .pl-img-ov img {
+      width: 100%;
+      max-width: 420px;
+      border-radius: 10px;
+      background: #FCF7F1;
+      display: block
+    }
   </style>
 </head>
 
@@ -2697,7 +3440,7 @@
     <!-- ─── SIDEBAR ─── -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
-        <div style="font-size:20px;margin-bottom:6px">🌸</div>
+        <div id="sidebarBrandLogo" style="font-size:20px;margin-bottom:6px">🌸</div>
         <div class="sidebar-brand-name">Daisafacare</div>
         <div class="sidebar-brand-tag">Mom &amp; Baby Treatment</div>
       </div>
@@ -2779,6 +3522,7 @@
       user: null,
       page: 'dashboard',
       settings: {},
+      brand: { logo: '', qris: '' },
       data: { schedules: [], customers: [], treatments: [], payments: [], users: [], customerDetail: null },
       calYear: new Date().getFullYear(),
       calMonth: new Date().getMonth(),
@@ -2859,6 +3603,66 @@
     // Awalan URL: "https://" ditulis tanpa dua garis miring berurutan di kode,
     // karena dua garis miring di dalam string JS dipotong saat file disajikan.
     const URLBASE = 'https:' + String.fromCharCode(47, 47);
+
+    // ─── Logo & QRIS ───
+    // Alamat gambar bawaan juga disusun dari URLBASE (tanpa dua garis miring di kode).
+    const DEFAULT_LOGO_URL = URLBASE + 'res.cloudinary.com/dlrxxfy7f/image/upload/w_320,q_auto:good,f_png/v1792500542/LOGO_DAISAFACARE_NO_TEXT-removebg-preview_yyopiu.png';
+    const DEFAULT_QRIS_URL = URLBASE + 'res.cloudinary.com/dlrxxfy7f/image/upload/w_500,q_auto:best,f_png/v1792500651/QRIS_DAISAFA_CARE_srnnbg.png';
+    // Alamat dari Pengaturan: kosong / bukan http(s) → gambar bawaan. data: juga diterima.
+    const brandUrlOk = raw => {
+      const v = String(raw || '').trim();
+      if (!v) return '';
+      if (/^data:image\//i.test(v)) return v;
+      return attrUrl(v);
+    };
+    const logoUrl = () => brandUrlOk(S.settings && S.settings.logo_url) || DEFAULT_LOGO_URL;
+    const qrisUrl = () => brandUrlOk(S.settings && S.settings.qris_url) || DEFAULT_QRIS_URL;
+    // Tag <img> untuk logo / QRIS. Bila data URI hasil prefetch sudah ada, itu yang dipakai
+    // supaya "Simpan Gambar" tidak pernah gagal karena kanvas tercemar (tainted).
+    const brandImg = (kind, w, extra) => {
+      const isQris = kind === 'qris';
+      const url = isQris ? qrisUrl() : logoUrl();
+      if (!url) return '';
+      const cached = isQris ? (S.brand && S.brand.qris) : (S.brand && S.brand.logo);
+      const src = cached || url;
+      const lebar = parseInt(w, 10) || 44;
+      const gaya = 'display:block;width:' + lebar + 'px;height:auto;object-fit:contain;' + (extra || '');
+      return `<img src="${src}" alt="${isQris ? 'QRIS Daisafacare' : 'Logo Daisafacare'}" loading="eager" decoding="sync" crossorigin="anonymous" style="${gaya}" onerror="this.style.display='none'">`;
+    };
+
+    // Ambil logo & QRIS sekali saat aplikasi dibuka, simpan sebagai data URI.
+    // Tidak menahan tampilan dan tidak menggambar ulang apa pun; gagal = diam saja.
+    function prefetchBrandAssets() {
+      const ambil = (url, key) => {
+        try {
+          if (!url || typeof fetch !== 'function' || typeof FileReader !== 'function') return;
+          fetch(url)
+            .then(r => (r && r.ok ? r.blob() : null))
+            .then(b => {
+              if (!b) return;
+              const fr = new FileReader();
+              fr.onload = () => {
+                const d = String(fr.result || '');
+                if (d.indexOf('data:') === 0) S.brand[key] = d;
+              };
+              fr.readAsDataURL(b);
+            })
+            .catch(() => { });
+        } catch (e) { }
+      };
+      ambil(logoUrl(), 'logo');
+      ambil(qrisUrl(), 'qris');
+    }
+
+    // Logo di sidebar (44px). Bila gambar gagal dimuat, kembali ke 🌸.
+    function setSidebarLogo() {
+      const el = $('sidebarBrandLogo');
+      if (!el) return;
+      const url = logoUrl();
+      if (!url) { el.innerHTML = '🌸'; return; }
+      const src = (S.brand && S.brand.logo) || url;
+      el.innerHTML = `<img src="${src}" alt="Logo Daisafacare" loading="lazy" crossorigin="anonymous" style="display:block;width:44px;height:auto;max-height:64px;object-fit:contain" onerror="this.style.display='none';var f=document.getElementById('sidebarBrandLogo');if(f){f.innerHTML='🌸'}">`;
+    }
 
     function ga(fn, args, cb) {
       // Google Apps Script call
@@ -3011,7 +3815,7 @@
       updateTopbarDate();
       setInterval(updateTopbarDate, 60000);
       refreshSessionUser();
-      loadSettings(() => navigate('dashboard'));
+      loadSettings(() => { setSidebarLogo(); prefetchBrandAssets(); navigate('dashboard'); });
     }
 
     // Ambil data user terbaru dari server (nama bisa berubah oleh admin).
@@ -3099,7 +3903,8 @@
       if (!arr.length) return `<div class="table-empty"><i class="fa fa-calendar-xmark"></i>${emptyMsg}</div>`;
       return `<div class="today-list">${arr.map(s => {
         const trt = schedTreatmentsText(s);
-        return `<div class="today-item"><div class="today-time">${sanitize(s.time) || '--:--'}</div><div class="today-info" style="min-width:0"><div class="today-cust">${sanitize(s.customer)}</div>${trt ? `<div class="today-loc" style="color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><i class="fa fa-spa"></i> ${sanitize(trt)}</div>` : ''}<div class="today-loc" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><i class="fa fa-location-dot"></i> ${sanitize(s.location) || '—'}</div></div><div class="today-therapist">${sanitize(s.therapist)}</div><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></div>`;
+        const maps = s.maps_link ? `<a class="today-maps" href="${attrUrl(s.maps_link)}" target="_blank" rel="noopener" title="Buka Maps"><i class="fa fa-map-location-dot"></i></a>` : '';
+        return `<div class="today-item"><div class="today-time">${sanitize(s.time) || '--:--'}</div><div class="today-info" style="min-width:0"><div class="today-cust">${sanitize(s.customer)}</div>${trt ? `<div class="today-loc" style="color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><i class="fa fa-spa"></i> ${sanitize(trt)}</div>` : ''}<div class="today-loc" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><i class="fa fa-location-dot"></i> ${sanitize(s.location) || '—'}</div></div><div class="today-therapist">${sanitize(s.therapist)}</div><span class="badge badge-${s.status}">${statusLabel(s.status)}</span>${maps}</div>`;
       }).join('')}</div>`;
     }
 
@@ -3216,7 +4021,9 @@
       }
       $('pageContent').innerHTML = `
   <div class="filter-bar">
+    <div class="fg"><label>Cari</label><input type="text" id="fSearch" placeholder="Cari pelanggan, No. HP, invoice, treatment..." oninput="applyJadwalFilters()"></div>
     <div class="fg"><label>Status</label><select class="fg" id="fStatus" onchange="loadSchedules()"><option value="">Semua</option><option value="scheduled">Terjadwal</option><option value="done">Selesai</option><option value="cancelled">Dibatalkan</option></select></div>
+    <div class="fg"><label>Urutkan</label><select id="fSort" onchange="applyJadwalFilters()"><option value="date_desc" selected>Tanggal terbaru</option><option value="date_asc">Tanggal terlama</option><option value="time_asc">Waktu (pagi ke sore)</option><option value="name_asc">Nama pelanggan (A-Z)</option><option value="total_desc">Total tertinggi</option></select></div>
     <div class="fg"><label>Dari Tanggal</label><input type="date" id="fFrom" onchange="loadSchedules()"></div>
     <div class="fg"><label>Sampai</label><input type="date" id="fTo" onchange="loadSchedules()"></div>
     <div class="fg"><label>&nbsp;</label><button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i class="fa fa-rotate-left"></i> Reset</button></div>
@@ -3241,6 +4048,8 @@
     }
     function resetFilters() {
       $('fStatus').value = ''; $('fFrom').value = ''; $('fTo').value = '';
+      if ($('fSearch')) $('fSearch').value = '';
+      if ($('fSort')) $('fSort').value = 'date_desc';
       loadSchedules();
     }
     function loadSchedules() {
@@ -3253,17 +4062,73 @@
       });
     }
 
+    // Pencarian & urutan di sisi klien: tidak memanggil server, S.data.schedules tetap utuh.
+    // Dipakai input #fSearch dan pilihan #fSort.
+    function applyJadwalFilters() {
+      if (currentView === 'cal') return; // tampilan kalender tidak diubah
+      if (!Array.isArray(S.data.schedules) || !S.data.schedules.length) return; // data belum termuat
+      renderScheduleList(S.data.schedules);
+    }
+
+    // Kolom yang ikut dicari (teks digabung, pencarian tidak peka huruf besar/kecil)
+    function scheduleSearchText(s) {
+      if (!s) return '';
+      return [s.customer_name, s.customer_phone, s.invoice_no, schedTreatmentsText(s), s.location]
+        .map(x => String(x || '')).join(' ');
+    }
+
+    function scheduleSortedFiltered(data) {
+      const semua = Array.isArray(data) ? data : [];
+      const q = String((($('fSearch') || {}).value) || '').trim().toLowerCase();
+      const qDigit = q.replace(/\D/g, '');
+      let rows = semua.slice();
+      if (q) {
+        rows = rows.filter(s => {
+          if (scheduleSearchText(s).toLowerCase().indexOf(q) !== -1) return true;
+          if (!qDigit) return false;
+          const hp = String((s && s.customer_phone) || '').replace(/\D/g, '');
+          return hp.indexOf(qDigit) !== -1;
+        });
+      }
+      const mode = ($('fSort') && $('fSort').value) || 'date_desc';
+      const tgl = s => String((s && s.schedule_date) || '');
+      const jam = s => String((s && s.schedule_time) || '').trim();
+      if (mode === 'date_asc') {
+        rows.sort((a, b) => tgl(a).localeCompare(tgl(b)) || (jam(a) || '99:99').localeCompare(jam(b) || '99:99'));
+      } else if (mode === 'time_asc') {
+        // Pagi ke sore: tanggal dulu, lalu jam (jam kosong paling bawah)
+        rows.sort((a, b) => tgl(a).localeCompare(tgl(b)) || (jam(a) || '99:99').localeCompare(jam(b) || '99:99'));
+      } else if (mode === 'name_asc') {
+        rows.sort((a, b) => String((a && a.customer_name) || '').localeCompare(String((b && b.customer_name) || ''), 'id'));
+      } else if (mode === 'total_desc') {
+        rows.sort((a, b) => (parseFloat(b && b.grand_total) || 0) - (parseFloat(a && a.grand_total) || 0));
+      } else {
+        // date_desc — urutan bawaan server (tanggal terbaru)
+        rows.sort((a, b) => tgl(b).localeCompare(tgl(a)));
+      }
+      return rows;
+    }
+
     function renderScheduleList(data) {
-      if (!data.length) { $('jadwalContent').innerHTML = `<div class="table-empty" style="background:var(--white);border-radius:var(--radius-md);padding:48px"><i class="fa fa-calendar-plus"></i>Belum ada jadwal.${isWriter() ? ' Klik + Tambah Jadwal untuk mulai.' : ''}</div>`; return; }
+      const semua = Array.isArray(data) ? data : [];
+      const rows = scheduleSortedFiltered(semua);
+      if (!rows.length) {
+        const cari = String((($('fSearch') || {}).value) || '').trim();
+        const kosong = semua.length
+          ? `<div class="table-empty" style="background:var(--white);border-radius:var(--radius-md);padding:48px"><i class="fa fa-magnifying-glass"></i>Tidak ada jadwal yang cocok${cari ? ' dengan "' + sanitize(cari) + '"' : ''}</div>`
+          : `<div class="table-empty" style="background:var(--white);border-radius:var(--radius-md);padding:48px"><i class="fa fa-calendar-plus"></i>Belum ada jadwal.${isWriter() ? ' Klik + Tambah Jadwal untuk mulai.' : ''}</div>`;
+        $('jadwalContent').innerHTML = kosong;
+        return;
+      }
       // Nomor invoice per baris, dipakai kunjungan paket untuk menampilkan nomor invoice induk
       const invById = {};
-      data.forEach(x => { if (x.invoice_no) invById[String(x.id)] = x.invoice_no; });
+      semua.forEach(x => { if (x.invoice_no) invById[String(x.id)] = x.invoice_no; });
       $('jadwalContent').innerHTML = `
   <div class="card">
     <div class="table-wrap">
       <table>
         <thead><tr><th>Invoice</th><th>Tanggal & Waktu</th><th>Pelanggan</th><th>Treatment</th><th>Terapis</th><th>Total</th><th>Status</th><th>Keterangan</th><th>Aksi</th></tr></thead>
-        <tbody>${data.map(s => `<tr>
+        <tbody>${rows.map(s => `<tr>
           <td>${invCellHtml(s, invById)}</td>
           <td><div style="font-weight:600">${fmtDate(s.schedule_date)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(s.schedule_time)}</div></td>
           <td><div style="font-weight:600">${sanitize(s.customer_name)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(s.customer_phone)}</div></td>
@@ -3273,6 +4138,7 @@
           <td><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></td>
           <td><span class="badge badge-${keteranganClass(s.keterangan)}" style="font-size:10px">${sanitize(s.keterangan) || '—'}</span></td>
           <td style="white-space:nowrap">
+            ${s.maps_link ? `<a class="btn btn-sm btn-outline" href="${attrUrl(s.maps_link)}" target="_blank" rel="noopener" title="Buka Maps"><i class="fa fa-map-location-dot"></i></a>` : ''}
             <button class="btn btn-sm btn-outline" onclick="viewSchedule(${s.id})" title="Lihat"><i class="fa fa-eye"></i></button>
             ${isWriter() ? `<button class="btn btn-sm btn-outline" onclick="openScheduleModal(${s.id})" title="Ubah"><i class="fa fa-pen"></i></button>` : ''}
             <button class="btn btn-sm btn-beige" onclick="printInvoiceById(${schedPrintId(s)})" title="Invoice"><i class="fa fa-file-invoice"></i></button>
@@ -3329,6 +4195,17 @@
         const d = s.schedule_date;
         if (!evtMap[d]) evtMap[d] = [];
         evtMap[d].push(s);
+      });
+      // Urutkan jam tiap hari (HH:mm naik); jam kosong ditaruh paling bawah
+      Object.keys(evtMap).forEach(k => {
+        evtMap[k].sort((a, b) => {
+          const ta = String((a && a.schedule_time) || '').trim();
+          const tb = String((b && b.schedule_time) || '').trim();
+          if (!ta && !tb) return 0;
+          if (!ta) return 1;
+          if (!tb) return -1;
+          return ta < tb ? -1 : (ta > tb ? 1 : 0);
+        });
       });
 
       let cells = '';
@@ -3421,8 +4298,26 @@
               <div class="form-section">
                 <div class="form-section-title"><i class="fa fa-user"></i> Info Pelanggan & Terapis</div>
                 <div class="form-row cols-2">
-                  <div class="fg"><label>Pelanggan <span style="color:var(--text-muted);font-weight:400">(kosongkan untuk walk-in)</span></label><select id="fCust"><option value="">— Walk-in —</option>${custOpts}</select></div>
+                  <div class="fg">
+                    <label>Pelanggan <span style="color:var(--text-muted);font-weight:400">(kosongkan untuk walk-in)</span></label>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                      <select id="fCust" onchange="fillLocFromCust('nc')" style="flex:1 1 130px;min-width:0"><option value="">— Walk-in —</option>${custOpts}</select>
+                      <button type="button" id="fCustNew" class="btn btn-ghost btn-sm" onclick="toggleNewCust('nc')" style="flex:0 0 auto;padding:9px 11px;font-size:12px;white-space:nowrap">+ Pelanggan Baru</button>
+                    </div>
+                  </div>
                   <div class="fg"><label>Terapis</label><select id="fTherapist"><option value="">— Pilih Terapis —</option>${therapOpts}</select></div>
+                </div>
+                <div id="ncBlock" style="display:none;background:var(--cream-dark);border:1px solid var(--beige);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px">
+                  <div style="font-size:12.5px;font-weight:700;color:var(--text-sec);margin-bottom:10px"><i class="fa fa-user-plus"></i> Pelanggan Baru</div>
+                  <div class="fg" style="margin-bottom:10px"><label>Nama *</label><input type="text" id="ncName" placeholder="Nama ibu/pelanggan" autocomplete="off"></div>
+                  <div class="fg" style="margin-bottom:10px"><label>No. HP *</label><input type="text" id="ncPhone" placeholder="08xxxxxxxxxx" inputmode="tel" autocomplete="off"></div>
+                  <div class="fg" style="margin-bottom:10px"><label>Alamat</label><input type="text" id="ncAddr" placeholder="Wilayah atau alamat lengkap (opsional)" autocomplete="off"></div>
+                  <div class="fg" style="margin-bottom:12px"><label>Nama Bayi</label><input type="text" id="ncBaby" placeholder="Opsional" autocomplete="off"></div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button type="button" id="ncSave" class="btn btn-primary btn-sm" onclick="saveNewCust('nc')"><i class="fa fa-floppy-disk"></i> Simpan Pelanggan</button>
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="cancelNewCust('nc')">Batal</button>
+                  </div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:8px;line-height:1.45">Pelanggan langsung tersimpan dan terpilih di form ini.</div>
                 </div>
               </div>
               <div class="form-section">
@@ -3486,6 +4381,7 @@
             </div>
           </div>
         </div>`;
+            ensureCustCache();
             if (isEdit) {
               ga('getScheduleDetail', [scheduleId, S.user.id, S.user.role], dres => {
                 loading(false);
@@ -3509,6 +4405,122 @@
             }
           });
         });
+      });
+    }
+
+    // ─── PELANGGAN BARU LANGSUNG DARI FORM (tetap di modal yang sama) ───
+    // prefix 'nc' = modal Tambah Jadwal, 'pc' = modal Tambah Paket NB.
+    const NEWCUST_MAP = {
+      nc: { sel: 'fCust', loc: 'fLoc', block: 'ncBlock', name: 'ncName', phone: 'ncPhone', addr: 'ncAddr', baby: 'ncBaby', save: 'ncSave' },
+      pc: { sel: 'pCust', loc: 'pLoc', block: 'pcBlock', name: 'pcName', phone: 'pcPhone', addr: 'pcAddr', baby: 'pcBaby', save: 'pcSave' }
+    };
+
+    // Cache pelanggan lengkap (berisi alamat) dimuat sekali saja, supaya pengisian
+    // lokasi otomatis tetap jalan walau halaman Pelanggan belum pernah dibuka.
+    function ensureCustCache() {
+      if ((S.data.customers || []).length) return;
+      ga('getCustomers', [S.user.id, S.user.role], res => {
+        if (!res || !res.success || !res.data) return;
+        S.data.customers = res.data;
+        fillLocFromCust('nc');
+        fillLocFromCust('pc');
+      });
+    }
+
+    function toggleNewCust(prefix) {
+      const m = NEWCUST_MAP[prefix];
+      const box = m ? $(m.block) : null;
+      if (!box) return;
+      const show = box.style.display === 'none';
+      box.style.display = show ? '' : 'none';
+      if (show) { const el = $(m.name); if (el) el.focus(); }
+    }
+
+    function clearNewCust(prefix) {
+      const m = NEWCUST_MAP[prefix];
+      if (!m) return;
+      [m.name, m.phone, m.addr, m.baby].forEach(k => { const el = $(k); if (el) el.value = ''; });
+    }
+
+    function cancelNewCust(prefix) {
+      const m = NEWCUST_MAP[prefix];
+      if (!m) return;
+      const box = $(m.block);
+      if (box) box.style.display = 'none';
+      clearNewCust(prefix);
+    }
+
+    // Tambahkan opsi pelanggan baru ke dropdown lalu pilih
+    function addCustOption(selId, id, name, phone) {
+      const sel = $(selId);
+      if (!sel || !id) return;
+      const o = document.createElement('option');
+      o.value = String(id);
+      o.textContent = String(name || '') + ' - ' + String(phone || '');
+      sel.appendChild(o);
+      sel.value = String(id);
+    }
+
+    // Isi Lokasi dari alamat pelanggan terpilih — hanya bila Lokasi masih kosong
+    function fillLocFromCust(prefix) {
+      const m = NEWCUST_MAP[prefix];
+      if (!m) return;
+      const sel = $(m.sel), loc = $(m.loc);
+      if (!sel || !loc) return;
+      if (String(loc.value || '').trim() !== '') return;
+      const id = String(sel.value || '');
+      if (!id) return;
+      const c = (S.data.customers || []).find(x => String(x.id) === id);
+      const addr = c ? String(c.address || '').trim() : '';
+      if (!addr) return;
+      loc.value = addr;
+    }
+
+    function saveNewCust(prefix) {
+      const m = NEWCUST_MAP[prefix];
+      if (!m) return;
+      const btn = $(m.save);
+      if (btn && btn.disabled) return; // cegah klik ganda
+      const nameEl = $(m.name), phoneEl = $(m.phone), addrEl = $(m.addr), babyEl = $(m.baby);
+      const name = String((nameEl && nameEl.value) || '').trim();
+      const phone = String((phoneEl && phoneEl.value) || '').trim();
+      if (!name) { toast('Nama pelanggan wajib diisi', 'warning'); if (nameEl) nameEl.focus(); return; }
+      if (!phone) { toast('No. HP pelanggan wajib diisi', 'warning'); if (phoneEl) phoneEl.focus(); return; }
+      const address = String((addrEl && addrEl.value) || '').trim();
+      const babyName = String((babyEl && babyEl.value) || '').trim();
+      const label = btn ? btn.innerHTML : '';
+      if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Menyimpan...'; }
+      let selesai = false;
+      const done = () => {
+        if (selesai) return;
+        selesai = true;
+        if (!btn || !btn.isConnected) return; // modal bisa saja sudah ditutup
+        btn.disabled = false;
+        btn.innerHTML = label;
+      };
+      // Jaring pengaman: bila koneksi putus tanpa balasan, tombol bisa dipakai lagi
+      setTimeout(done, 20000);
+      ga('addCustomer', [{
+        name: name, phone: phone, address: address, baby_name: babyName,
+        baby_age: '', dob: '', maps_link: '', notes: ''
+      }, S.user.id, S.user.role], res => {
+        done();
+        if (!res || !res.success) {
+          toast((res && res.message) || 'Gagal menambahkan pelanggan', 'error');
+          return; // isian dibiarkan supaya bisa dicoba lagi
+        }
+        const data = (res && res.data) || {};
+        const newName = data.name || name;
+        // Sinkronkan cache supaya halaman Pelanggan & pencarian langsung melihatnya
+        if (Array.isArray(S.data.customers)) {
+          S.data.customers.push({ id: data.id, name: newName, phone: phone, address: address, baby_name: babyName, dob: '', maps_link: '', notes: '', total_purchase: 0, total_paid: 0, total_due: 0 });
+        }
+        addCustOption(m.sel, data.id, newName, phone);
+        const box = $(m.block);
+        if (box) box.style.display = 'none';
+        clearNewCust(prefix);
+        toast('Pelanggan ' + newName + ' ditambahkan', 'success');
+        fillLocFromCust(prefix); // alamat baru langsung dipakai bila Lokasi masih kosong
       });
     }
 
@@ -3852,8 +4864,26 @@
               <div class="form-section">
                 <div class="form-section-title"><i class="fa fa-user"></i> Pelanggan & Terapis</div>
                 <div class="form-row cols-2">
-                  <div class="fg"><label>Pelanggan *</label><select id="pCust"><option value="">— Pilih Pelanggan —</option>${custOpts}</select></div>
+                  <div class="fg">
+                    <label>Pelanggan *</label>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                      <select id="pCust" onchange="fillLocFromCust('pc')" style="flex:1 1 130px;min-width:0"><option value="">— Pilih Pelanggan —</option>${custOpts}</select>
+                      <button type="button" id="pCustNew" class="btn btn-ghost btn-sm" onclick="toggleNewCust('pc')" style="flex:0 0 auto;padding:9px 11px;font-size:12px;white-space:nowrap">+ Pelanggan Baru</button>
+                    </div>
+                  </div>
                   <div class="fg"><label>Terapis</label><select id="pTherapist"><option value="">— Pilih Terapis —</option>${therapOpts}</select></div>
+                </div>
+                <div id="pcBlock" style="display:none;background:var(--cream-dark);border:1px solid var(--beige);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px">
+                  <div style="font-size:12.5px;font-weight:700;color:var(--text-sec);margin-bottom:10px"><i class="fa fa-user-plus"></i> Pelanggan Baru</div>
+                  <div class="fg" style="margin-bottom:10px"><label>Nama *</label><input type="text" id="pcName" placeholder="Nama ibu/pelanggan" autocomplete="off"></div>
+                  <div class="fg" style="margin-bottom:10px"><label>No. HP *</label><input type="text" id="pcPhone" placeholder="08xxxxxxxxxx" inputmode="tel" autocomplete="off"></div>
+                  <div class="fg" style="margin-bottom:10px"><label>Alamat</label><input type="text" id="pcAddr" placeholder="Wilayah atau alamat lengkap (opsional)" autocomplete="off"></div>
+                  <div class="fg" style="margin-bottom:12px"><label>Nama Bayi</label><input type="text" id="pcBaby" placeholder="Opsional" autocomplete="off"></div>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button type="button" id="pcSave" class="btn btn-primary btn-sm" onclick="saveNewCust('pc')"><i class="fa fa-floppy-disk"></i> Simpan Pelanggan</button>
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="cancelNewCust('pc')">Batal</button>
+                  </div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin-top:8px;line-height:1.45">Pelanggan langsung tersimpan dan terpilih di form ini.</div>
                 </div>
               </div>
               <div class="form-section">
@@ -3909,6 +4939,7 @@
             pkgOnPackageChange();
             pkgUpdateHint();
             pkgCalcSummary();
+            ensureCustCache();
           });
         });
       });
@@ -4398,7 +5429,8 @@
         res.data.forEach(t => { if (!cats[t.category]) cats[t.category] = []; cats[t.category].push(t); });
         const catOrder = urutanKategori();
         const sortedCats = [...catOrder, ...Object.keys(cats).filter(c => catOrder.indexOf(c) === -1)].filter(c => cats[c]);
-        $('pricelistContent').innerHTML = sortedCats.map(cat => `
+        $('pricelistContent').innerHTML = `
+    <div class="pl-entry"><button class="btn btn-primary pl-entry-btn" onclick="openPricelistModal()"><i class="fa fa-image"></i> Buat Gambar Pricelist</button></div>` + sortedCats.map(cat => `
     <div class="price-category">
       <div class="price-cat-title"><span><i class="fa fa-spa"></i> ${sanitize(cat)}</span><span style="font-size:13px;color:var(--text-muted);font-weight:400">${cats[cat].length} treatment</span></div>
       ${cats[cat].map(t => `
@@ -4416,6 +5448,535 @@
     </div>`).join('');
       });
     }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  PEMBUAT GAMBAR PRICELIST (1080 × 1350, 4:5)
+    // ═══════════════════════════════════════════════════════════════
+    const PL_W = 1080;
+    const PL_H = 1350;
+    const PL_BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const plBulanTahun = d => { const x = d || new Date(); return PL_BULAN[x.getMonth()] + ' ' + x.getFullYear(); };
+    const plSubJudul = () => 'Daftar harga · ' + plBulanTahun();
+    const PL_CATATAN = 'Transport gratis untuk jarak ≤ 5 km · Surabaya & sekitarnya';
+
+    // Kontak diambil dari Pengaturan, dengan nilai cadangan yang wajar
+    const plKontak = () => ({
+      phone: (S.settings && S.settings.business_phone) || '0822-3212-1081',
+      instagram: (S.settings && S.settings.business_instagram) || '@daisafacare',
+      address: (S.settings && S.settings.business_address) || 'Surabaya'
+    });
+
+    // Status isian modal (tema & halaman aktif). Slide dihitung ulang tiap isian berubah.
+    let PL = { theme: 'cream', page: 1, slides: [], opts: null };
+
+    // Data pricelist: hanya treatment aktif, dikelompokkan per kategori sesuai urutanBaku
+    function pricelistData() {
+      const aktif = (S.data.treatments || []).filter(t => isActiveVal(t.is_active));
+      const urut = urutanKategori();
+      const peta = {};
+      aktif.forEach(t => {
+        const c = String(t.category || '').trim() || 'Lainnya';
+        if (!peta[c]) peta[c] = [];
+        peta[c].push(t);
+      });
+      const hasil = urut.filter(c => peta[c]);
+      Object.keys(peta).forEach(c => { if (hasil.indexOf(c) === -1) hasil.push(c); });
+      return hasil.map(c => ({ category: c, items: peta[c] }));
+    }
+
+    // Semua pilihan modal dibaca sekali di sini. Tanpa modal (mis. saat ekspor) dipakai nilai bawaan.
+    function pricelistOpts() {
+      const k = plKontak();
+      const nilai = (id, cadangan) => { const el = $(id); const v = el ? String(el.value).trim() : ''; return v || cadangan; };
+      const cek = (id, cadangan) => { const el = $(id); return el ? !!el.checked : cadangan; };
+      const cats = [];
+      const box = $('plCats');
+      if (box) {
+        const inputs = box.querySelectorAll('input[type="checkbox"]');
+        for (let i = 0; i < inputs.length; i++) { if (inputs[i].checked) cats.push(inputs[i].value); }
+      }
+      return {
+        title: nilai('plTitle', 'Pricelist'),
+        subtitle: nilai('plSubtitle', plSubJudul()),
+        theme: PL.theme === 'sage' ? 'sage' : 'cream',
+        cats: cats,
+        showDur: cek('plTogDur', true),
+        showContact: cek('plTogKontak', true),
+        showNote: cek('plTogNote', true),
+        showDesc: cek('plTogDesc', false),
+        note: nilai('plNote', PL_CATATAN),
+        phone: k.phone,
+        instagram: k.instagram,
+        address: k.address
+      };
+    }
+
+    // ─── Potongan markup slide (dipakai ulang oleh pengukur & pratinjau) ───
+    function plCatHeadHtml(cat) {
+      return `<div class="pls-cat-head"><span class="pls-dot"></span><span class="pls-cat-name">${sanitize(cat)}</span><span class="pls-cat-line"></span></div>`;
+    }
+
+    // Durasi di slide: ≥ 2 jam yang bulat ditulis "6 jam", sisanya tetap "{n} mnt".
+    // 0 menit tidak pernah ditampilkan. Data asli (duration_min) tidak diubah.
+    function plDurasiTeks(menit) {
+      const n = parseInt(menit, 10) || 0;
+      if (n <= 0) return '';
+      if (n >= 120 && n % 60 === 0) return (n / 60) + ' jam';
+      return n + ' mnt';
+    }
+
+    // Nama item yang sudah menyebut durasinya (mis. "6 Jam" + "6 jam") tidak perlu chip durasi lagi.
+    function plDurasiDuplikat(nama, dteks) {
+      if (!dteks) return false;
+      const rapi = s => String(s || '').toLowerCase().replace(/\s+/g, '');
+      const namaRapi = rapi(nama);
+      const teks = rapi(dteks);
+      if (!namaRapi || !teks) return false;
+      const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      if (new RegExp('(^|[^0-9])' + esc(teks)).test(namaRapi)) return true;
+      const angka = teks.match(/^(\d+)/);
+      if (!angka) return false;
+      return new RegExp('(^|[^0-9])' + angka[1] + '(jam|hari|menit)').test(namaRapi);
+    }
+
+    function plItemHtml(t, opts) {
+      let dteks = opts.showDur ? plDurasiTeks(t.duration_min) : '';
+      if (dteks && plDurasiDuplikat(t.name, dteks)) dteks = '';
+      const dur = dteks ? `<span class="pls-dur">${sanitize(dteks)}</span>` : '';
+      const desc = (opts.showDesc && t.description) ? `<div class="pls-desc">${sanitize(t.description)}</div>` : '';
+      return `<div class="pls-it"><div class="pls-item"><span class="pls-nm">${sanitize(t.name)}</span>${dur}<span class="pls-lead"></span><span class="pls-amt">${fmtRp(t.price)}</span></div>${desc}</div>`;
+    }
+
+    // Satu slide 1080 × 1350. Murni: hanya menerima data dan mengembalikan markup.
+    function priceSlideHtml(desc, opts, pageInfo) {
+      const info = pageInfo || { page: 1, total: 1 };
+      const total = Math.max(1, parseInt(info.total, 10) || 1);
+      const page = Math.min(total, Math.max(1, parseInt(info.page, 10) || 1));
+      const last = page >= total;
+      const o = opts || {};
+      const tema = o.theme === 'sage' ? 'sage' : 'cream';
+      const src = (S.brand && S.brand.logo) || logoUrl();
+      const logo = src ? `<img class="pls-logo" src="${src}" alt="Logo Daisafacare" crossorigin="anonymous" loading="eager" decoding="sync">` : '';
+      const logoBox = tema === 'sage' ? `<span class="pls-logo-tile">${logo}</span>` : logo;
+      const groups = (desc && desc.groups) || [];
+
+      const isi = groups.map(g => `<div class="pls-cat">${plCatHeadHtml(g.category)}${(g.items || []).map(t => plItemHtml(t, o)).join('')}</div>`).join('');
+
+      let kaki = '';
+      if (last) {
+        const kartu = o.showContact ? `<div class="pls-card">
+          <div class="pls-card-l"><div class="pls-card-label">Booking &amp; info</div><div class="pls-card-phone"><i class="fab fa-whatsapp"></i>${sanitize(o.phone)}</div></div>
+          <div class="pls-card-r"><div class="pls-card-ig">${sanitize(o.instagram)}</div>${o.address ? `<div class="pls-card-addr">${sanitize(o.address)}</div>` : ''}</div>
+        </div>` : '';
+        const catatan = (o.showNote && o.note) ? `<div class="pls-note">${sanitize(o.note)}</div>` : '';
+        kaki = kartu + catatan;
+      } else {
+        const baris = o.showContact ? `${sanitize(o.phone)} · ${sanitize(o.instagram)} · lanjutan` : 'lanjutan';
+        kaki = `<div class="pls-endline">${baris}</div>`;
+      }
+      const nomor = total > 1 ? `<div class="pls-page">${page}/${total}</div>` : '';
+
+      return `<div class="pls-slide pls-${tema}">
+        <div class="pls-motif"><span class="pls-dot-a"></span><span class="pls-dot-b"></span><span class="pls-dot-c"></span></div>
+        <div class="pls-head">
+          <div class="pls-brand">${logoBox}<div class="pls-brand-txt"><div class="pls-mark">DAISAFACARE</div><div class="pls-brand-sub">Mom &amp; Baby Treatment</div></div><div class="pls-city">SURABAYA</div></div>
+          <div class="pls-hero">${sanitize(o.title || 'Pricelist')}</div>
+          <div class="pls-rule"></div>
+          <div class="pls-tagline">${sanitize(o.subtitle || '')}</div>
+        </div>
+        <div class="pls-body">${isi}</div>
+        <div class="pls-foot">${kaki}${nomor}</div>
+      </div>`;
+    }
+
+    // Halaman terakhir saja: kalau sisa ruang di bawah baris akhir masih > 120 px,
+    // bagikan ruang itu ke sela antar kategori (maks +48 px per sela) supaya tidak
+    // ada lubang kosong besar di atas kartu kontak. Satu kategori → ditengahkan.
+    function plSeimbangkan(el) {
+      if (!el) return;
+      const body = el.querySelector('.pls-body');
+      if (!body) return;
+      const cats = body.querySelectorAll('.pls-cat');
+      if (!cats.length) return;
+      // Jarak dari tepi atas .pls-body ke sebuah simpul (offsetTop relatif ke offsetParent-nya)
+      const posY = node => { let y = 0, n = node; while (n && n !== body) { y += n.offsetTop; n = n.offsetParent; } return y; };
+      const akhir = cats[cats.length - 1];
+      const bawah = parseFloat(getComputedStyle(body).paddingBottom) || 0;
+      const bebas = body.clientHeight - (posY(akhir) + akhir.offsetHeight) - bawah;
+      if (bebas <= 120) return;
+      if (cats.length === 1) {
+        cats[0].style.marginTop = Math.floor(bebas / 2) + 'px';
+        return;
+      }
+      const sela = cats.length - 1;
+      const tambah = Math.min(48, Math.floor(bebas / sela));
+      if (tambah < 1) return;
+      for (let i = 1; i < cats.length; i++) cats[i].style.paddingTop = (30 + tambah) + 'px';
+    }
+
+    // Wadah tak terlihat berisi slide ukur 1080 px (di luar layar)
+    function plStaging() {
+      let el = $('plStage');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'plStage';
+        el.className = 'pl-stage';
+        document.body.appendChild(el);
+      }
+      return el;
+    }
+
+    // Bagi item ke beberapa slide dengan mengukur tinggi isi sungguhan, bukan menebak.
+    // footerAkhir = true → slide ukur memakai kartu kontak (footer halaman terakhir).
+    function plMeasure(groups, opts, footerAkhir) {
+      const out = [];
+      const stage = plStaging();
+      stage.innerHTML = priceSlideHtml({ groups: [] }, opts, footerAkhir ? { page: 2, total: 2 } : { page: 1, total: 2 });
+      const body = stage.querySelector('.pls-body');
+      if (!body) { stage.innerHTML = ''; return [{ groups: (groups || []).slice() }]; }
+      const luber = () => body.scrollHeight > body.clientHeight + 1;
+
+      let cur = { groups: [] };
+      const tutupSlide = () => { out.push(cur); cur = { groups: [] }; };
+
+      (groups || []).forEach(g => {
+        let i = 0;
+        while (i < g.items.length) {
+          const catEl = document.createElement('div');
+          catEl.className = 'pls-cat';
+          catEl.innerHTML = plCatHeadHtml(g.category);
+          body.appendChild(catEl);
+          if (luber() && cur.groups.length) {
+            // judul kategori tidak muat lagi → pindah slide, ulangi kategori ini
+            body.removeChild(catEl);
+            tutupSlide();
+            body.innerHTML = '';
+            continue;
+          }
+          const sec = { category: g.category, items: [] };
+          cur.groups.push(sec);
+
+          let taruh = 0;
+          let ulangi = false;
+          while (i < g.items.length) {
+            const bungkus = document.createElement('div');
+            bungkus.innerHTML = plItemHtml(g.items[i], opts);
+            const node = bungkus.firstElementChild;
+            catEl.appendChild(node);
+            if (luber()) {
+              catEl.removeChild(node);
+              if (taruh > 0) break;                        // lanjut di slide berikutnya
+              if (cur.groups.length > 1) {                 // slide sudah berisi kategori lain
+                cur.groups.pop();
+                body.removeChild(catEl);
+                tutupSlide();
+                body.innerHTML = '';
+                ulangi = true;
+                break;
+              }
+              // slide kosong: item tinggi tetap ditampilkan sendiri (tidak boleh berulang tanpa henti)
+              catEl.appendChild(node);
+            }
+            sec.items.push(g.items[i]);
+            i++;
+            taruh++;
+          }
+          if (ulangi) continue;
+          // kategori habis? lanjut ke kategori berikutnya di slide yang sama.
+          if (i < g.items.length) { tutupSlide(); body.innerHTML = ''; }
+        }
+      });
+      if (cur.groups.length) out.push(cur);
+      stage.innerHTML = '';
+      return out.length ? out : [{ groups: [] }];
+    }
+
+    // Halaman terakhir memakai kartu kontak yang lebih tinggi, jadi isinya dicek ulang.
+    function plRapikan(groups, opts, dalam) {
+      const slides = plMeasure(groups, opts, false);
+      if (slides.length <= 1) return plMeasure(groups, opts, true);
+      const ekor = slides.pop();
+      if ((dalam || 0) > 8) return slides.concat([ekor]);
+      return slides.concat(plRapikan(ekor.groups, opts, (dalam || 0) + 1));
+    }
+
+    function paginatePricelist(groups, opts) {
+      if (!groups || !groups.length) return [{ groups: [] }];
+      return plRapikan(groups, opts);
+    }
+
+    // ─── Pratinjau di dalam modal ───
+    function plFitPreview() {
+      const frame = $('plFrame');
+      if (!frame) return;
+      const slide = frame.querySelector('.pls-slide');
+      if (!slide) return;
+      const lebar = frame.clientWidth || 0;
+      if (!lebar) return;
+      slide.style.transform = 'scale(' + (lebar / PL_W) + ')';
+    }
+
+    function plUpdateNav() {
+      const nav = $('plNav');
+      if (!nav) return;
+      const jumlah = (PL.slides || []).length;
+      const banyak = jumlah > 1;
+      nav.style.display = banyak ? 'flex' : 'none';
+      $('plPrev').disabled = PL.page <= 1;
+      $('plNext').disabled = PL.page >= jumlah;
+      $('plCounter').textContent = PL.page + '/' + jumlah;
+    }
+
+    function plShowPage() {
+      const frame = $('plFrame');
+      if (!frame || !PL.slides.length) return;
+      frame.innerHTML = priceSlideHtml(PL.slides[PL.page - 1], PL.opts, { page: PL.page, total: PL.slides.length });
+      if (PL.page === PL.slides.length) plSeimbangkan(frame.querySelector('.pls-slide'));
+      plFitPreview();
+      plUpdateNav();
+    }
+
+    function plEmptyPreview() {
+      const frame = $('plFrame');
+      if (!frame) return;
+      frame.innerHTML = '<div class="pl-empty" style="height:100%;display:flex;align-items:center;justify-content:center;box-sizing:border-box"><div><i class="fa fa-circle-info"></i>Pilih minimal satu kategori</div></div>';
+      PL.slides = [];
+      PL.page = 1;
+      const nav = $('plNav');
+      if (nav) nav.style.display = 'none';
+    }
+
+    function renderPricelistPreview() {
+      if (!$('plFrame')) return;
+      const opts = pricelistOpts();
+      PL.opts = opts;
+      const pakai = pricelistData().filter(g => opts.cats.indexOf(g.category) !== -1);
+      if (!pakai.length) { plEmptyPreview(); return; }
+      PL.slides = paginatePricelist(pakai, opts);
+      if (PL.page > PL.slides.length) PL.page = PL.slides.length;
+      if (PL.page < 1) PL.page = 1;
+      plShowPage();
+    }
+
+    function plSetTheme(t) {
+      PL.theme = t === 'sage' ? 'sage' : 'cream';
+      if ($('plThemeCream')) $('plThemeCream').classList.toggle('on', PL.theme === 'cream');
+      if ($('plThemeSage')) $('plThemeSage').classList.toggle('on', PL.theme === 'sage');
+      renderPricelistPreview();
+    }
+
+    function plChip(input) {
+      const label = input && input.closest ? input.closest('.pl-chk') : null;
+      if (label) label.classList.toggle('on', !!input.checked);
+      renderPricelistPreview();
+    }
+
+    function plGantiHalaman(d) {
+      if (!PL.slides.length) return;
+      const n = PL.page + (parseInt(d, 10) || 0);
+      PL.page = Math.min(PL.slides.length, Math.max(1, n));
+      plShowPage();
+    }
+
+    function openPricelistModal() {
+      const aktif = (S.data.treatments || []).filter(t => isActiveVal(t.is_active));
+      if (!aktif.length) { toast('Belum ada treatment aktif', 'warning'); return; }
+      const k = plKontak();
+      const cats = pricelistData().map(g => g.category);
+      PL = { theme: 'cream', page: 1, slides: [], opts: null };
+      $('modalContainer').innerHTML = `
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal modal-lg pl-modal">
+      <div class="modal-header"><h3><i class="fa fa-image"></i> Buat Gambar Pricelist</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+      <div class="modal-body">
+        <div class="pl-hint">Ukuran 4:5, siap untuk WhatsApp status.</div>
+        <div class="pl-grid">
+          <div class="pl-form">
+            <div><label class="pl-label" for="plTitle">Judul</label><input class="pl-input" id="plTitle" maxlength="30" value="Pricelist" oninput="renderPricelistPreview()"></div>
+            <div><label class="pl-label" for="plSubtitle">Baris kedua</label><input class="pl-input" id="plSubtitle" maxlength="70" value="${sanitize(plSubJudul())}" oninput="renderPricelistPreview()"></div>
+            <div>
+              <div class="pl-label">Tema</div>
+              <div class="pl-seg">
+                <button type="button" class="pl-seg-btn on" id="plThemeCream" onclick="plSetTheme('cream')">Cream</button>
+                <button type="button" class="pl-seg-btn" id="plThemeSage" onclick="plSetTheme('sage')">Sage</button>
+              </div>
+            </div>
+            <div>
+              <div class="pl-label">Kategori</div>
+              <div class="pl-cats" id="plCats">${cats.map(c => `<label class="pl-chk on"><input type="checkbox" value="${sanitize(c)}" checked onchange="plChip(this)">${sanitize(c)}</label>`).join('')}</div>
+            </div>
+            <div>
+              <div class="pl-label">Tampilan</div>
+              <div class="pl-togs">
+                <label class="pl-chk on"><input type="checkbox" id="plTogDur" checked onchange="plChip(this)">Tampilkan durasi</label>
+                <label class="pl-chk on"><input type="checkbox" id="plTogKontak" checked onchange="plChip(this)">Tampilkan kontak</label>
+                <label class="pl-chk on"><input type="checkbox" id="plTogNote" checked onchange="plChip(this)">Tampilkan catatan</label>
+                <label class="pl-chk"><input type="checkbox" id="plTogDesc" onchange="plChip(this)">Tampilkan deskripsi</label>
+              </div>
+            </div>
+            <div><label class="pl-label" for="plNote">Catatan bawah</label><input class="pl-input" id="plNote" maxlength="90" value="${sanitize(PL_CATATAN)}" oninput="renderPricelistPreview()"></div>
+            <div style="font-size:12px;color:var(--text-muted);line-height:1.5">Kontak dari Pengaturan: ${sanitize(k.phone)} · ${sanitize(k.instagram)}</div>
+          </div>
+          <div class="pl-preview">
+            <div class="pl-frame" id="plFrame"></div>
+            <div class="pl-nav" id="plNav" style="display:none">
+              <button type="button" class="pl-nav-btn" id="plPrev" onclick="plGantiHalaman(-1)"><i class="fa fa-chevron-left"></i></button>
+              <span class="pl-nav-txt" id="plCounter">1/1</span>
+              <button type="button" class="pl-nav-btn" id="plNext" onclick="plGantiHalaman(1)"><i class="fa fa-chevron-right"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Tutup</button>
+        <button class="btn btn-outline" id="plBtnCaption" onclick="plCopyCaption()"><i class="fa fa-copy"></i> Salin Caption</button>
+        <button class="btn btn-primary" id="plBtnSave" onclick="plSaveImages()"><i class="fa fa-image"></i> Simpan Gambar</button>
+      </div>
+    </div>
+  </div>`;
+      renderPricelistPreview();
+    }
+
+    // ─── Caption WhatsApp ───
+    function plCaptionText() {
+      const opts = PL.opts || pricelistOpts();
+      const pakai = pricelistData().filter(g => opts.cats.indexOf(g.category) !== -1);
+      const baris = ['DAISAFACARE · Mom & Baby Treatment', opts.subtitle, ''];
+      pakai.forEach(g => {
+        baris.push('*' + String(g.category).toUpperCase() + '*');
+        g.items.forEach(t => {
+          baris.push('• ' + t.name + ' — ' + fmtRp(t.price) + ((opts.showDur && t.duration_min) ? ' (' + t.duration_min + ' mnt)' : ''));
+        });
+        baris.push('');
+      });
+      if (opts.showContact) {
+        baris.push('Booking & info: ' + opts.phone);
+        baris.push('Instagram: ' + opts.instagram);
+      }
+      if (opts.showNote && opts.note) baris.push(opts.note);
+      return baris.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+    }
+
+    function plCopyCaption() {
+      const teks = plCaptionText();
+      const beres = () => toast('Caption disalin', 'success');
+      const gagal = () => toast('Gagal menyalin caption', 'error');
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(teks).then(beres).catch(gagal);
+          return;
+        }
+      } catch (e) { }
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = teks;
+        ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        ta.remove();
+        if (ok) beres(); else gagal();
+      } catch (e) { gagal(); }
+    }
+
+    // ─── Ekspor gambar (html2canvas, satu panggilan per slide) ───
+    const plBgWarna = tema => (tema === 'sage' ? '#6F7D64' : '#FCF7F1');
+    const plFileName = i => 'pricelist-daisafacare-' + (i + 1) + '.png';
+
+    function plExportHost() {
+      let el = $('plExHost');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'plExHost';
+        el.className = 'pl-ex-host';
+        document.body.appendChild(el);
+      }
+      return el;
+    }
+
+    function plSaveImages() {
+      const slides = (PL.slides || []).slice();
+      const opts = PL.opts || pricelistOpts();
+      if (!slides.length) { toast('Pilih minimal satu kategori', 'warning'); return; }
+      if (typeof html2canvas !== 'function') { toast('Gambar tidak bisa dibuat di perangkat ini', 'error'); return; }
+      const btn = $('plBtnSave');
+      if (btn) btn.disabled = true;
+      const host = plExportHost();
+      const hasil = [];
+      const bersih = () => { host.innerHTML = ''; if (btn) btn.disabled = false; };
+      const satu = i => {
+        if (i >= slides.length) return Promise.resolve(hasil);
+        toast('Membuat gambar ' + (i + 1) + '/' + slides.length + '...', 'info', 1600);
+        host.innerHTML = priceSlideHtml(slides[i], opts, { page: i + 1, total: slides.length });
+        const el = host.firstElementChild;
+        if (i === slides.length - 1) plSeimbangkan(el);
+        return waitInvImages(el).catch(() => false)
+          .then(() => html2canvas(el, { scale: 2, backgroundColor: plBgWarna(opts.theme), useCORS: true, width: PL_W, height: PL_H, windowWidth: PL_W }))
+          .then(canvas => { hasil.push({ canvas: canvas, fname: plFileName(i) }); return satu(i + 1); });
+      };
+      satu(0).then(() => { bersih(); plBagikanGambar(hasil); })
+        .catch(() => { bersih(); toast('Gagal membuat gambar', 'error'); });
+    }
+
+    // iPhone: bagikan semua slide sekaligus. Perangkat lain: pratinjau + tautan unduh.
+    function plBagikanGambar(list) {
+      if (!list.length) { toast('Gagal membuat gambar', 'error'); return; }
+      const blobs = [];
+      let sisa = list.length;
+      const lanjut = () => {
+        const files = [];
+        for (let i = 0; i < blobs.length; i++) {
+          if (!blobs[i]) continue;
+          try { files.push(new File([blobs[i]], list[i].fname, { type: 'image/png' })); } catch (e) { }
+        }
+        let bisa = false;
+        try {
+          bisa = files.length === list.length && !!navigator.canShare && navigator.canShare({ files: files });
+        } catch (e) { bisa = false; }
+        if (!bisa) { showPlImgPreview(list); return; }
+        navigator.share({ files: files, title: 'Pricelist DaisafaCare' })
+          .then(() => toast('Gambar pricelist siap', 'success'))
+          .catch(() => showPlImgPreview(list));
+      };
+      const tanpaBlob = list.some(x => !x.canvas || typeof x.canvas.toBlob !== 'function');
+      if (tanpaBlob) { showPlImgPreview(list); return; }
+      list.forEach((x, i) => {
+        x.canvas.toBlob(b => {
+          blobs[i] = b;
+          sisa--;
+          if (sisa <= 0) lanjut();
+        }, 'image/png');
+      });
+    }
+
+    function showPlImgPreview(list) {
+      const lama = $('plImgOv');
+      if (lama) lama.remove();
+      const ov = document.createElement('div');
+      ov.id = 'plImgOv';
+      ov.className = 'pl-img-ov';
+      const blok = list.map((x, i) => {
+        const url = x.canvas.toDataURL('image/png');
+        const label = list.length > 1 ? 'Unduh Halaman ' + (i + 1) : 'Unduh';
+        return `<div style="width:100%;max-width:420px;display:flex;flex-direction:column;gap:8px">
+          <img src="${url}" alt="Pricelist DaisafaCare ${i + 1}">
+          <a class="btn btn-beige" href="${url}" download="${x.fname}"><i class="fa fa-download"></i> ${label}</a>
+        </div>`;
+      }).join('');
+      ov.innerHTML = `<div style="color:#FCF7F1;font-weight:700;font-size:15px;text-align:center">Gambar Pricelist</div>
+        <div style="color:#D4C2AA;font-size:12.5px;text-align:center;max-width:420px">Tekan lama gambar lalu pilih Simpan ke Foto, atau ketuk Unduh.</div>
+        ${blok}
+        <button class="btn btn-ghost" style="margin-bottom:20px" onclick="document.getElementById('plImgOv').remove()">Tutup</button>`;
+      document.body.appendChild(ov);
+    }
+
+    // Pratinjau ikut menyesuaikan lebar layar (mis. ponsel diputar)
+    let plResizeTimer = null;
+    window.addEventListener('resize', () => {
+      if (!$('plFrame')) return;
+      clearTimeout(plResizeTimer);
+      plResizeTimer = setTimeout(plFitPreview, 120);
+    });
 
     function openTreatmentModal(tr) {
       if (!isAdmin()) { toast('Hanya admin yang bisa mengubah treatment', 'error'); return; }
@@ -4515,7 +6076,7 @@
           <td style="font-weight:700">${fmtRp(s.grand_total)}</td>
           <td style="font-weight:700;color:var(--success)">${fmtRp(s.paid_amount)}</td>
           <td><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></td>
-          <td><button class="btn btn-sm btn-primary" onclick="printInvoiceById(${s.id})"><i class="fa fa-print"></i> Cetak</button></td>
+          <td style="white-space:nowrap">${s.maps_link ? `<a class="btn btn-sm btn-outline" href="${attrUrl(s.maps_link)}" target="_blank" rel="noopener" title="Buka Maps"><i class="fa fa-map-location-dot"></i></a>` : ''}<button class="btn btn-sm btn-primary" onclick="printInvoiceById(${s.id})"><i class="fa fa-print"></i> Cetak</button></td>
         </tr>`).join('') : '<tr><td colspan="8" class="table-empty"><i class="fa fa-file-invoice"></i>Tidak ada invoice ditemukan</td></tr>'}
         </tbody>
       </table>
@@ -4573,6 +6134,11 @@
       // Paket NB: transport ditagih per kunjungan, jadi labelnya memakai jumlah kunjungan
       const pkgVisits = parseInt(s.total_visits, 10) || 0;
       const transportLabel = pkgVisits > 1 ? `Transport (${pkgVisits} kunjungan)` : `Transport (${s.km} km)`;
+      // QRIS hanya tampil bila masih ada sisa tagihan; kalau lunas → tanda "Sudah dibayar"
+      const sisaTagih = (grandAmt - paidAmt) > 0;
+      const bayarBox = sisaTagih
+        ? `<div class="inv-qris-row">${brandImg('qris', 86, 'flex:none;padding:6px;background:#fff;border:1px solid var(--beige);border-radius:8px')}<div class="inv-qris-cap"><div class="inv-qris-cap-title">Scan untuk bayar</div><div class="inv-qris-cap-sub">QRIS · semua e-wallet &amp; m-bank</div></div></div>`
+        : `<div class="inv-paid-line">✓ Sudah dibayar</div>`;
 
       $('modalContainer').innerHTML = `
   <div class="modal-overlay" onclick="if(event.target===this)closeModal()" style="background:rgba(0,0,0,0.7)">
@@ -4590,7 +6156,7 @@
           <!-- Header -->
           <div class="inv-header">
             <div class="inv-brand">
-              <div class="inv-brand-ico">🌸</div>
+              ${brandImg('logo', 44, 'flex:none')}
               <div>
                 <div class="inv-brand-name">${sanitize(bizName).toUpperCase()}</div>
                 <div class="inv-brand-sub">${sanitize(bizTagline)}</div>
@@ -4637,6 +6203,7 @@
               ${(isDp && lastPay) ? `<div style="font-size:11.5px;font-weight:700;color:var(--sage);margin-bottom:6px">DP diterima: ${fmtRp(lastPay.amount)} (${sanitize(lastPay.method)}) — ${fmtDate(lastPay.date)}</div>` : ''}
               <div style="font-size:11px;font-weight:700;color:var(--sage-dark);margin-bottom:4px">Payment Method:</div>
               <div style="font-size:12px;font-weight:700">${sanitize(payInfo)}</div>
+              ${bayarBox}
             </div>
             <div class="inv-totals">
               <div class="inv-total-row"><span>Subtotal</span><span>Rp ${(s.subtotal || s.fee_treatment + s.transport_fee || 0).toLocaleString('id-ID')}</span></div>
@@ -4684,6 +6251,29 @@
       return awalan + no.replace(/[^A-Za-z0-9._-]/g, '-') + '.png';
     }
 
+    // Tunggu semua <img> di dalam invoice selesai dimuat (atau gagal) sebelum digambar,
+    // supaya logo / QRIS tidak kosong di hasil "Simpan Gambar".
+    // Dibatasi ~2500 ms agar alamat gambar yang lambat atau rusak tidak menggantung tombol.
+    function waitInvImages(tmpl) {
+      const tunggu = new Promise(resolve => {
+        try {
+          const imgs = tmpl && tmpl.querySelectorAll ? Array.prototype.slice.call(tmpl.querySelectorAll('img')) : [];
+          if (!imgs.length) { resolve(true); return; }
+          let sisa = 0;
+          const satuSelesai = () => { sisa--; if (sisa <= 0) resolve(true); };
+          imgs.forEach(img => {
+            if (!img || img.complete) return;
+            sisa++;
+            img.addEventListener('load', satuSelesai, { once: true });
+            img.addEventListener('error', satuSelesai, { once: true });
+          });
+          if (sisa <= 0) resolve(true);
+        } catch (e) { resolve(false); }
+      });
+      const batas = new Promise(resolve => setTimeout(() => resolve(false), 2500));
+      return Promise.race([tunggu, batas]);
+    }
+
     // Simpan gambar invoice. Di iPhone memakai menu bagikan bawaan (Simpan ke Foto / WhatsApp),
     // di perangkat lain menampilkan pratinjau gambar dengan tautan Unduh.
     function saveInvImg() {
@@ -4691,7 +6281,7 @@
       if (!tmpl) { toast('Invoice tidak ditemukan', 'warning'); return; }
       if (typeof html2canvas !== 'function') { toast('Gambar tidak bisa dibuat di perangkat ini', 'error'); return; }
       toast('Membuat gambar invoice...', 'info', 2000);
-      html2canvas(tmpl, { scale: 2, backgroundColor: '#FCF7F1', useCORS: true, width: 700, windowWidth: 700 }).then(canvas => {
+      waitInvImages(tmpl).catch(() => false).then(() => html2canvas(tmpl, { scale: 2, backgroundColor: '#FCF7F1', useCORS: true, width: 700, windowWidth: 700 })).then(canvas => {
         const fname = invImgName();
         const fallback = () => showInvImgPreview(canvas, fname);
         const shareIt = blob => {
@@ -4900,6 +6490,15 @@
       </div>
       <div class="fg" style="margin-bottom:12px"><label>Info Pembayaran (untuk Invoice)</label><textarea id="sBizPay" rows="2">${sanitize(s.payment_info || '')}</textarea></div>
       <div class="form-row cols-2">
+        <div class="fg"><label>Logo URL</label><input id="sBizLogo" value="${sanitize(s.logo_url || '')}" placeholder="${URLBASE}..." oninput="previewBrandImg()"></div>
+        <div class="fg"><label>QRIS URL</label><input id="sBizQris" value="${sanitize(s.qris_url || '')}" placeholder="${URLBASE}..." oninput="previewBrandImg()"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:-6px;margin-bottom:10px">Kosongkan untuk memakai gambar bawaan.</div>
+      <div class="form-row cols-2">
+        <div class="fg"><label style="font-size:11px">Pratinjau Logo</label><div id="sBizLogoPrev" style="display:none;align-items:center;min-height:40px"></div></div>
+        <div class="fg"><label style="font-size:11px">Pratinjau QRIS</label><div id="sBizQrisPrev" style="display:none;align-items:center;min-height:40px"></div></div>
+      </div>
+      <div class="form-row cols-2">
         <div class="fg"><label>Transport per KM (Rp)</label><input type="number" id="sTransRate" value="${sanitize(s.transport_rate_per_km || '2000')}"></div>
         <div class="fg"><label>Footer Invoice</label><input id="sInvFooter" value="${sanitize(s.invoice_footer || '')}"></div>
       </div>
@@ -4909,6 +6508,7 @@
       </div>
       <button class="btn btn-primary" onclick="saveBizSettings()"><i class="fa fa-floppy-disk"></i> Simpan Pengaturan</button>
     </div>`;
+        previewBrandImg();
       } else if (tab === 'users') {
         if (!isAdmin()) { $('settingsContent').innerHTML = '<div class="table-empty"><i class="fa fa-lock"></i>Akses ditolak</div>'; return; }
         $('settingsContent').innerHTML = `<div class="section-hdr"><h2><i class="fa fa-users"></i> Manajemen Pengguna</h2><button class="btn btn-primary" onclick="openUserModal()"><i class="fa fa-plus"></i> Tambah</button></div><div id="userTable"><div class="table-empty"><i class="fa fa-spinner fa-spin"></i></div></div>`;
@@ -4941,12 +6541,34 @@
       }
     }
 
+    // Pratinjau kecil logo & QRIS di tab Info Bisnis (mengikuti isi input)
+    function previewBrandImg() {
+      const pasang = (boxId, inputId, alt) => {
+        const box = $(boxId), inp = $(inputId);
+        if (!box) return;
+        const v = String((inp && inp.value) || '').trim();
+        const src = v ? brandUrlOk(v) : '';
+        if (!src) { box.innerHTML = ''; box.style.display = 'none'; return; }
+        box.style.display = 'flex';
+        box.innerHTML = `<img src="${src}" alt="${alt}" loading="lazy" crossorigin="anonymous" style="display:block;width:40px;height:40px;object-fit:contain;background:#fff;border:1px solid var(--border);border-radius:6px;padding:2px" onerror="this.style.display='none'">`;
+      };
+      pasang('sBizLogoPrev', 'sBizLogo', 'Pratinjau logo');
+      pasang('sBizQrisPrev', 'sBizQris', 'Pratinjau QRIS');
+    }
+
     function saveBizSettings() {
-      const settings = { business_name: $('sBizName').value, business_tagline: $('sBizTag').value, business_phone: $('sBizPhone').value, business_address: $('sBizAddr').value, business_instagram: $('sBizIG').value, business_tiktok: $('sBizTT').value, payment_info: $('sBizPay').value, transport_rate_per_km: $('sTransRate').value, invoice_footer: $('sInvFooter').value, invoice_prefix: ($('sInvPrefix').value || 'DSF').trim(), currency_symbol: ($('sCurrency').value || 'Rp').trim() };
+      const settings = { business_name: $('sBizName').value, business_tagline: $('sBizTag').value, business_phone: $('sBizPhone').value, business_address: $('sBizAddr').value, business_instagram: $('sBizIG').value, business_tiktok: $('sBizTT').value, payment_info: $('sBizPay').value, transport_rate_per_km: $('sTransRate').value, invoice_footer: $('sInvFooter').value, invoice_prefix: ($('sInvPrefix').value || 'DSF').trim(), currency_symbol: ($('sCurrency').value || 'Rp').trim(), logo_url: ($('sBizLogo') ? $('sBizLogo').value.trim() : ''), qris_url: ($('sBizQris') ? $('sBizQris').value.trim() : '') };
       loading(true, 'Menyimpan...');
       ga('saveAllSettings', [settings, S.user.id, S.user.role], res => {
         loading(false);
-        if (res.success) { Object.assign(S.settings, settings); toast('Pengaturan disimpan!', 'success'); }
+        if (res.success) {
+          Object.assign(S.settings, settings);
+          toast('Pengaturan disimpan!', 'success');
+          // Gambar bisa berubah: bersihkan cache data URI lalu ambil ulang di latar belakang
+          S.brand.logo = ''; S.brand.qris = '';
+          setSidebarLogo();
+          prefetchBrandAssets();
+        }
         else toast(res.message, 'error');
       });
     }
