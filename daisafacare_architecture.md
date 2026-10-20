@@ -177,3 +177,38 @@ Both files already exist and implement all of the above. To deploy: open the bou
 
 **Do not run `setupSheets()` against the live spreadsheet** — it deletes every sheet. It is only for a fresh/thrown-away copy.
 
+
+
+---
+
+## 9. Columns added in the "next update" round
+
+Three columns were **appended** (existing indices never shift, so old data keeps working):
+
+| Sheet | Column | Header | Used for |
+|---|---|---|---|
+| Customers | index 13 (N) | `Tanggal Lahir` | `dob` as `yyyy-MM-dd`; the frontend computes the baby's age from it |
+| Customers | index 14 (O) | `Maps Link` | pasted Google Maps URL, shown as a "Buka Maps" button |
+| Schedules | index 22 (W) | `Maps Link` | per-visit Google Maps URL (can differ from the customer's) |
+
+These headers must be typed once in the live spreadsheet. `setupSheets()` already writes them for a fresh copy, but it must never run on the real sheet.
+
+### Phone numbers
+
+Legacy rows store phones as **numbers**, so the leading `0` is gone and `.includes()` would crash. Every read endpoint therefore returns two strings: `phone` (pretty, e.g. `0852-5898-8480`) for display and search, and `phone_wa` (digits, e.g. `6285258988480`) for `wa.me` links. Writes store the pretty string as text.
+
+### Transport fee
+
+One rule, enforced in `calcTransportFee()` on the server and `hitungTransport()` on the client:
+
+1. Round the distance **down** to whole km.
+2. `<= 5` km is free; otherwise `whole * transport_rate_per_km` (real data: 27,6 km -> 27 -> Rp54.000, 9,2 -> 18.000, 5,8 -> 5 -> free).
+3. The field stays editable: when the owner types a number the app stops auto-calculating, and the backend keeps whatever the client sent (only if `transport_fee` is absent does it compute the value itself).
+
+### Edit Jadwal
+
+`updateSchedule(userId, role, scheduleId, payload)` re-prices the booking from the Treatments sheet, replaces that schedule's `Schedule_Items`, keeps the same invoice number and the already-paid amount (clamped to the new total), and moves the customer totals by the delta (old value out, new value in).
+
+### Invoice numbers
+
+`genInvoiceNo()` uses the Settings key `last_invoice_no` as a high-water mark, so deleting the newest invoice can no longer free its number for reuse.

@@ -2191,6 +2191,487 @@
       color: var(--sage-dark);
       font-weight: 600;
     }
+
+    /* ============ iPhone / mobile fixes (max-width 600px) ============ */
+    @media (max-width:600px) {
+      .kpi-grid {
+        gap: 10px
+      }
+
+      .kpi-card {
+        padding: 14px 13px
+      }
+
+      .kpi-ico {
+        width: 34px;
+        height: 34px;
+        font-size: 15px;
+        margin-bottom: 10px
+      }
+
+      .kpi-val {
+        font-size: 17px;
+        line-height: 1.25;
+        overflow-wrap: anywhere
+      }
+
+      .kpi-label {
+        font-size: 10px;
+        letter-spacing: .2px
+      }
+
+      .cal-grid {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 1px
+      }
+
+      .cal-day-hdr {
+        font-size: 9.5px;
+        padding: 5px 0;
+        letter-spacing: 0
+      }
+
+      .cal-day {
+        padding: 3px;
+        min-height: 56px;
+        border-radius: 6px
+      }
+
+      .cal-day-num {
+        font-size: 11px;
+        margin-bottom: 2px
+      }
+
+      .cal-day.today .cal-day-num {
+        width: 19px;
+        height: 19px;
+        font-size: 10px
+      }
+
+      .cal-event {
+        font-size: 8.5px;
+        padding: 1px 3px
+      }
+
+      .cal-month-title {
+        font-size: 16px
+      }
+
+      .topbar {
+        padding: 12px 14px;
+        gap: 8px
+      }
+
+      .topbar-title {
+        font-size: 16px;
+        gap: 8px;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap
+      }
+
+      .topbar-date {
+        display: none
+      }
+
+      .topbar-right {
+        gap: 8px;
+        flex-shrink: 0
+      }
+
+      #topbarAction {
+        padding: 9px 12px;
+        font-size: 13px
+      }
+
+      .modal-footer {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 8px
+      }
+
+      .modal-footer .btn {
+        flex: 1 1 calc(50% - 4px)
+      }
+
+      .modal-body table {
+        font-size: 12px
+      }
+
+      .modal-body thead th,
+      .modal-body tbody td {
+        padding: 6px 6px
+      }
+
+      .modal thead th {
+        white-space: normal
+      }
+
+      .btn {
+        padding: 9px 14px;
+        font-size: 13.5px;
+        min-height: 40px
+      }
+
+      input,
+      select,
+      textarea,
+      .fg input,
+      .fg select,
+      .fg textarea,
+      .form-group input {
+        font-size: 16px !important
+      }
+
+      .modal {
+        max-height: calc(100dvh - 24px)
+      }
+
+      .modal-overlay {
+        padding: 10px;
+        padding-top: 12px;
+        align-items: flex-start;
+        overscroll-behavior: contain
+      }
+
+      .popup {
+        padding: 24px 18px;
+        max-height: calc(100dvh - 40px);
+        overflow-y: auto
+      }
+
+      #invoice-template {
+        padding: 16px 14px;
+        min-height: 0
+      }
+
+      .inv-header {
+        flex-direction: column;
+        gap: 10px
+      }
+
+      .inv-title-block {
+        text-align: left
+      }
+
+      .inv-brand-ico {
+        width: 44px;
+        height: 44px;
+        font-size: 18px
+      }
+
+      .inv-brand-name {
+        font-size: 17px
+      }
+
+      .inv-brand-sub,
+      .inv-brand-tagline {
+        font-size: 10px
+      }
+
+      .inv-title {
+        font-size: 20px
+      }
+
+      .inv-info-box {
+        padding: 12px
+      }
+
+      .inv-info-row {
+        font-size: 12px
+      }
+
+      .inv-info-label {
+        min-width: 64px
+      }
+
+      .inv-table thead th {
+        white-space: normal;
+        padding: 7px 5px;
+        font-size: 11px
+      }
+
+      .inv-table tbody td {
+        padding: 7px 5px;
+        font-size: 11px
+      }
+
+      .inv-total-row {
+        font-size: 12px
+      }
+
+      .inv-total-row.grand {
+        font-size: 14px;
+        padding: 8px 10px
+      }
+
+      .inv-contacts {
+        flex-wrap: wrap;
+        gap: 6px 14px;
+        font-size: 10px
+      }
+
+      .inv-sig-line {
+        min-width: 130px
+      }
+
+      .inv-footer-thanks {
+        font-size: 16px
+      }
+
+      .filter-bar {
+        padding: 12px;
+        gap: 10px
+      }
+
+      .filter-bar .fg {
+        min-width: 0;
+        flex: 1 1 calc(50% - 5px)
+      }
+
+      .filter-bar .fg input,
+      .filter-bar .fg select {
+        width: 100%;
+        min-width: 0
+      }
+
+      .table-wrap {
+        -webkit-overflow-scrolling: touch
+      }
+
+      table {
+        font-size: 13px
+      }
+
+      thead th {
+        padding: 10px;
+        font-size: 11px
+      }
+
+      tbody td {
+        padding: 10px
+      }
+
+      .today-info {
+        min-width: 0
+      }
+
+      .today-cust,
+      .today-loc {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap
+      }
+
+      .today-therapist {
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap
+      }
+
+      .today-time {
+        min-width: 44px;
+        font-size: 13px
+      }
+
+      .cust-card {
+        padding: 14px;
+        gap: 12px
+      }
+
+      .price-item {
+        padding: 11px 12px;
+        gap: 10px
+      }
+
+      .price-item-right {
+        gap: 8px;
+        flex-shrink: 0
+      }
+
+      .cust-name,
+      .cust-phone,
+      .cust-baby,
+      .price-item-name,
+      .inv-info-val,
+      td {
+        overflow-wrap: anywhere
+      }
+
+      .toast-stack {
+        top: 12px;
+        left: 12px;
+        right: 12px
+      }
+
+      .toast {
+        min-width: 0;
+        max-width: 100%;
+        width: 100%;
+        padding: 12px 14px
+      }
+
+      .dash-hero {
+        padding: 20px 18px
+      }
+
+      .dash-hero-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px
+      }
+
+      .dash-hero-greet {
+        font-size: 20px
+      }
+
+      .dash-hero-badge {
+        font-size: 11px;
+        padding: 6px 12px
+      }
+
+      .dash-hero-stats {
+        gap: 14px 22px;
+        padding-top: 14px;
+        margin-top: 14px
+      }
+
+      .dash-stat-val {
+        font-size: 18px
+      }
+
+      .dash-stat-lbl {
+        font-size: 10px
+      }
+
+      .btn-sm {
+        padding: 8px 11px;
+        font-size: 12.5px;
+        min-height: 40px
+      }
+
+      .btn-icon {
+        width: 40px;
+        height: 40px;
+        padding: 0
+      }
+
+      .modal-close {
+        width: 40px;
+        height: 40px
+      }
+
+      .menu-toggle {
+        padding: 8px 10px
+      }
+
+      .wa-btn {
+        padding: 8px 14px;
+        min-height: 36px
+      }
+
+      .settings-tab {
+        padding: 11px 8px;
+        font-size: 12.5px;
+        min-height: 44px
+      }
+
+      .pwd-eye {
+        padding: 10px
+      }
+
+      .page-content {
+        padding: 12px
+      }
+
+      .card-header {
+        padding: 14px 16px 0
+      }
+
+      .card-body {
+        padding: 14px 16px
+      }
+
+      .form-section {
+        padding: 16px
+      }
+    }
+
+    /* iOS: 100vh hides the bottom of the screen behind the Safari toolbar */
+    .app {
+      height: 100vh;
+      height: 100dvh
+    }
+
+    .login-page {
+      min-height: 100vh;
+      min-height: 100dvh
+    }
+
+    /* ============ Print (invoice) ============ */
+    @media print {
+      @page {
+        size: A4;
+        margin: 12mm
+      }
+
+      html,
+      body {
+        background: #fff !important;
+        height: auto !important
+      }
+
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important
+      }
+
+      .sidebar,
+      .topbar,
+      .toast-stack,
+      .loading-ov,
+      .sidebar-overlay {
+        display: none !important
+      }
+
+      .modal-overlay {
+        position: static !important;
+        display: block !important;
+        padding: 0 !important;
+        background: none !important
+      }
+
+      .modal {
+        max-width: none !important;
+        max-height: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        overflow: visible !important
+      }
+
+      .modal-header,
+      .modal-close {
+        display: none !important
+      }
+
+      .inv-table thead {
+        display: table-header-group
+      }
+
+      .inv-bottom,
+      .inv-footer {
+        page-break-inside: avoid
+      }
+
+      #invoice-template {
+        max-width: none !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important
+      }
+    }
   </style>
 </head>
 
@@ -2324,6 +2805,7 @@
       calMonth: new Date().getMonth(),
       invoiceData: null,
       editingScheduleId: null,
+      openInvoiceId: null,
     };
 
     // ═══════════════════════════════════════════════════════════════
@@ -2335,6 +2817,62 @@
     const fmtDateInput = s => { if (!s) return ''; const d = new Date(s); if (isNaN(d)) return ''; return d.toISOString().split('T')[0]; };
     const today = () => new Date().toISOString().split('T')[0];
     const sanitize = s => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    // ─── Tarif & biaya transport (sama dengan aturan backend) ───
+    // Gratis sampai 5 km. Lebih dari itu jarak dibulatkan ke bawah lalu dikali tarif per km.
+    // Contoh: 5 km = 0, 5.8 km = 0 (dibulatkan jadi 5 km), 6.3 km = Rp12.000, 27.6 km = Rp54.000.
+    const tarifTransport = () => {
+      const r = parseFloat(S.settings && S.settings.transport_rate_per_km);
+      return isFinite(r) && r > 0 ? r : 2000;
+    };
+    const hitungTransport = km => {
+      const d = parseFloat(km);
+      if (!isFinite(d)) return 0;
+      const bulat = Math.floor(d);
+      if (bulat <= 5) return 0;
+      return Math.max(0, bulat * tarifTransport());
+    };
+
+    // ─── Usia dari tanggal lahir (yyyy-MM-dd) ───
+    // Kurang dari 1 bulan → hari, 1-23 bulan → bulan + hari, 24 bulan ke atas → tahun + bulan.
+    const fmtUsia = dob => {
+      const m = String(dob || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (!m) return '';
+      const b = new Date(parseInt(m[1], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10));
+      if (isNaN(b.getTime())) return '';
+      const now = new Date();
+      if (b.getTime() > now.getTime()) return '';
+      let years = now.getFullYear() - b.getFullYear();
+      let months = now.getMonth() - b.getMonth();
+      let days = now.getDate() - b.getDate();
+      if (days < 0) {
+        months--;
+        days += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+      }
+      if (months < 0) { years--; months += 12; }
+      const totalMonths = years * 12 + months;
+      if (totalMonths >= 24) return years + ' tahun' + (months > 0 ? ' ' + months + ' bulan' : '');
+      if (totalMonths < 1) {
+        const hari = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() - b.getTime()) / 86400000);
+        return (hari > 0 ? hari : 0) + ' hari';
+      }
+      return totalMonths + ' bulan' + (days > 0 ? ' ' + days + ' hari' : '');
+    };
+    // Usia tampil: dari tanggal lahir bila ada, kalau tidak pakai isian manual baby_age
+    const usiaBayi = c => {
+      const auto = fmtUsia(c && c.dob);
+      return auto || String((c && c.baby_age) || '').trim();
+    };
+    // URL yang aman dipakai di atribut href: hanya http/https, alamat tanpa awalan diberi https
+    const attrUrl = u => {
+      let s = String(u || '').trim();
+      if (!s) return '';
+      const low = s.toLowerCase();
+      const berprotokol = /^[a-z][a-z0-9+.-]*:/.test(low);
+      if (berprotokol && low.indexOf('https:') !== 0 && low.indexOf('http:') !== 0) return '';
+      if (!berprotokol) s = URLBASE + s;
+      return sanitize(s).replace(/"/g, '%22');
+    };
     const isWriter = () => ['admin', 'receptionist'].includes(S.user && S.user.role);
     const isAdmin = () => !!(S.user && S.user.role === 'admin');
     const isActiveVal = v => { if (v === undefined || v === null || v === '') return true; const t = String(v).toLowerCase(); return !(t === '0' || t === 'false' || t === 'nonaktif'); };
@@ -2401,7 +2939,11 @@
     function popupOk() { closePopup(); if (window._popupOk) window._popupOk(); }
     function closePopup() { $('popupContainer').innerHTML = ''; }
 
-    function closeModal() { $('modalContainer').innerHTML = ''; }
+    function closeModal() {
+      $('modalContainer').innerHTML = '';
+      S.editingScheduleId = null;
+      S.openInvoiceId = null;
+    }
 
     function togglePwd(id, btn) {
       const inp = $(id);
@@ -2620,7 +3162,7 @@
         // Recent
         $('recentList').innerHTML = d.recentSchedules.length ? `<div style="display:flex;flex-direction:column;gap:8px">${d.recentSchedules.map(s => `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light)"><div><div style="font-size:13.5px;font-weight:700">${sanitize(s.invoice_no)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(s.customer)} · ${fmtDate(s.date)}</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:700;color:var(--sage-dark)">${fmtRp(s.total)}</div><span class="badge badge-${s.status}" style="font-size:10px">${statusLabel(s.status)}</span></div></div>`).join('')}</div>` : '<div class="table-empty"><i class="fa fa-list"></i>Belum ada jadwal</div>';
         // Overdue
-        $('overdueList').innerHTML = d.overdueCustomers.length ? d.overdueCustomers.map(c => `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-light)"><div><div style="font-size:14px;font-weight:700">${sanitize(c.name)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(c.phone)}</div></div><div style="text-align:right"><div style="font-size:14px;font-weight:800;color:var(--danger)">${fmtRp(c.due)}</div><a href="${URLBASE}wa.me/${sanitize(c.phone)}" target="_blank" class="wa-btn" style="margin-top:4px"><i class="fab fa-whatsapp"></i> WA</a></div></div>`).join('') : '<div class="table-empty"><i class="fa fa-circle-check" style="color:var(--success)"></i>Semua lunas!</div>';
+        $('overdueList').innerHTML = d.overdueCustomers.length ? d.overdueCustomers.map(c => `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-light)"><div><div style="font-size:14px;font-weight:700">${sanitize(c.name)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(c.phone)}</div></div><div style="text-align:right"><div style="font-size:14px;font-weight:800;color:var(--danger)">${fmtRp(c.due)}</div>${c.phone_wa ? `<a href="${URLBASE}wa.me/${sanitize(c.phone_wa)}" target="_blank" rel="noopener" class="wa-btn" style="margin-top:4px"><i class="fab fa-whatsapp"></i> WA</a>` : ''}</div></div>`).join('') : '<div class="table-empty"><i class="fa fa-circle-check" style="color:var(--success)"></i>Semua lunas!</div>';
         // Top customers
         $('topCustList').innerHTML = d.topCustomers.length ? d.topCustomers.map((c, i) => `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border-light)"><div style="width:28px;height:28px;border-radius:50%;background:${i < 3 ? ['#FFD700', '#C0C0C0', '#CD7F32'][i] : 'var(--cream-dark)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">${i + 1}</div><div style="flex:1;font-size:13.5px;font-weight:600">${sanitize(c.name)}</div><div style="font-size:13.5px;font-weight:700;color:var(--success)">${fmtRp(c.total)}</div></div>`).join('') : '<div class="table-empty"><i class="fa fa-users"></i>Belum ada data</div>';
       });
@@ -2692,6 +3234,7 @@
           <td><span class="badge badge-${keteranganClass(s.keterangan)}" style="font-size:10px">${sanitize(s.keterangan) || '—'}</span></td>
           <td style="white-space:nowrap">
             <button class="btn btn-sm btn-outline" onclick="viewSchedule(${s.id})" title="Lihat"><i class="fa fa-eye"></i></button>
+            ${isWriter() ? `<button class="btn btn-sm btn-outline" onclick="openScheduleModal(${s.id})" title="Ubah"><i class="fa fa-pen"></i></button>` : ''}
             <button class="btn btn-sm btn-beige" onclick="printInvoiceById(${s.id})" title="Invoice"><i class="fa fa-file-invoice"></i></button>
             ${s.status === 'scheduled' && isWriter() ? `<button class="btn btn-sm btn-outline" onclick="changeStatus(${s.id},'done')" title="Tandai Selesai"><i class="fa fa-circle-check"></i></button>` : ''}
             ${s.due_amount > 0 && isWriter() ? `<button class="btn btn-sm btn-primary" onclick="openPayModal(${s.id},${s.due_amount},'${sanitize(s.customer_id)}','${sanitize(s.invoice_no)}')" title="Bayar"><i class="fa fa-money-bill"></i></button>` : ''}
@@ -2780,8 +3323,17 @@
     function keteranganClass(k) { if (!k) return ''; k = k.toLowerCase(); if (k.includes('lunas')) return 'lunas'; if (k.includes('belum')) return 'belum'; if (k.includes('dp')) return 'dp'; return ''; }
 
     // ─── SCHEDULE MODAL ───
-    function openScheduleModal(preDate) {
-      if (!isWriter()) { toast('Anda tidak memiliki akses untuk menambah jadwal', 'error'); return; }
+    // Tanpa id = tambah jadwal baru. openScheduleModal(12) atau openScheduleModal('', 12) = ubah jadwal.
+    function openScheduleModal(preDate, editId) {
+      let scheduleId = editId || null;
+      let dateVal = preDate || '';
+      if (!scheduleId && preDate !== undefined && preDate !== null && /^\d+$/.test(String(preDate))) {
+        scheduleId = String(preDate); dateVal = '';
+      }
+      const isEdit = !!scheduleId;
+      if (!isWriter()) { toast('Anda tidak memiliki akses untuk ' + (isEdit ? 'mengubah' : 'menambah') + ' jadwal', 'error'); return; }
+      S.editingScheduleId = isEdit ? scheduleId : null;
+      if (isEdit) loading(true, 'Memuat jadwal...');
       let treatmentOpts = '';
       ga('getTreatmentsForDropdown', [], res => {
         if (res.success) S.data.treatments = res.data;
@@ -2793,7 +3345,7 @@
             $('modalContainer').innerHTML = `
         <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
           <div class="modal modal-lg">
-            <div class="modal-header"><h3><i class="fa fa-calendar-plus"></i> Tambah Jadwal Baru</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+            <div class="modal-header"><h3><i class="fa ${isEdit ? 'fa-pen' : 'fa-calendar-plus'}"></i> ${isEdit ? 'Ubah Jadwal' : 'Tambah Jadwal Baru'}</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
             <div class="modal-body">
               <div class="form-section">
                 <div class="form-section-title"><i class="fa fa-user"></i> Info Pelanggan & Terapis</div>
@@ -2805,14 +3357,15 @@
               <div class="form-section">
                 <div class="form-section-title"><i class="fa fa-calendar"></i> Info Jadwal</div>
                 <div class="form-row cols-3">
-                  <div class="fg"><label>Tanggal *</label><input type="date" id="fDate" value="${preDate || today()}"></div>
-                  <div class="fg"><label>Waktu</label><input type="time" id="fTime" value="09:00"></div>
+                  <div class="fg"><label>Tanggal *</label><input type="date" id="fDate" value="${isEdit ? '' : (dateVal || today())}"></div>
+                  <div class="fg"><label>Waktu</label><input type="time" id="fTime" value="${isEdit ? '' : '09:00'}"></div>
                   <div class="fg"><label>Metode Bayar</label><select id="fMethod" onchange="calcSummary()"><option>TF/QRIS</option><option>Cash</option><option>Transfer</option></select></div>
                 </div>
                 <div class="form-row cols-2">
                   <div class="fg"><label>Lokasi / Alamat</label><input type="text" id="fLoc" placeholder="Nama wilayah atau alamat lengkap"></div>
-                  <div class="fg"><label>Jarak (km)</label><input type="number" id="fKm" value="0" min="0" step="0.5" onchange="calcTransport()"></div>
+                  <div class="fg"><label>Jarak (km)</label><input type="number" id="fKm" value="0" min="0" step="0.5" oninput="calcTransport()"></div>
                 </div>
+                <div class="fg"><label>Link Google Maps</label><input type="url" id="fMaps" placeholder="Tempel link Google Maps (opsional)"></div>
               </div>
               <div class="form-section">
                 <div class="form-section-title"><i class="fa fa-spa"></i> Treatment</div>
@@ -2822,9 +3375,14 @@
               <div class="form-section">
                 <div class="form-section-title"><i class="fa fa-calculator"></i> Pembayaran</div>
                 <div class="form-row cols-3">
-                  <div class="fg"><label>Transport (Rp)</label><input type="number" id="fTransport" value="0" min="0" step="1000" oninput="calcSummary()"></div>
+                  <div class="fg">
+                    <label>Transport (Rp)</label>
+                    <input type="number" id="fTransport" value="0" min="0" step="1000" oninput="onTransportInput()">
+                    <div id="fTransportHint" style="font-size:11.5px;font-weight:600;color:var(--text-muted);margin-top:4px">≤ 5 km gratis · 6 km = Rp12.000</div>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text-sec);margin-top:6px;cursor:pointer"><input type="checkbox" id="fTransportAuto" checked onchange="toggleTransportAuto()" style="width:16px;height:16px;accent-color:var(--sage);cursor:pointer"> Hitung otomatis dari KM</label>
+                  </div>
                   <div class="fg"><label>Diskon (Rp)</label><input type="number" id="fDiscount" value="0" min="0" step="1000" oninput="calcSummary()"></div>
-                  <div class="fg"><label>Dibayar (Rp)</label><input type="number" id="fPaid" value="0" min="0" step="1000" oninput="calcSummary()"></div>
+                  <div class="fg"><label>Dibayar (Rp)${isEdit ? ' <span style="color:var(--text-muted);font-weight:400">(tetap)</span>' : ''}</label><input type="number" id="fPaid" value="0" min="0" step="1000" oninput="calcSummary()"></div>
                 </div>
                 <div id="summaryBox" class="summary-box" style="margin-top:4px">
                   <div class="summary-row"><span>Fee Treatment</span><span id="sumFee">Rp 0</span></div>
@@ -2840,19 +3398,29 @@
             </div>
             <div class="modal-footer">
               <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
-              <button class="btn btn-primary" onclick="saveSchedule()"><i class="fa fa-floppy-disk"></i> Simpan Jadwal</button>
+              <button class="btn btn-primary" onclick="saveSchedule()"><i class="fa fa-floppy-disk"></i> ${isEdit ? 'Simpan Perubahan' : 'Simpan Jadwal'}</button>
             </div>
           </div>
         </div>`;
-            addItemRow(); // add first row
-            calcSummary();
+            if (isEdit) {
+              ga('getScheduleDetail', [scheduleId, S.user.id, S.user.role], dres => {
+                loading(false);
+                if (!dres.success) { toast(dres.message, 'error'); closeModal(); return; }
+                prefillScheduleForm(dres.data);
+              });
+            } else {
+              addItemRow(); // add first row
+              calcSummary();
+              updateTransportHint();
+            }
           });
         });
       });
     }
 
     let itemCount = 0;
-    function addItemRow() {
+    // Tanpa argumen = baris kosong. Dengan trId = baris terisi (dipakai saat mengubah jadwal).
+    function addItemRow(trId, qty, priceOverride, labelOverride) {
       itemCount++;
       const id = 'item_' + itemCount;
       const treatments = S.data.treatments || [];
@@ -2865,6 +3433,69 @@
     <div class="fg"><label>Qty</label><input type="number" id="${id}_qty" value="1" min="1" oninput="calcItemRow('${id}');calcSummary()"></div>
     <div style="padding-top:26px"><button class="btn btn-danger btn-icon" onclick="document.getElementById('${id}').remove();calcSummary()" title="Hapus"><i class="fa fa-trash"></i></button></div>`;
       $('itemsContainer').appendChild(row);
+      if (!trId) return id;
+      const sel = row.querySelector('select');
+      const val = String(trId);
+      // Treatment lama yang sudah tidak aktif/dihapus tetap ditampilkan supaya tidak hilang diam-diam
+      if (!treatments.some(t => String(t.id) === val) && labelOverride) {
+        const o = document.createElement('option');
+        o.value = val; o.dataset.price = String(parseFloat(priceOverride) || 0); o.textContent = labelOverride;
+        sel.appendChild(o);
+      }
+      sel.value = val;
+      const opt = sel.options[sel.selectedIndex];
+      const price = priceOverride !== undefined && priceOverride !== null ? (parseFloat(priceOverride) || 0) : (parseFloat(opt ? opt.dataset.price : 0) || 0);
+      $(id + '_price').value = price;
+      $(id + '_qty').value = parseInt(qty, 10) > 0 ? parseInt(qty, 10) : 1;
+      sel.dataset.trId = sel.value;
+      sel.dataset.trName = opt ? opt.text : '';
+      calcItemRow(id);
+      return id;
+    }
+
+    // Isi form jadwal dari getScheduleDetail (mode ubah)
+    function prefillScheduleForm(s) {
+      const setVal = (id, v) => { const el = $(id); if (el) el.value = v; };
+      // Pelanggan/terapis yang sudah nonaktif tidak ada di dropdown — tambahkan agar tidak hilang saat disimpan
+      const setSelect = (id, val, label) => {
+        const el = $(id);
+        if (!el) return;
+        el.value = val ? String(val) : '';
+        if (val && el.value !== String(val)) {
+          const o = document.createElement('option');
+          o.value = String(val); o.textContent = label || String(val);
+          el.appendChild(o); el.value = String(val);
+        }
+      };
+      setSelect('fCust', s.customer_id, s.customer_name);
+      setSelect('fTherapist', s.therapist_id, s.therapist_name);
+      setVal('fDate', fmtDateInput(s.schedule_date));
+      setVal('fTime', s.schedule_time || '');
+      setVal('fLoc', s.location || '');
+      setVal('fMaps', s.maps_link || '');
+      setVal('fKm', parseFloat(s.km) || 0);
+      setVal('fTransport', parseFloat(s.transport_fee) || 0);
+      setVal('fDiscount', parseFloat(s.discount) || 0);
+      setVal('fNotes', s.notes || '');
+      // Metode bayar hanya "Cash" atau "TF/QRIS"
+      const meth = $('fMethod');
+      if (meth) meth.value = String(s.payment_method || '').toLowerCase().indexOf('cash') !== -1 ? 'Cash' : 'TF/QRIS';
+      // Sudah dibayar tidak diubah dari form ini (backend mempertahankan nilai lama)
+      const paidEl = $('fPaid');
+      if (paidEl) {
+        paidEl.value = parseFloat(s.paid_amount) || 0;
+        paidEl.disabled = true;
+        paidEl.title = 'Pembayaran dicatat lewat tombol Catat Pembayaran';
+        paidEl.style.background = 'var(--cream-dark)';
+      }
+      $('itemsContainer').innerHTML = '';
+      (s.items || []).forEach(it => addItemRow(it.treatment_id, it.qty, it.price, it.treatment_name));
+      if (!(s.items || []).length) addItemRow();
+      // Transport dianggap otomatis bila nilainya sama dengan hitungan KM
+      const autoEl = $('fTransportAuto');
+      if (autoEl) autoEl.checked = hitungTransport(s.km) === (parseFloat(s.transport_fee) || 0);
+      calcSummary();
+      updateTransportHint();
     }
 
     function itemTrSelect(sel, id) {
@@ -2885,11 +3516,36 @@
       st.textContent = fmtRp(price * qty);
     }
 
+    // ─── TRANSPORT: hitung otomatis, tetap bisa diubah manual ───
+    function updateTransportHint() {
+      const el = $('fTransportHint');
+      if (!el) return;
+      const auto = !$('fTransportAuto') || $('fTransportAuto').checked;
+      el.innerHTML = `≤ 5 km gratis · 6 km = ${fmtRp(6 * tarifTransport())} · ` + (auto
+        ? '<span style="color:var(--sage-dark);font-weight:700">Hitung otomatis</span>'
+        : '<span style="color:var(--warning);font-weight:700">Ubah manual</span>');
+    }
+
     function calcTransport() {
-      const km = parseFloat($('fKm').value) || 0;
-      const rate = parseFloat(S.settings.transport_rate_per_km) || 2000;
-      $('fTransport').value = Math.round(km * rate);
+      const kmEl = $('fKm'), trEl = $('fTransport');
+      const auto = !$('fTransportAuto') || $('fTransportAuto').checked;
+      if (kmEl && trEl && auto) trEl.value = hitungTransport(kmEl.value);
+      updateTransportHint();
       calcSummary();
+    }
+
+    // Pengguna mengetik nominal transport sendiri → mode otomatis dimatikan
+    function onTransportInput() {
+      const autoEl = $('fTransportAuto');
+      if (autoEl && autoEl.checked) autoEl.checked = false;
+      updateTransportHint();
+      calcSummary();
+    }
+
+    function toggleTransportAuto() {
+      const autoEl = $('fTransportAuto');
+      if (autoEl && autoEl.checked) calcTransport();
+      else { updateTransportHint(); calcSummary(); }
     }
 
     function calcSummary() {
@@ -2924,6 +3580,7 @@
     }
 
     function saveSchedule() {
+      const editId = S.editingScheduleId || null;
       const items = [];
       document.querySelectorAll('.item-row').forEach(row => {
         const sel = row.querySelector('select');
@@ -2934,16 +3591,37 @@
       });
       if (!$('fDate').value) { toast('Tanggal wajib diisi', 'warning'); return; }
       if (!items.length) { toast('Tambahkan minimal satu treatment', 'warning'); return; }
-      const scData = {
-        customer_id: $('fCust').value || null, therapist_id: $('fTherapist').value || null,
-        schedule_date: $('fDate').value, schedule_time: $('fTime').value,
-        location: $('fLoc').value, km: parseFloat($('fKm').value) || 0,
-        items, transport_fee: parseFloat($('fTransport').value) || 0,
+      // Tidak boleh ada Date/undefined yang dikirim ke server: string kosong untuk isian kosong
+      const formData = {
+        customer_id: $('fCust').value || '', therapist_id: $('fTherapist').value || '',
+        schedule_date: $('fDate').value, schedule_time: $('fTime').value || '',
+        location: $('fLoc').value || '', maps_link: $('fMaps') ? ($('fMaps').value || '').trim() : '',
+        km: parseFloat($('fKm').value) || 0,
+        transport_fee: parseFloat($('fTransport').value) || 0,
         discount: parseFloat($('fDiscount').value) || 0,
-        paid_amount: parseFloat($('fPaid').value) || 0,
         payment_method: $('fMethod').value,
-        notes: $('fNotes').value
+        notes: $('fNotes').value || ''
       };
+      if (editId) {
+        loading(true, 'Menyimpan perubahan...');
+        // Harga dihitung ulang di server, cukup kirim id treatment + qty
+        const payload = {};
+        Object.keys(formData).forEach(k => { payload[k] = formData[k]; });
+        payload.items = items.map(i => ({ treatment_id: i.treatment_id, qty: i.qty }));
+        const invoiceOpen = !!$('invoice-template') && String(S.openInvoiceId || '') === String(editId);
+        ga('updateSchedule', [S.user.id, S.user.role, editId, payload], res => {
+          loading(false);
+          if (!res.success) { toast(res.message, 'error'); return; }
+          toast(res.message || 'Jadwal berhasil diperbarui', 'success');
+          closeModal();
+          refreshListAfterScheduleChange();
+          if (invoiceOpen) setTimeout(() => printInvoiceById(editId), 300);
+        });
+        return;
+      }
+      formData.items = items;
+      formData.paid_amount = parseFloat($('fPaid').value) || 0;
+      const scData = formData;
       loading(true, 'Menyimpan jadwal...');
       ga('addSchedule', [scData, S.user.id, S.user.role], res => {
         loading(false);
@@ -2952,12 +3630,24 @@
       });
     }
 
+    // Segarkan daftar yang sedang dibuka setelah jadwal berubah
+    function refreshListAfterScheduleChange() {
+      if (S.page === 'jadwal') loadSchedules();
+      else if (S.page === 'pelanggan') renderPelanggan();
+      else if (S.page === 'invoice') renderInvoice();
+      else if (S.page === 'pembayaran') loadPayments();
+      else if (S.page === 'dashboard') renderDashboard();
+      else if (S.page === 'laporan') loadReport();
+    }
+
     function viewSchedule(id) {
       loading(true, 'Memuat detail...');
       ga('getScheduleDetail', [id, S.user.id, S.user.role], res => {
         loading(false);
         if (!res.success) { toast(res.message, 'error'); return; }
         const s = res.data;
+        const waLink = s.customer_phone_wa ? `<a href="${URLBASE}wa.me/${sanitize(s.customer_phone_wa)}" target="_blank" rel="noopener" class="wa-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : '';
+        const mapsBtn = s.maps_link ? `<a href="${attrUrl(s.maps_link)}" target="_blank" rel="noopener" class="btn btn-sm btn-outline"><i class="fa fa-map-location-dot"></i> Buka Maps</a>` : '';
         $('modalContainer').innerHTML = `
     <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
       <div class="modal modal-lg">
@@ -2968,6 +3658,7 @@
               <div class="form-section-title"><i class="fa fa-user"></i> Pelanggan</div>
               <div style="font-size:15px;font-weight:700">${sanitize(s.customer_name)}</div>
               <div style="font-size:13px;color:var(--text-muted);margin-top:4px"><i class="fa fa-phone"></i> ${sanitize(s.customer_phone) || '—'}</div>
+              ${(waLink || mapsBtn) ? `<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">${waLink}${mapsBtn}</div>` : ''}
               ${s.baby_name ? `<div style="font-size:13px;color:var(--sage-dark);margin-top:4px"><i class="fa fa-baby"></i> ${sanitize(s.baby_name)} (${sanitize(s.baby_age)})</div>` : ''}
               <div style="font-size:13px;color:var(--text-muted);margin-top:4px"><i class="fa fa-location-dot"></i> ${sanitize(s.location) || '—'}</div>
             </div>
@@ -2998,10 +3689,11 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-ghost" onclick="closeModal()">Tutup</button>
+          ${isWriter() ? `<button class="btn btn-beige" onclick="closeModal();openScheduleModal(${s.id})"><i class="fa fa-pen"></i> Ubah</button>` : ''}
           ${s.status === 'scheduled' && isWriter() ? `<button class="btn btn-outline" onclick="changeStatus(${s.id},'done')"><i class="fa fa-circle-check"></i> Tandai Selesai</button>` : ''}
           ${s.status !== 'cancelled' && isAdmin() ? `<button class="btn btn-danger" onclick="changeStatus(${s.id},'cancelled')"><i class="fa fa-ban"></i> Batalkan Jadwal</button>` : ''}
           ${s.due_amount > 0 && isWriter() ? `<button class="btn btn-primary" onclick="closeModal();openPayModal(${s.id},${s.due_amount},'${s.customer_id}','${sanitize(s.invoice_no)}')"><i class="fa fa-money-bill"></i> Catat Pembayaran</button>` : ''}
-          <button class="btn btn-beige" onclick="printInvoiceById(${s.id})"><i class="fa fa-print"></i> Print Invoice</button>
+          <button class="btn btn-beige" onclick="printInvoiceById(${s.id})"><i class="fa fa-print"></i> Cetak Invoice</button>
         </div>
       </div>
     </div>`;
@@ -3097,15 +3789,25 @@
     }
 
     function filterCustomers() {
-      const q = ($('custSearch')?.value || '').toLowerCase();
-      const filtered = S.data.customers.filter(c => c.name.toLowerCase().includes(q) || (c.phone || '').includes(q));
+      const q = String(($('custSearch') && $('custSearch').value) || '').toLowerCase();
+      const qDigits = q.replace(/\D/g, '');
+      const filtered = (S.data.customers || []).filter(c => {
+        if (!q) return true;
+        const name = String(c.name || '').toLowerCase();
+        const phone = String(c.phone || '');
+        const baby = String(c.baby_name || '').toLowerCase();
+        if (name.indexOf(q) !== -1 || phone.indexOf(q) !== -1 || baby.indexOf(q) !== -1) return true;
+        // Nomor HP dicari tanpa tanda hubung juga (mis. 081234567890)
+        return !!qDigits && phone.replace(/\D/g, '').indexOf(qDigits) !== -1;
+      });
       $('custGrid').innerHTML = filtered.length ? filtered.map(c => `
   <div class="cust-card" onclick="viewCustomer(${c.id})">
-    <div class="cust-avatar">${c.name.charAt(0).toUpperCase()}</div>
+    <div class="cust-avatar">${sanitize(String(c.name || '?').charAt(0).toUpperCase())}</div>
     <div class="cust-info">
       <div class="cust-name">${sanitize(c.name)}</div>
       <div class="cust-phone"><i class="fa fa-phone"></i> ${sanitize(c.phone) || '—'}</div>
-      ${c.baby_name ? `<div class="cust-baby"><i class="fa fa-baby"></i> ${sanitize(c.baby_name)} (${sanitize(c.baby_age)})</div>` : ''}
+      ${c.baby_name ? `<div class="cust-baby"><i class="fa fa-baby"></i> ${sanitize(c.baby_name)}${usiaBayi(c) ? ' (' + sanitize(usiaBayi(c)) + ')' : ''}</div>` : ''}
+      ${c.maps_link ? `<div style="margin-top:8px"><a href="${attrUrl(c.maps_link)}" target="_blank" rel="noopener" class="btn btn-sm btn-outline" onclick="event.stopPropagation()"><i class="fa fa-map-location-dot"></i> Buka Maps</a></div>` : ''}
     </div>
     <div class="cust-due">
       ${c.total_due > 0 ? `<div class="cust-due-amt">${fmtRp(c.total_due)}</div><div class="cust-due-lbl">Piutang</div>` : `<div style="color:var(--success);font-size:13px;font-weight:700"><i class="fa fa-check-circle"></i> Lunas</div>`}
@@ -3118,7 +3820,7 @@
       $('modalContainer').innerHTML = `
   <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
     <div class="modal">
-      <div class="modal-header"><h3><i class="fa fa-user-plus"></i> ${cust ? 'Edit' : 'Tambah'} Pelanggan</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+      <div class="modal-header"><h3><i class="fa fa-user-plus"></i> ${cust ? 'Ubah' : 'Tambah'} Pelanggan</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
       <div class="modal-body">
         <div class="form-section" style="margin-bottom:14px">
           <div class="form-section-title"><i class="fa fa-user"></i> Data Ibu/Pelanggan</div>
@@ -3126,14 +3828,20 @@
             <div class="fg"><label>Nama Lengkap *</label><input type="text" id="cName" value="${sanitize(cust?.name || '')}"></div>
             <div class="fg"><label>No. HP / WhatsApp</label><input type="text" id="cPhone" value="${sanitize(cust?.phone || '')}"></div>
           </div>
+          <div class="fg"><label>Link Google Maps</label><input type="url" id="cMaps" value="${sanitize(cust?.maps_link || '')}" placeholder="Tempel link Google Maps (opsional)"></div>
           <div class="fg"><label>Alamat</label><textarea id="cAddr" rows="2">${sanitize(cust?.address || '')}</textarea></div>
         </div>
         <div class="form-section">
           <div class="form-section-title"><i class="fa fa-baby"></i> Data Bayi/Anak (Opsional)</div>
           <div class="form-row cols-2">
             <div class="fg"><label>Nama Bayi</label><input type="text" id="cBabyName" value="${sanitize(cust?.baby_name || '')}"></div>
-            <div class="fg"><label>Usia Bayi</label><input type="text" id="cBabyAge" value="${sanitize(cust?.baby_age || '')}" placeholder="Cth: 3 bulan, 1 tahun"></div>
+            <div class="fg">
+              <label>Tanggal Lahir Bayi</label>
+              <input type="date" id="cDob" value="${sanitize(cust?.dob || '')}" oninput="updateDobHint()">
+              <div id="cDobHint" style="font-size:11.5px;font-weight:600;color:var(--sage-dark);margin-top:4px"></div>
+            </div>
           </div>
+          <div class="fg" style="margin-bottom:12px"><label>Usia Bayi (manual, dipakai bila tanggal lahir kosong)</label><input type="text" id="cBabyAge" value="${sanitize(cust?.baby_age || '')}" placeholder="Cth: 3 bulan, 1 tahun"></div>
           <div class="fg" style="margin-bottom:12px"><label>Catatan</label><textarea id="cNotes" rows="2">${sanitize(cust?.notes || '')}</textarea></div>
           <label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--text-sec);cursor:pointer"><input type="checkbox" id="cActive" ${isActiveVal(cust?.is_active) ? 'checked' : ''} style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer"> Status Aktif</label>
         </div>
@@ -3144,6 +3852,15 @@
       </div>
     </div>
   </div>`;
+      updateDobHint();
+    }
+
+    // Petunjuk usia di bawah isian Tanggal Lahir (dihitung otomatis dari tanggal lahir)
+    function updateDobHint() {
+      const el = $('cDobHint');
+      if (!el) return;
+      const usia = fmtUsia($('cDob') ? $('cDob').value : '');
+      el.textContent = usia ? 'Usia: ' + usia : '';
     }
 
     // Lookup by id — menghindari JSON inline pada atribut onclick
@@ -3158,7 +3875,17 @@
       const name = $('cName').value.trim();
       if (!name) { toast('Nama pelanggan wajib diisi', 'warning'); return; }
       const cust = id ? (S.data.customers || []).find(x => String(x.id) === String(id)) : null;
-      const cuData = { name, phone: $('cPhone').value, address: $('cAddr').value, baby_name: $('cBabyName').value, baby_age: $('cBabyAge').value, notes: $('cNotes').value, is_active: $('cActive') ? ($('cActive').checked ? 1 : 0) : (cust ? cust.is_active : 1) };
+      const cuData = {
+        name,
+        phone: $('cPhone').value || '',
+        address: $('cAddr').value || '',
+        baby_name: $('cBabyName').value || '',
+        baby_age: $('cBabyAge').value || '',
+        notes: $('cNotes').value || '',
+        dob: $('cDob') ? ($('cDob').value || '') : '',
+        maps_link: $('cMaps') ? ($('cMaps').value || '').trim() : '',
+        is_active: $('cActive') ? ($('cActive').checked ? 1 : 0) : (cust ? cust.is_active : 1)
+      };
       if (id) cuData.id = id;
       loading(true, 'Menyimpan...');
       ga(id ? 'updateCustomer' : 'addCustomer', [cuData, S.user.id, S.user.role], res => {
@@ -3181,15 +3908,17 @@
         <div class="modal-header"><h3><i class="fa fa-user"></i> ${sanitize(c.name)}</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
         <div class="modal-body">
           <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;align-items:flex-start">
-            <div class="cust-avatar" style="width:60px;height:60px;font-size:24px;flex-shrink:0">${c.name.charAt(0)}</div>
+            <div class="cust-avatar" style="width:60px;height:60px;font-size:24px;flex-shrink:0">${sanitize(String(c.name || '?').charAt(0))}</div>
             <div style="flex:1">
               <div style="font-size:18px;font-weight:800">${sanitize(c.name)}</div>
               <div style="font-size:13px;color:var(--text-muted);margin-top:3px"><i class="fa fa-phone"></i> ${sanitize(c.phone) || '—'}</div>
-              ${c.baby_name ? `<div style="font-size:13px;color:var(--sage-dark);margin-top:3px"><i class="fa fa-baby"></i> ${sanitize(c.baby_name)} · ${sanitize(c.baby_age)}</div>` : ''}
+              ${c.baby_name ? `<div style="font-size:13px;color:var(--sage-dark);margin-top:3px"><i class="fa fa-baby"></i> ${sanitize(c.baby_name)}${usiaBayi(c) ? ' · ' + sanitize(usiaBayi(c)) : ''}</div>` : ''}
+              ${c.dob ? `<div style="font-size:12.5px;color:var(--text-muted);margin-top:3px"><i class="fa fa-cake-candles"></i> Lahir ${fmtDate(c.dob)}</div>` : ''}
               <div style="font-size:13px;color:var(--text-muted);margin-top:3px"><i class="fa fa-location-dot"></i> ${sanitize(c.address) || '—'}</div>
             </div>
-            <div style="display:flex;gap:6px;flex-shrink:0">
-              ${c.phone ? `<a href="${URLBASE}wa.me/${c.phone}" target="_blank" class="wa-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : ''}
+            <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap">
+              ${c.phone_wa ? `<a href="${URLBASE}wa.me/${sanitize(c.phone_wa)}" target="_blank" rel="noopener" class="wa-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : ''}
+              ${c.maps_link ? `<a href="${attrUrl(c.maps_link)}" target="_blank" rel="noopener" class="btn btn-sm btn-outline"><i class="fa fa-map-location-dot"></i> Buka Maps</a>` : ''}
               ${isWriter() ? `<button class="btn btn-beige btn-sm" onclick="openCustomerModalById(${c.id})"><i class="fa fa-edit"></i> Edit</button>` : ''}
             </div>
           </div>
@@ -3224,6 +3953,19 @@
     // ═══════════════════════════════════════════════════════════════
     //  PRICELIST
     // ═══════════════════════════════════════════════════════════════
+    // Urutan kategori baku + kategori lain yang ada di data (alfabetis)
+    const KATEGORI_BAKU = ['Baby', 'Kids', 'Mom', 'Jaga', 'NB 1x', 'NB 2x', 'Selapan'];
+    function urutanKategori() {
+      const list = KATEGORI_BAKU.slice();
+      const lain = [];
+      (S.data.treatments || []).forEach(t => {
+        const c = String(t.category || '').trim();
+        if (c && list.indexOf(c) === -1 && lain.indexOf(c) === -1) lain.push(c);
+      });
+      lain.sort((a, b) => a.localeCompare(b));
+      return list.concat(lain);
+    }
+
     function renderPricelist() {
       if (isAdmin()) { $('topbarAction').style.display = 'flex'; $('topbarActionLabel').textContent = 'Tambah Treatment'; }
       else { $('topbarAction').style.display = 'none'; }
@@ -3233,8 +3975,8 @@
         S.data.treatments = res.data;
         const cats = {};
         res.data.forEach(t => { if (!cats[t.category]) cats[t.category] = []; cats[t.category].push(t); });
-        const catOrder = ['Baby', 'Kids', 'Mom', 'Jaga'];
-        const sortedCats = [...catOrder, ...Object.keys(cats).filter(c => !catOrder.includes(c))].filter(c => cats[c]);
+        const catOrder = urutanKategori();
+        const sortedCats = [...catOrder, ...Object.keys(cats).filter(c => catOrder.indexOf(c) === -1)].filter(c => cats[c]);
         $('pricelistContent').innerHTML = sortedCats.map(cat => `
     <div class="price-category">
       <div class="price-cat-title"><span><i class="fa fa-spa"></i> ${sanitize(cat)}</span><span style="font-size:13px;color:var(--text-muted);font-weight:400">${cats[cat].length} treatment</span></div>
@@ -3256,13 +3998,18 @@
 
     function openTreatmentModal(tr) {
       if (!isAdmin()) { toast('Hanya admin yang bisa mengubah treatment', 'error'); return; }
+      // Pilihan kategori diambil dari data + daftar baku, supaya kategori treatment tidak tertimpa
+      const curCat = tr && tr.category ? String(tr.category).trim() : '';
+      const catList = urutanKategori();
+      if (curCat && catList.indexOf(curCat) === -1) catList.push(curCat);
+      const catOpts = catList.map(c => `<option value="${sanitize(c)}">${sanitize(c)}</option>`).join('');
       $('modalContainer').innerHTML = `
   <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
     <div class="modal modal-sm">
-      <div class="modal-header"><h3><i class="fa fa-spa"></i> ${tr ? 'Edit' : 'Tambah'} Treatment</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+      <div class="modal-header"><h3><i class="fa fa-spa"></i> ${tr ? 'Ubah' : 'Tambah'} Treatment</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
       <div class="modal-body">
         <div class="form-row cols-2">
-          <div class="fg"><label>Kategori *</label><select id="tCat"><option>Baby</option><option>Kids</option><option>Mom</option><option>Jaga</option></select></div>
+          <div class="fg"><label>Kategori *</label><select id="tCat">${catOpts}</select></div>
           <div class="fg"><label>Durasi (menit)</label><input type="number" id="tDur" value="${tr?.duration_min || 60}" min="0"></div>
         </div>
         <div class="fg" style="margin-bottom:12px"><label>Nama Treatment *</label><input type="text" id="tName" value="${sanitize(tr?.name || '')}"></div>
@@ -3276,7 +4023,7 @@
       </div>
     </div>
   </div>`;
-      if (tr) $('tCat').value = tr.category;
+      if (curCat) $('tCat').value = curCat;
     }
 
     // Lookup by id — menghindari JSON inline pada atribut onclick
@@ -3344,7 +4091,7 @@
           <td style="font-weight:700">${fmtRp(s.grand_total)}</td>
           <td style="font-weight:700;color:var(--success)">${fmtRp(s.paid_amount)}</td>
           <td><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></td>
-          <td><button class="btn btn-sm btn-primary" onclick="printInvoiceById(${s.id})"><i class="fa fa-print"></i> Print</button></td>
+          <td><button class="btn btn-sm btn-primary" onclick="printInvoiceById(${s.id})"><i class="fa fa-print"></i> Cetak</button></td>
         </tr>`).join('') : '<tr><td colspan="8" class="table-empty"><i class="fa fa-file-invoice"></i>Tidak ada invoice ditemukan</td></tr>'}
         </tbody>
       </table>
@@ -3362,6 +4109,8 @@
     }
 
     function renderInvoiceModal(s) {
+      S.invoiceData = s;
+      S.openInvoiceId = s.id;
       const bizName = S.settings.business_name || 'Daisafacare';
       const bizTagline = S.settings.business_tagline || 'Mom & Baby Treatment';
       const bizPhone = S.settings.business_phone || '0822-3212-1081';
@@ -3376,7 +4125,7 @@
       <div class="modal-header"><h3><i class="fa fa-file-invoice"></i> Invoice ${sanitize(s.invoice_no)}</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
       <div style="padding:20px 24px">
         <div style="display:flex;gap:10px;margin-bottom:16px;justify-content:flex-end">
-          <button class="btn btn-primary" onclick="printInv()"><i class="fa fa-print"></i> Print</button>
+          <button class="btn btn-primary" onclick="printInv()"><i class="fa fa-print"></i> Cetak</button>
           <button class="btn btn-beige" onclick="saveInvImg()"><i class="fa fa-image"></i> Simpan Gambar</button>
           <button class="btn btn-ghost" onclick="closeModal()"><i class="fa fa-xmark"></i> Tutup</button>
         </div>
@@ -3465,16 +4214,52 @@
       setTimeout(() => printWin.print(), 800);
     }
 
+    // Nama file gambar invoice: invoice-<no invoice>.png (karakter aman untuk file)
+    function invImgName() {
+      const no = String((S.invoiceData && S.invoiceData.invoice_no) || 'daisafacare').trim();
+      return 'invoice-' + no.replace(/[^A-Za-z0-9._-]/g, '-') + '.png';
+    }
+
+    // Simpan gambar invoice. Di iPhone memakai menu bagikan bawaan (Simpan ke Foto / WhatsApp),
+    // di perangkat lain menampilkan pratinjau gambar dengan tautan Unduh.
     function saveInvImg() {
       const tmpl = $('invoice-template');
+      if (!tmpl) { toast('Invoice tidak ditemukan', 'warning'); return; }
+      if (typeof html2canvas !== 'function') { toast('Gambar tidak bisa dibuat di perangkat ini', 'error'); return; }
       toast('Membuat gambar invoice...', 'info', 2000);
-      html2canvas(tmpl, { scale: 2, backgroundColor: '#FCF7F1', useCORS: true }).then(canvas => {
-        const a = document.createElement('a');
-        a.download = 'invoice-daisafacare.png';
-        a.href = canvas.toDataURL('image/png');
-        a.click();
-        toast('Gambar invoice berhasil disimpan!', 'success');
-      });
+      html2canvas(tmpl, { scale: 2, backgroundColor: '#FCF7F1', useCORS: true, width: 700, windowWidth: 700 }).then(canvas => {
+        const fname = invImgName();
+        const fallback = () => showInvImgPreview(canvas, fname);
+        const shareIt = blob => {
+          if (!blob || typeof navigator === 'undefined' || !navigator.canShare || typeof File !== 'function') { fallback(); return; }
+          const file = new File([blob], fname, { type: 'image/png' });
+          if (!navigator.canShare({ files: [file] })) { fallback(); return; }
+          navigator.share({ files: [file], title: 'Invoice DaisafaCare' })
+            .then(() => toast('Gambar invoice siap disimpan', 'success'))
+            .catch(() => fallback());
+        };
+        if (canvas.toBlob) canvas.toBlob(shareIt, 'image/png');
+        else fallback();
+      }).catch(() => toast('Gagal membuat gambar invoice', 'error'));
+    }
+
+    // Pratinjau gambar invoice (fallback desktop / saat bagikan tidak tersedia atau dibatalkan)
+    function showInvImgPreview(canvas, fname) {
+      const dataUrl = canvas.toDataURL('image/png');
+      const lama = $('invImgOv');
+      if (lama) lama.remove();
+      const ov = document.createElement('div');
+      ov.id = 'invImgOv';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:3000;background:rgba(20,20,20,0.92);overflow-y:auto;padding:16px;display:flex;flex-direction:column;align-items:center;gap:12px';
+      ov.innerHTML = `
+    <div style="color:#FCF7F1;font-weight:700;font-size:15px;text-align:center">Gambar Invoice</div>
+    <img src="${dataUrl}" alt="Invoice DaisafaCare" style="width:100%;max-width:700px;border-radius:8px;background:#FCF7F1">
+    <div style="color:#D4C2AA;font-size:12.5px;text-align:center;max-width:700px">Tekan lama gambar lalu pilih Simpan ke Foto</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding-bottom:20px">
+      <a class="btn btn-beige" href="${dataUrl}" download="${fname}"><i class="fa fa-download"></i> Unduh</a>
+      <button class="btn btn-ghost" onclick="document.getElementById('invImgOv').remove()">Tutup</button>
+    </div>`;
+      document.body.appendChild(ov);
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -3740,7 +4525,7 @@
       $('modalContainer').innerHTML = `
   <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
     <div class="modal modal-sm">
-      <div class="modal-header"><h3><i class="fa fa-user-gear"></i> ${u ? 'Edit' : 'Tambah'} Pengguna</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+      <div class="modal-header"><h3><i class="fa fa-user-gear"></i> ${u ? 'Ubah' : 'Tambah'} Pengguna</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
       <div class="modal-body">
         <div class="fg" style="margin-bottom:12px"><label>Nama Lengkap *</label><input id="uName" value="${sanitize(u?.full_name || '')}"></div>
         <div class="fg" style="margin-bottom:12px"><label>Email *</label><input type="email" id="uEmail" value="${sanitize(u?.email || '')}"></div>

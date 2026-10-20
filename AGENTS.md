@@ -6,6 +6,7 @@
 - Keep answers short and simple, unless I ask for more.
 - All text users see in the app must be in Indonesian.
 - Money is in Rupiah (Rp).
+- Use English for basic response. But for real case, variables, or data, use the real data
 
 ### Planning
 - Always ask questions first. Never assume the design, tools, or features.
