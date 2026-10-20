@@ -30,7 +30,7 @@
       }
       window.addEventListener('error', function (e) { showErr((e.message || e.type) + (e.lineno ? ' (baris ' + e.lineno + ')' : '')); });
       window.addEventListener('load', function () {
-        if (typeof doLogin !== 'function') showErr('File index.html tidak lengkap/rusak — fungsi doLogin tidak ditemukan.');
+        if (typeof bootstrapApp !== 'function') showErr('File index.html tidak lengkap/rusak — fungsi bootstrapApp tidak ditemukan.');
       });
     })();
   </script>
@@ -2680,30 +2680,12 @@
   <!-- Toast Stack -->
   <div class="toast-stack" id="toastStack"></div>
 
-  <!-- ═══ LOGIN PAGE ═══ -->
-  <div id="loginPage" class="login-page">
-    <div class="login-card">
-      <div class="login-logo">
-        <div class="login-logo-icon">🌸</div>
-        <h1>Daisafacare</h1>
-        <p>Mom & Baby Treatment — Management System</p>
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="loginEmail" placeholder="admin@daisafacare.com" autocomplete="email">
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <div class="pwd-wrap">
-          <input type="password" id="loginPwd" placeholder="••••••••" autocomplete="current-password">
-          <button class="pwd-eye" onclick="togglePwd('loginPwd',this)" type="button"><i class="fa fa-eye"></i></button>
-        </div>
-      </div>
-      <button class="btn-login" id="loginBtn" onclick="doLogin()"><i class="fa fa-leaf"></i> Masuk</button>
-      <div id="loginErr" class="login-error" style="display:none"><i class="fa fa-circle-exclamation"></i><span></span>
-      </div>
-      <div class="login-footer">DaisafaCare &copy; 2026 — Homecare Baby Spa</div>
-    </div>
+  <!-- ═══ SPLASH (selama aplikasi memuat) ═══ -->
+  <div id="bootSplash"
+    style="position:fixed;top:0;right:0;bottom:0;left:0;z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:var(--cream)">
+    <div style="font-size:34px">🌸</div>
+    <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--sage-dark)">Daisafacare</div>
+    <div style="font-size:13px;color:var(--text-sec)">Memuat aplikasi...</div>
   </div>
 
   <!-- ═══ APP ═══ -->
@@ -2758,9 +2740,6 @@
           <i class="fa fa-list-check"></i> Log Aktivitas
         </button>
       </nav>
-      <div class="sidebar-bottom">
-        <button class="btn-logout" onclick="doLogout()"><i class="fa fa-right-from-bracket"></i> Keluar</button>
-      </div>
     </aside>
 
     <!-- ─── MAIN ─── -->
@@ -2804,6 +2783,7 @@
       calYear: new Date().getFullYear(),
       calMonth: new Date().getMonth(),
       invoiceData: null,
+      invoiceMode: 'full',
       editingScheduleId: null,
       openInvoiceId: null,
     };
@@ -2945,61 +2925,84 @@
       S.openInvoiceId = null;
     }
 
-    function togglePwd(id, btn) {
-      const inp = $(id);
-      if (inp.type === 'password') { inp.type = 'text'; btn.innerHTML = '<i class="fa fa-eye-slash"></i>'; }
-      else { inp.type = 'password'; btn.innerHTML = '<i class="fa fa-eye"></i>'; }
-    }
-
     // ═══════════════════════════════════════════════════════════════
-    //  AUTH
+    //  BOOTSTRAP (tanpa halaman login)
     // ═══════════════════════════════════════════════════════════════
-    function doLogin() {
-      const email = $('loginEmail').value.trim();
-      const pwd = $('loginPwd').value;
-      const err = $('loginErr');
-      if (!email || !pwd) { showLoginErr('Email dan password wajib diisi'); return; }
-      const btn = $('loginBtn');
-      btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Masuk...';
-      ga('login', [email, pwd], res => {
-        btn.disabled = false; btn.innerHTML = '<i class="fa fa-leaf"></i> Masuk';
-        if (res.success) {
-          S.user = res.data;
-          try { localStorage.setItem('dsf_user', JSON.stringify(res.data)); } catch (e) { }
-          startApp();
-        } else { showLoginErr(res.message || 'Login gagal'); }
-      });
+    // Aplikasi langsung terbuka sebagai pengguna admin aktif (getAppUser).
+    // Kalau server tidak menjawab / fungsi belum ada, dipakai admin bawaan
+    // supaya layar tidak pernah kosong.
+    const DEFAULT_USER = { id: 1, full_name: 'Admin Daisafa', email: '', role: 'admin', phone: '' };
+    const BOOT_WARN = 'Data pengguna tidak termuat. Aplikasi dibuka sebagai Admin Daisafa.';
+    let bootDone = false;
+
+    function normalizeUser(u) {
+      const d = { id: DEFAULT_USER.id, full_name: DEFAULT_USER.full_name, email: '', role: DEFAULT_USER.role, phone: '' };
+      if (u && typeof u === 'object') {
+        if (u.id !== undefined && u.id !== null && u.id !== '') d.id = u.id;
+        if (u.full_name) d.full_name = String(u.full_name);
+        if (u.email) d.email = String(u.email);
+        if (u.role) d.role = String(u.role).toLowerCase().trim();
+        if (u.phone !== undefined && u.phone !== null) d.phone = u.phone;
+      }
+      if (!d.full_name) d.full_name = DEFAULT_USER.full_name;
+      if (['admin', 'therapist', 'receptionist'].indexOf(d.role) === -1) d.role = 'admin';
+      return d;
     }
 
-    function showLoginErr(msg) {
-      const el = $('loginErr');
-      el.style.display = 'flex';
-      el.querySelector('span').textContent = msg;
+    function syncSidebarUser() {
+      $('sidebarName').textContent = S.user.full_name || '';
+      $('sidebarAvatar').textContent = (S.user.full_name || '?').charAt(0).toUpperCase();
+      $('sidebarRole').textContent = S.user.role;
+      $('adminNav').style.display = isAdmin() ? '' : 'none';
+      $('nav-logs').style.display = isAdmin() ? 'flex' : 'none';
     }
 
-    $('loginPwd').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-    $('loginEmail').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginPwd').focus(); });
+    function bootApp(user, warnMsg) {
+      if (bootDone) return;
+      bootDone = true;
+      S.user = normalizeUser(user);
+      startApp();
+      if (warnMsg) toast(warnMsg, 'warning', 5000);
+    }
 
-    function doLogout() {
-      confirm('Keluar?', 'Anda yakin ingin keluar?', 'warning', () => {
-        S.user = null;
-        try { localStorage.removeItem('dsf_user'); } catch (e) { }
-        $('app').style.display = 'none';
-        $('loginPage').style.display = 'flex';
-        $('loginPwd').value = '';
-        $('loginErr').style.display = 'none';
-      }, 'Ya, Keluar');
+    // Dipanggil sekali saat halaman dimuat (lihat init() di bawah).
+    function bootstrapApp() {
+      let answered = false;
+      // Pengaman: server tidak menjawab (fungsi belum dipasang / lambat)
+      // → aplikasi tetap terbuka dengan admin bawaan setelah 3 detik.
+      const watchdog = setTimeout(() => { if (!answered) bootApp(DEFAULT_USER, BOOT_WARN); }, 3000);
+      function reply(u, warnMsg) {
+        answered = true;
+        clearTimeout(watchdog);
+        if (bootDone) {
+          // Server menjawab terlambat (setelah pengaman jalan): cukup perbarui identitas.
+          if (u) { S.user = normalizeUser(u); syncSidebarUser(); }
+          return;
+        }
+        bootApp(u, warnMsg);
+      }
+      try {
+        ga('getAppUser', [], res => {
+          const u = res && res.success && res.data ? res.data : null;
+          reply(u, u ? '' : BOOT_WARN);
+        });
+      } catch (e) {
+        // Fungsi getAppUser belum ada di backend yang terpasang
+        reply(DEFAULT_USER, BOOT_WARN);
+      }
     }
 
     // ═══════════════════════════════════════════════════════════════
     //  APP INIT
     // ═══════════════════════════════════════════════════════════════
     function startApp() {
-      $('loginPage').style.display = 'none';
+      const splash = $('bootSplash');
+      if (splash) splash.parentNode.removeChild(splash);
       $('app').style.display = 'flex';
+      loading(false);
       $('sidebarName').textContent = S.user.full_name;
       $('sidebarRole').textContent = S.user.role;
-      $('sidebarAvatar').textContent = S.user.full_name.charAt(0).toUpperCase();
+      $('sidebarAvatar').textContent = (S.user.full_name || '?').charAt(0).toUpperCase();
       // Section "Manajemen" hanya untuk admin
       $('adminNav').style.display = isAdmin() ? '' : 'none';
       if (isAdmin()) {
@@ -3011,7 +3014,8 @@
       loadSettings(() => navigate('dashboard'));
     }
 
-    // Ambil data user terbaru dari server (nama bisa berubah oleh admin)
+    // Ambil data user terbaru dari server (nama bisa berubah oleh admin).
+    // Tidak pernah mengarahkan ke halaman login: gagal = diam saja.
     function refreshSessionUser() {
       if (!S.user || !S.user.id) return;
       ga('getProfile', [S.user.id], res => {
@@ -3023,12 +3027,7 @@
         if (u.phone !== undefined) S.user.phone = u.phone;
         if (u.email) S.user.email = u.email;
         if (u.role) S.user.role = u.role;
-        $('sidebarName').textContent = S.user.full_name || '';
-        $('sidebarAvatar').textContent = (S.user.full_name || '?').charAt(0).toUpperCase();
-        $('sidebarRole').textContent = S.user.role;
-        $('adminNav').style.display = isAdmin() ? '' : 'none';
-        $('nav-logs').style.display = isAdmin() ? 'flex' : 'none';
-        try { localStorage.setItem('dsf_user', JSON.stringify(S.user)); } catch (e) { }
+        syncSidebarUser();
       });
     }
 
@@ -3086,6 +3085,24 @@
     // ═══════════════════════════════════════════════════════════════
     //  DASHBOARD
     // ═══════════════════════════════════════════════════════════════
+    // Teks treatment ringkas dari backend (s.treatments), cadangan nama paket
+    function schedTreatmentsText(s) {
+      if (!s) return '';
+      const t = String(s.treatments || '').trim();
+      if (t) return t;
+      return String(s.package_name || '').trim();
+    }
+
+    // Isi kartu "Jadwal Hari Ini" / "Jadwal Besok" — bentuk barisnya sama
+    function dashUpcomingHtml(list, emptyMsg) {
+      const arr = Array.isArray(list) ? list : [];
+      if (!arr.length) return `<div class="table-empty"><i class="fa fa-calendar-xmark"></i>${emptyMsg}</div>`;
+      return `<div class="today-list">${arr.map(s => {
+        const trt = schedTreatmentsText(s);
+        return `<div class="today-item"><div class="today-time">${sanitize(s.time) || '--:--'}</div><div class="today-info" style="min-width:0"><div class="today-cust">${sanitize(s.customer)}</div>${trt ? `<div class="today-loc" style="color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><i class="fa fa-spa"></i> ${sanitize(trt)}</div>` : ''}<div class="today-loc" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><i class="fa fa-location-dot"></i> ${sanitize(s.location) || '—'}</div></div><div class="today-therapist">${sanitize(s.therapist)}</div><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></div>`;
+      }).join('')}</div>`;
+    }
+
     function renderDashboard() {
       $('pageContent').innerHTML = `
   <div class="dash-hero">
@@ -3117,8 +3134,12 @@
   </div>
   <div class="grid-2">
     <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fa fa-calendar-day" style="color:var(--sage)"></i> Jadwal Hari Ini</div></div>
+      <div class="card-header"><div class="card-title"><i class="fa fa-calendar-day" style="color:var(--sage)"></i> Jadwal Hari Ini <span class="today-count-lbl" id="todayCountLbl" style="font-weight:700;color:var(--sage-dark)">· —</span></div></div>
       <div class="card-body" id="todayList"><div class="table-empty"><i class="fa fa-calendar"></i>Memuat...</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fa fa-calendar-plus" style="color:var(--sage)"></i> Jadwal Besok <span class="today-count-lbl" id="tomorrowCountLbl" style="font-weight:700;color:var(--sage-dark)">· —</span></div></div>
+      <div class="card-body" id="tomorrowList"><div class="table-empty"><i class="fa fa-calendar"></i>Memuat...</div></div>
     </div>
     <div class="card">
       <div class="card-header"><div class="card-title"><i class="fa fa-clock-rotate-left" style="color:var(--sage)"></i> Jadwal Terbaru</div></div>
@@ -3133,6 +3154,10 @@
     <div class="card">
       <div class="card-header"><div class="card-title"><i class="fa fa-star" style="color:var(--beige-dark)"></i> Top 5 Pelanggan</div></div>
       <div class="card-body" id="topCustList"><div class="table-empty"><i class="fa fa-users"></i>Memuat...</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title"><i class="fa fa-box-open" style="color:var(--danger)"></i> Belum DP <span id="belumDpCount" style="background:var(--danger-bg);color:var(--danger);border-radius:10px;padding:2px 8px;font-size:11px;font-weight:700">0</span></div></div>
+      <div class="card-body" id="belumDpList"><div class="table-empty"><i class="fa fa-hourglass-half"></i>Memuat...</div></div>
     </div>
   </div>`;
 
@@ -3157,12 +3182,23 @@
         const ctx2 = document.getElementById('statusChart').getContext('2d');
         const sd = d.statusDist;
         new Chart(ctx2, { type: 'doughnut', data: { labels: ['Terjadwal', 'Selesai', 'Dibatalkan'], datasets: [{ data: [sd.scheduled, sd.done, sd.cancelled], backgroundColor: ['#5B8FB9', '#4CAF7D', '#E05252'], borderWidth: 0, hoverOffset: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 } } } } } });
-        // Today list
-        $('todayList').innerHTML = d.upcomingToday.length ? `<div class="today-list">${d.upcomingToday.map(s => `<div class="today-item"><div class="today-time">${sanitize(s.time) || '--:--'}</div><div class="today-info"><div class="today-cust">${sanitize(s.customer)}</div><div class="today-loc"><i class="fa fa-location-dot"></i> ${sanitize(s.location) || '—'}</div></div><div class="today-therapist">${sanitize(s.therapist)}</div><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></div>`).join('')}</div>` : '<div class="table-empty"><i class="fa fa-calendar-xmark"></i>Tidak ada jadwal hari ini</div>';
+        // Today & tomorrow list — bentuk kartu sama, jumlah tampil di judul
+        const todayList = Array.isArray(d.upcomingToday) ? d.upcomingToday : [];
+        const tomorrowList = Array.isArray(d.upcomingTomorrow) ? d.upcomingTomorrow : [];
+        const todayCount = (d.todayCount === undefined || d.todayCount === null) ? todayList.length : d.todayCount;
+        const tomorrowCount = (d.tomorrowCount === undefined || d.tomorrowCount === null) ? tomorrowList.length : d.tomorrowCount;
+        if ($('todayCountLbl')) $('todayCountLbl').textContent = '· ' + todayCount;
+        if ($('tomorrowCountLbl')) $('tomorrowCountLbl').textContent = '· ' + tomorrowCount;
+        $('todayList').innerHTML = dashUpcomingHtml(todayList, 'Tidak ada jadwal hari ini');
+        $('tomorrowList').innerHTML = dashUpcomingHtml(tomorrowList, 'Tidak ada jadwal besok');
         // Recent
         $('recentList').innerHTML = d.recentSchedules.length ? `<div style="display:flex;flex-direction:column;gap:8px">${d.recentSchedules.map(s => `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light)"><div><div style="font-size:13.5px;font-weight:700">${sanitize(s.invoice_no)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(s.customer)} · ${fmtDate(s.date)}</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:700;color:var(--sage-dark)">${fmtRp(s.total)}</div><span class="badge badge-${s.status}" style="font-size:10px">${statusLabel(s.status)}</span></div></div>`).join('')}</div>` : '<div class="table-empty"><i class="fa fa-list"></i>Belum ada jadwal</div>';
         // Overdue
         $('overdueList').innerHTML = d.overdueCustomers.length ? d.overdueCustomers.map(c => `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-light)"><div><div style="font-size:14px;font-weight:700">${sanitize(c.name)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(c.phone)}</div></div><div style="text-align:right"><div style="font-size:14px;font-weight:800;color:var(--danger)">${fmtRp(c.due)}</div>${c.phone_wa ? `<a href="${URLBASE}wa.me/${sanitize(c.phone_wa)}" target="_blank" rel="noopener" class="wa-btn" style="margin-top:4px"><i class="fab fa-whatsapp"></i> WA</a>` : ''}</div></div>`).join('') : '<div class="table-empty"><i class="fa fa-circle-check" style="color:var(--success)"></i>Semua lunas!</div>';
+        // Belum DP — paket NB yang belum disetor DP (uang paket ada di kunjungan pertama)
+        const dpList = Array.isArray(d.belumDp) ? d.belumDp : [];
+        if ($('belumDpCount')) $('belumDpCount').textContent = (d.belumDpCount || dpList.length);
+        $('belumDpList').innerHTML = dpList.length ? dpList.map(x => `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-light)"><div style="min-width:0"><div style="font-size:14px;font-weight:700">${sanitize(x.customer_name)}</div><div style="font-size:12px;color:var(--text-muted)"><span style="font-family:monospace;font-weight:700">${sanitize(x.invoice_no)}</span> · ${fmtDate(x.date)}</div></div><div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:800;color:var(--danger)">${fmtRp(x.grand_total)}</div>${x.customer_phone_wa ? `<a href="${URLBASE}wa.me/${sanitize(x.customer_phone_wa)}" target="_blank" rel="noopener" class="wa-btn" style="margin-top:4px"><i class="fab fa-whatsapp"></i> WA</a>` : ''}</div></div>`).join('') : '<div class="table-empty"><i class="fa fa-circle-check" style="color:var(--success)"></i>Semua paket sudah DP</div>';
         // Top customers
         $('topCustList').innerHTML = d.topCustomers.length ? d.topCustomers.map((c, i) => `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border-light)"><div style="width:28px;height:28px;border-radius:50%;background:${i < 3 ? ['#FFD700', '#C0C0C0', '#CD7F32'][i] : 'var(--cream-dark)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">${i + 1}</div><div style="flex:1;font-size:13.5px;font-weight:600">${sanitize(c.name)}</div><div style="font-size:13.5px;font-weight:700;color:var(--success)">${fmtRp(c.total)}</div></div>`).join('') : '<div class="table-empty"><i class="fa fa-users"></i>Belum ada data</div>';
       });
@@ -3184,6 +3220,7 @@
     <div class="fg"><label>Dari Tanggal</label><input type="date" id="fFrom" onchange="loadSchedules()"></div>
     <div class="fg"><label>Sampai</label><input type="date" id="fTo" onchange="loadSchedules()"></div>
     <div class="fg"><label>&nbsp;</label><button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i class="fa fa-rotate-left"></i> Reset</button></div>
+    ${isWriter() ? `<div class="fg"><label>&nbsp;</label><button class="btn btn-outline btn-sm" onclick="openPackageModal()" style="width:100%"><i class="fa fa-box-open"></i> Tambah Paket NB</button></div>` : ''}
     <div class="fg" style="margin-left:auto"><label>&nbsp;</label>
       <div style="display:flex;gap:6px">
         <button class="btn btn-ghost btn-sm" id="viewList" onclick="setView('list')" style="background:var(--sage);color:#fff"><i class="fa fa-list"></i></button>
@@ -3218,16 +3255,19 @@
 
     function renderScheduleList(data) {
       if (!data.length) { $('jadwalContent').innerHTML = `<div class="table-empty" style="background:var(--white);border-radius:var(--radius-md);padding:48px"><i class="fa fa-calendar-plus"></i>Belum ada jadwal.${isWriter() ? ' Klik + Tambah Jadwal untuk mulai.' : ''}</div>`; return; }
+      // Nomor invoice per baris, dipakai kunjungan paket untuk menampilkan nomor invoice induk
+      const invById = {};
+      data.forEach(x => { if (x.invoice_no) invById[String(x.id)] = x.invoice_no; });
       $('jadwalContent').innerHTML = `
   <div class="card">
     <div class="table-wrap">
       <table>
         <thead><tr><th>Invoice</th><th>Tanggal & Waktu</th><th>Pelanggan</th><th>Treatment</th><th>Terapis</th><th>Total</th><th>Status</th><th>Keterangan</th><th>Aksi</th></tr></thead>
         <tbody>${data.map(s => `<tr>
-          <td><span style="font-family:monospace;font-weight:700;font-size:12px">${sanitize(s.invoice_no)}</span></td>
+          <td>${invCellHtml(s, invById)}</td>
           <td><div style="font-weight:600">${fmtDate(s.schedule_date)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(s.schedule_time)}</div></td>
           <td><div style="font-weight:600">${sanitize(s.customer_name)}</div><div style="font-size:12px;color:var(--text-muted)">${sanitize(s.customer_phone)}</div></td>
-          <td><div style="font-size:12px;color:var(--text-sec)">${sanitize(s.location)}</div></td>
+          <td style="max-width:200px"><div style="font-size:12.5px;font-weight:600;color:var(--text-sec);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${sanitize(schedTreatmentsText(s)) || '—'}</div><div style="font-size:11px;color:var(--text-muted);margin-top:3px;overflow-wrap:anywhere"><i class="fa fa-location-dot"></i> ${sanitize(s.location) || '—'}</div></td>
           <td>${sanitize(s.therapist_name) || '—'}</td>
           <td style="font-weight:700;color:var(--sage-dark)">${fmtRp(s.grand_total)}</td>
           <td><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></td>
@@ -3235,15 +3275,45 @@
           <td style="white-space:nowrap">
             <button class="btn btn-sm btn-outline" onclick="viewSchedule(${s.id})" title="Lihat"><i class="fa fa-eye"></i></button>
             ${isWriter() ? `<button class="btn btn-sm btn-outline" onclick="openScheduleModal(${s.id})" title="Ubah"><i class="fa fa-pen"></i></button>` : ''}
-            <button class="btn btn-sm btn-beige" onclick="printInvoiceById(${s.id})" title="Invoice"><i class="fa fa-file-invoice"></i></button>
+            <button class="btn btn-sm btn-beige" onclick="printInvoiceById(${schedPrintId(s)})" title="Invoice"><i class="fa fa-file-invoice"></i></button>
             ${s.status === 'scheduled' && isWriter() ? `<button class="btn btn-sm btn-outline" onclick="changeStatus(${s.id},'done')" title="Tandai Selesai"><i class="fa fa-circle-check"></i></button>` : ''}
-            ${s.due_amount > 0 && isWriter() ? `<button class="btn btn-sm btn-primary" onclick="openPayModal(${s.id},${s.due_amount},'${sanitize(s.customer_id)}','${sanitize(s.invoice_no)}')" title="Bayar"><i class="fa fa-money-bill"></i></button>` : ''}
+            ${s.due_amount > 0 && isWriter() && !isPackageVisit(s) ? `<button class="btn btn-sm btn-primary" onclick="openPayModal(${s.id},${s.due_amount},'${sanitize(s.customer_id)}','${sanitize(s.invoice_no)}')" title="Bayar"><i class="fa fa-money-bill"></i></button>` : ''}
             ${isAdmin() ? `<button class="btn btn-sm btn-danger" onclick="deleteSchedule(${s.id})" title="Hapus"><i class="fa fa-trash"></i></button>` : ''}
           </td>
         </tr>`).join('')}</tbody>
       </table>
     </div>
   </div>`;
+    }
+
+    // ─── Penanda paket NB di daftar jadwal ───
+    // Kunjungan selain kunjungan pertama tidak memegang nomor invoice, jadi nomor
+    // invoice induknya dicari dari baris lain yang sudah dimuat.
+    function isPackageVisit(s) {
+      if (!s || !s.package_id || !s.master_id) return false;
+      return String(s.master_id) !== String(s.id);
+    }
+    function masterInvoiceNoOf(s, invById) {
+      if (!s || !s.package_id) return String((s && s.invoice_no) || '');
+      if (!isPackageVisit(s)) return String(s.invoice_no || '');
+      const key = String(s.master_id);
+      if (invById && invById[key]) return invById[key];
+      return '';
+    }
+    // Tombol cetak untuk kunjungan paket membuka invoice induk
+    function schedPrintId(s) {
+      if (!s) return '';
+      return (s.package_id && s.master_id) ? s.master_id : s.id;
+    }
+    function invCellHtml(s, invById) {
+      if (!s.package_id) return `<span style="font-family:monospace;font-weight:700;font-size:12px">${sanitize(s.invoice_no)}</span>`;
+      const vno = parseInt(s.visit_no, 10) || 1;
+      const vtot = parseInt(s.total_visits, 10) || 1;
+      const badge = `<span class="badge" style="background:var(--cream-dark);color:var(--sage-dark);font-size:10px">Paket ${vno}/${vtot}</span>`;
+      const no = masterInvoiceNoOf(s, invById);
+      if (!no) return badge;
+      const gaya = isPackageVisit(s) ? 'font-size:11px;color:var(--text-muted)' : 'font-weight:700;font-size:12px';
+      return badge + `<div style="font-family:monospace;${gaya};margin-top:4px">${sanitize(no)}</div>`;
     }
 
     function renderCalendar(data) {
@@ -3347,6 +3417,7 @@
           <div class="modal modal-lg">
             <div class="modal-header"><h3><i class="fa ${isEdit ? 'fa-pen' : 'fa-calendar-plus'}"></i> ${isEdit ? 'Ubah Jadwal' : 'Tambah Jadwal Baru'}</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
             <div class="modal-body">
+              <div id="pkgEditNote" style="display:none;background:var(--cream-dark);border:1px solid var(--beige);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;font-size:12.5px;line-height:1.5;color:var(--text-sec)"></div>
               <div class="form-section">
                 <div class="form-section-title"><i class="fa fa-user"></i> Info Pelanggan & Terapis</div>
                 <div class="form-row cols-2">
@@ -3359,22 +3430,26 @@
                 <div class="form-row cols-3">
                   <div class="fg"><label>Tanggal *</label><input type="date" id="fDate" value="${isEdit ? '' : (dateVal || today())}"></div>
                   <div class="fg"><label>Waktu</label><input type="time" id="fTime" value="${isEdit ? '' : '09:00'}"></div>
-                  <div class="fg"><label>Metode Bayar</label><select id="fMethod" onchange="calcSummary()"><option>TF/QRIS</option><option>Cash</option><option>Transfer</option></select></div>
+                  <div class="fg" id="fgMethod"><label>Metode Bayar</label><select id="fMethod" onchange="calcSummary()"><option>TF/QRIS</option><option>Cash</option><option>Transfer</option></select></div>
                 </div>
                 <div class="form-row cols-2">
                   <div class="fg"><label>Lokasi / Alamat</label><input type="text" id="fLoc" placeholder="Nama wilayah atau alamat lengkap"></div>
-                  <div class="fg"><label>Jarak (km)</label><input type="number" id="fKm" value="0" min="0" step="0.5" oninput="calcTransport()"></div>
+                  <div class="fg" id="fgKm"><label>Jarak (km)</label><input type="number" id="fKm" value="0" min="0" step="0.5" oninput="calcTransport()"></div>
                 </div>
                 <div class="fg"><label>Link Google Maps</label><input type="url" id="fMaps" placeholder="Tempel link Google Maps (opsional)"></div>
               </div>
-              <div class="form-section">
+              <div class="form-section" id="secTreatment">
                 <div class="form-section-title"><i class="fa fa-spa"></i> Treatment</div>
                 <div id="itemsContainer"></div>
+                <div id="nbWarn" style="display:none;margin-top:10px;background:var(--warning-bg);border:1px solid var(--beige);border-left:4px solid var(--warning);border-radius:var(--radius-sm);padding:11px 13px">
+                  <div style="font-size:12.5px;line-height:1.5;color:var(--text-sec)"><i class="fa fa-triangle-exclamation" style="color:var(--warning)"></i> Ini paket NB. Jadwal dibuat untuk semua hari lewat tombol Tambah Paket NB.</div>
+                  <button type="button" class="btn btn-outline btn-sm" style="margin-top:8px" onclick="closeModal();openPackageModal()"><i class="fa fa-box-open"></i> Buka Tambah Paket NB</button>
+                </div>
                 <button class="add-item-btn" onclick="addItemRow()"><i class="fa fa-plus"></i> Tambah Treatment</button>
               </div>
               <div class="form-section">
                 <div class="form-section-title"><i class="fa fa-calculator"></i> Pembayaran</div>
-                <div class="form-row cols-3">
+                <div class="form-row cols-3" id="rowMoney">
                   <div class="fg">
                     <label>Transport (Rp)</label>
                     <input type="number" id="fTransport" value="0" min="0" step="1000" oninput="onTransportInput()">
@@ -3382,7 +3457,16 @@
                     <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text-sec);margin-top:6px;cursor:pointer"><input type="checkbox" id="fTransportAuto" checked onchange="toggleTransportAuto()" style="width:16px;height:16px;accent-color:var(--sage);cursor:pointer"> Hitung otomatis dari KM</label>
                   </div>
                   <div class="fg"><label>Diskon (Rp)</label><input type="number" id="fDiscount" value="0" min="0" step="1000" oninput="calcSummary()"></div>
-                  <div class="fg"><label>Dibayar (Rp)${isEdit ? ' <span style="color:var(--text-muted);font-weight:400">(tetap)</span>' : ''}</label><input type="number" id="fPaid" value="0" min="0" step="1000" oninput="calcSummary()"></div>
+                  <div class="fg">
+                    <label>Dibayar (Rp)${isEdit ? ' <span style="color:var(--text-muted);font-weight:400">(tetap)</span>' : ''}</label>
+                    <input type="number" id="fPaid" value="0" min="0" step="1000" oninput="calcSummary()">
+                    ${isEdit ? '' : `<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+                      <button type="button" class="btn btn-outline" id="fPaidPct20" onclick="setPaidPct(20)" style="min-height:0;padding:5px 10px;font-size:11.5px">20%</button>
+                      <button type="button" class="btn btn-outline" id="fPaidPct50" onclick="setPaidPct(50)" style="min-height:0;padding:5px 10px;font-size:11.5px">50%</button>
+                      <button type="button" class="btn btn-outline" id="fPaidPct100" onclick="setPaidPct(100)" style="min-height:0;padding:5px 10px;font-size:11.5px">Lunas</button>
+                    </div>
+                    <div style="font-size:11.5px;font-weight:600;color:var(--text-muted);margin-top:4px">DP opsional</div>`}
+                  </div>
                 </div>
                 <div id="summaryBox" class="summary-box" style="margin-top:4px">
                   <div class="summary-row"><span>Fee Treatment</span><span id="sumFee">Rp 0</span></div>
@@ -3392,7 +3476,7 @@
                   <div class="summary-row total"><span>TOTAL</span><span id="sumTotal">Rp 0</span></div>
                   <div class="summary-row" style="color:var(--danger);font-weight:700"><span>Sisa Bayar</span><span id="sumDue">Rp 0</span></div>
                 </div>
-                <div class="fg" style="margin-top:14px"><label>Status Pembayaran (otomatis)</label><input type="text" id="fKetPreview" value="BELUM BAYAR" disabled style="opacity:0.85;background:var(--cream-dark);font-weight:700;color:var(--sage-dark)"></div>
+                <div class="fg" style="margin-top:14px" id="fgStatusPreview"><label>Status Pembayaran (otomatis)</label><input type="text" id="fKetPreview" value="BELUM BAYAR" disabled style="opacity:0.85;background:var(--cream-dark);font-weight:700;color:var(--sage-dark)"></div>
                 <div class="fg" style="margin-top:10px"><label>Catatan</label><textarea id="fNotes" rows="2" placeholder="Catatan tambahan..."></textarea></div>
               </div>
             </div>
@@ -3406,7 +3490,17 @@
               ga('getScheduleDetail', [scheduleId, S.user.id, S.user.role], dres => {
                 loading(false);
                 if (!dres.success) { toast(dres.message, 'error'); closeModal(); return; }
-                prefillScheduleForm(dres.data);
+                const det = dres.data;
+                // Kunjungan paket tidak punya baris treatment sendiri — item dibaca dari
+                // invoice induk supaya isian yang dikirim tetap berisi id treatment asli.
+                if (det.is_package && det.master_id && String(det.master_id) !== String(det.id)) {
+                  ga('getScheduleDetail', [det.master_id, S.user.id, S.user.role], mres => {
+                    if (mres && mres.success && mres.data && (mres.data.items || []).length) det.itemsMaster = mres.data.items;
+                    prefillScheduleForm(det);
+                  });
+                  return;
+                }
+                prefillScheduleForm(det);
               });
             } else {
               addItemRow(); // add first row
@@ -3431,9 +3525,9 @@
     <div class="fg"><label>Treatment</label><select onchange="itemTrSelect(this,'${id}')"><option value="">— Pilih —</option>${opts}</select></div>
     <div class="fg"><label>Harga (Rp)</label><input type="number" id="${id}_price" value="0" min="0" step="1000" oninput="calcItemRow('${id}');calcSummary()"></div>
     <div class="fg"><label>Qty</label><input type="number" id="${id}_qty" value="1" min="1" oninput="calcItemRow('${id}');calcSummary()"></div>
-    <div style="padding-top:26px"><button class="btn btn-danger btn-icon" onclick="document.getElementById('${id}').remove();calcSummary()" title="Hapus"><i class="fa fa-trash"></i></button></div>`;
+    <div style="padding-top:26px"><button class="btn btn-danger btn-icon" onclick="document.getElementById('${id}').remove();calcSummary();updateNbWarn()" title="Hapus"><i class="fa fa-trash"></i></button></div>`;
       $('itemsContainer').appendChild(row);
-      if (!trId) return id;
+      if (!trId) { updateNbWarn(); return id; }
       const sel = row.querySelector('select');
       const val = String(trId);
       // Treatment lama yang sudah tidak aktif/dihapus tetap ditampilkan supaya tidak hilang diam-diam
@@ -3450,11 +3544,32 @@
       sel.dataset.trId = sel.value;
       sel.dataset.trName = opt ? opt.text : '';
       calcItemRow(id);
+      updateNbWarn();
       return id;
+    }
+
+    // Peringatan lunak: treatment kategori NB sebaiknya dibuat lewat "Tambah Paket NB".
+    // Hanya peringatan — jadwal satu kunjungan tetap boleh disimpan.
+    function updateNbWarn() {
+      const box = $('nbWarn');
+      const cont = $('itemsContainer');
+      if (!box || !cont) return;
+      let isNb = false;
+      cont.querySelectorAll('select').forEach(sel => {
+        if (isNb || !sel.value) return;
+        const opt = sel.options[sel.selectedIndex];
+        const tr = (S.data.treatments || []).find(t => String(t.id) === String(sel.value));
+        // Kategori ada di awal label baris ("NB - Nama Paket | Rp ...")
+        const label = tr ? String(tr.category || '') : String((opt && opt.text) || '');
+        if (/^\s*nb/i.test(label)) isNb = true;
+      });
+      box.style.display = isNb ? '' : 'none';
     }
 
     // Isi form jadwal dari getScheduleDetail (mode ubah)
     function prefillScheduleForm(s) {
+      // Modal bisa saja sudah ditutup saat data datang
+      if (!$('itemsContainer')) return;
       const setVal = (id, v) => { const el = $(id); if (el) el.value = v; };
       // Pelanggan/terapis yang sudah nonaktif tidak ada di dropdown — tambahkan agar tidak hilang saat disimpan
       const setSelect = (id, val, label) => {
@@ -3489,13 +3604,46 @@
         paidEl.style.background = 'var(--cream-dark)';
       }
       $('itemsContainer').innerHTML = '';
-      (s.items || []).forEach(it => addItemRow(it.treatment_id, it.qty, it.price, it.treatment_name));
-      if (!(s.items || []).length) addItemRow();
+      let itemList = (s.items || []).length ? s.items : (s.itemsMaster || []);
+      // Pengaman: kalau rincian induk tidak terbaca, item dicari dari nama paketnya
+      if (s.is_package && !itemList.length) {
+        const pkgName = String(s.package_name || '');
+        const cocok = (S.data.treatments || []).find(t => (String(t.category || '') + ' - ' + String(t.name || '')) === pkgName);
+        if (cocok) itemList = [{ treatment_id: cocok.id, qty: 1, price: cocok.price, treatment_name: pkgName }];
+      }
+      itemList.forEach(it => addItemRow(it.treatment_id, it.qty, it.price, it.treatment_name));
+      if (!itemList.length) addItemRow();
       // Transport dianggap otomatis bila nilainya sama dengan hitungan KM
       const autoEl = $('fTransportAuto');
       if (autoEl) autoEl.checked = hitungTransport(s.km) === (parseFloat(s.transport_fee) || 0);
+      // ── Kunjungan paket: uang dikunci di invoice induk, form hanya untuk jadwal ──
+      if (s.is_package) lockMoneyFieldsForPackage(s);
       calcSummary();
       updateTransportHint();
+    }
+
+    // Sembunyikan isian uang saat mengubah kunjungan paket. Backend memang mengabaikan
+    // nilai uang untuk baris paket, jadi yang bisa diubah hanya jadwal dan catatan.
+    function lockMoneyFieldsForPackage(s) {
+      const sembunyi = id => { const el = $(id); if (el) el.style.display = 'none'; };
+      sembunyi('secTreatment');
+      sembunyi('fgKm');
+      sembunyi('rowMoney');
+      sembunyi('summaryBox');
+      sembunyi('fgStatusPreview');
+      const note = $('pkgEditNote');
+      if (note) {
+        const inv = String(s.master_invoice_no || s.invoice_no || '');
+        note.style.display = '';
+        note.innerHTML = `<i class="fa fa-lock"></i> Nilai paket dihitung sekali di invoice induk${inv ? ' (<strong>' + sanitize(inv) + '</strong>)' : ''}, di sini hanya tanggal, jam, lokasi, Maps dan catatan.`;
+      }
+      // Metode bayar & status juga bagian dari uang paket
+      const meth = $('fMethod');
+      if (meth) meth.disabled = true;
+      const paidEl = $('fPaid');
+      if (paidEl) paidEl.disabled = true;
+      // Isian yang tersembunyi tetap terkirim apa adanya (items, KM, transport, diskon)
+      ['fKm', 'fTransport', 'fDiscount'].forEach(id => { const el = $(id); if (el) el.disabled = true; });
     }
 
     function itemTrSelect(sel, id) {
@@ -3504,7 +3652,7 @@
       $(id + '_price').value = price;
       sel.dataset.trId = sel.value;
       sel.dataset.trName = opt.text;
-      calcItemRow(id); calcSummary();
+      calcItemRow(id); calcSummary(); updateNbWarn();
     }
 
     function calcItemRow(id) {
@@ -3546,6 +3694,24 @@
       const autoEl = $('fTransportAuto');
       if (autoEl && autoEl.checked) calcTransport();
       else { updateTransportHint(); calcSummary(); }
+    }
+
+    // Isi cepat nominal DP: chip 20%, 50%, Lunas pada isian Dibayar
+    function setPaidPct(pct) {
+      const el = $('fPaid');
+      if (!el || el.disabled) return;
+      let fee = 0;
+      document.querySelectorAll('.item-row').forEach(row => {
+        const priceEl = row.querySelector('input[type=number]');
+        const qtyEl = row.querySelectorAll('input[type=number]')[1];
+        if (priceEl && qtyEl) fee += (parseFloat(priceEl.value) || 0) * (parseInt(qtyEl.value) || 1);
+      });
+      const transport = parseFloat($('fTransport').value) || 0;
+      const discount = parseFloat($('fDiscount').value) || 0;
+      const total = Math.max(0, fee + transport - discount);
+      // Lunas = total penuh, chip persen dibulatkan ke rupiah terdekat
+      el.value = pct >= 100 ? total : Math.round(total * pct / 100);
+      calcSummary();
     }
 
     function calcSummary() {
@@ -3621,11 +3787,18 @@
       }
       formData.items = items;
       formData.paid_amount = parseFloat($('fPaid').value) || 0;
+      // addSchedule hanya membalas id, jadi keputusan invoice diambil dari isian form
+      const feeForm = items.reduce((a, it) => a + (parseFloat(it.subtotal) || 0), 0);
+      const totalForm = Math.max(0, feeForm + (parseFloat(formData.transport_fee) || 0) - (parseFloat(formData.discount) || 0));
+      const openDpInv = formData.paid_amount > 0 && formData.paid_amount < totalForm;
       const scData = formData;
       loading(true, 'Menyimpan jadwal...');
       ga('addSchedule', [scData, S.user.id, S.user.role], res => {
         loading(false);
-        if (res.success) { toast('Jadwal berhasil disimpan!', 'success'); closeModal(); loadSchedules(); if (res.data) setTimeout(() => printInvoiceById(res.data.id), 400); }
+        if (res.success) {
+          toast('Jadwal berhasil disimpan!', 'success'); closeModal(); loadSchedules();
+          if (res.data) setTimeout(() => openDpInv ? printDpInvoiceById(res.data.id) : printInvoiceById(res.data.id), 400);
+        }
         else toast(res.message, 'error');
       });
     }
@@ -3640,6 +3813,243 @@
       else if (S.page === 'laporan') loadReport();
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    //  PAKET NB (satu invoice untuk banyak kunjungan)
+    // ═══════════════════════════════════════════════════════════════
+    // Aturan sama dengan backend (parsePackageTreatment): jumlah hari diambil dari
+    // angka pertama pada nama treatment, kunjungan per hari dari "2x" pada kategori.
+    function parsePackageTreatment(name, cat) {
+      const c = String(cat || '').toLowerCase().replace(/\s+/g, '');
+      const visitsPerDay = c.indexOf('2x') !== -1 ? 2 : 1;
+      const m = String(name || '').match(/\d+/);
+      let days = m ? parseInt(m[0], 10) : 1;
+      if (!isFinite(days) || days < 1) days = 1;
+      if (days > 60) days = 60;
+      return { days: days, visitsPerDay: visitsPerDay };
+    }
+
+    let pkgManualDp = false;
+
+    function openPackageModal() {
+      if (!isWriter()) { toast('Anda tidak memiliki akses untuk menambah paket', 'error'); return; }
+      pkgManualDp = false;
+      loading(true, 'Memuat data paket...');
+      ga('getTreatmentsForDropdown', [], tres => {
+        ga('getCustomersForDropdown', [], cres => {
+          ga('getTherapistsForDropdown', [], therres => {
+            loading(false);
+            S.data.treatments = (tres && tres.data) || [];
+            const paket = S.data.treatments.filter(t => String(t.category || '').trim().toLowerCase().indexOf('nb') === 0);
+            if (!paket.length) { toast('Belum ada treatment berkategori NB di pricelist', 'warning'); return; }
+            const pkgOpts = paket.map(t => `<option value="${t.id}" data-price="${parseFloat(t.price) || 0}" data-name="${sanitize(t.name)}" data-cat="${sanitize(t.category)}">${sanitize(t.category)} — ${sanitize(t.name)} — ${fmtRp(t.price)}</option>`).join('');
+            const custOpts = ((cres && cres.data) || []).map(c => `<option value="${c.id}">${sanitize(c.name)} - ${sanitize(c.phone)}</option>`).join('');
+            const therapOpts = ((therres && therres.data) || []).map(t => `<option value="${t.id}">${sanitize(t.name)}</option>`).join('');
+            $('modalContainer').innerHTML = `
+        <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+          <div class="modal modal-lg" style="display:flex;flex-direction:column;overflow:hidden">
+            <div class="modal-header"><h3><i class="fa fa-box-open"></i> Tambah Paket NB</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+            <div class="modal-body" style="flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch">
+              <div class="form-section">
+                <div class="form-section-title"><i class="fa fa-user"></i> Pelanggan & Terapis</div>
+                <div class="form-row cols-2">
+                  <div class="fg"><label>Pelanggan *</label><select id="pCust"><option value="">— Pilih Pelanggan —</option>${custOpts}</select></div>
+                  <div class="fg"><label>Terapis</label><select id="pTherapist"><option value="">— Pilih Terapis —</option>${therapOpts}</select></div>
+                </div>
+              </div>
+              <div class="form-section">
+                <div class="form-section-title"><i class="fa fa-box-open"></i> Paket & Jadwal</div>
+                <div class="form-row cols-2">
+                  <div class="fg"><label>Tanggal Mulai *</label><input type="date" id="pStart" value="${today()}"></div>
+                  <div class="fg"><label>Paket NB *</label><select id="pTrt" onchange="pkgOnPackageChange()">${pkgOpts}</select></div>
+                </div>
+                <div class="form-row cols-2">
+                  <div class="fg"><label>Jam 1 *</label><input type="time" id="pTime1" value="07:00"></div>
+                  <div class="fg" id="pTime2Wrap"><label>Jam 2 *</label><input type="time" id="pTime2" value="15:30"></div>
+                </div>
+                <div class="form-row cols-2">
+                  <div class="fg"><label>Lokasi / Alamat</label><input type="text" id="pLoc" placeholder="Nama wilayah atau alamat lengkap"></div>
+                  <div class="fg"><label>Jarak (km)</label><input type="number" id="pKm" value="0" min="0" step="0.5" oninput="pkgCalcTransport()"></div>
+                </div>
+                <div class="fg"><label>Link Google Maps</label><input type="url" id="pMaps" placeholder="Tempel link Google Maps (opsional)"></div>
+              </div>
+              <div class="form-section">
+                <div class="form-section-title"><i class="fa fa-calculator"></i> Nilai Paket</div>
+                <div class="form-row cols-2">
+                  <div class="fg">
+                    <label>Transport per kunjungan (Rp)</label>
+                    <input type="number" id="pTransport" value="0" min="0" step="1000" oninput="pkgOnTransportInput()">
+                    <div id="pTransportHint" style="font-size:11.5px;font-weight:600;color:var(--text-muted);margin-top:4px"></div>
+                    <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--text-sec);margin-top:6px;cursor:pointer"><input type="checkbox" id="pTransportAuto" checked onchange="pkgToggleTransportAuto()" style="width:16px;height:16px;accent-color:var(--sage);cursor:pointer"> Hitung otomatis dari KM</label>
+                  </div>
+                  <div class="fg"><label>Diskon (Rp)</label><input type="number" id="pDiscount" value="0" min="0" step="1000" oninput="pkgCalcSummary()"></div>
+                </div>
+                <div class="form-row cols-3">
+                  <div class="fg"><label>DP (%)</label><input type="number" id="pDpPct" value="20" min="0" max="100" step="1" oninput="pkgOnPctInput()"></div>
+                  <div class="fg"><label>Nominal DP (Rp)</label><input type="number" id="pDpAmt" value="0" min="0" step="1000" oninput="pkgOnDpAmtInput()"></div>
+                  <div class="fg"><label>Metode Bayar</label><select id="pMethod"><option>TF/QRIS</option><option>Cash</option><option>Transfer</option></select></div>
+                </div>
+                <div id="pkgSummaryBox" class="summary-box" style="margin-top:4px">
+                  <div class="summary-row"><span>Jumlah kunjungan</span><span id="pkgVisits">—</span></div>
+                  <div class="summary-row"><span>Total paket</span><span id="pkgFee">Rp 0</span></div>
+                  <div class="summary-row"><span id="pkgTransportLbl">Transport</span><span id="pkgTransport">Rp 0</span></div>
+                  <div class="summary-row"><span>Diskon</span><span id="pkgDiscount">Rp 0</span></div>
+                  <div class="summary-row total"><span>TOTAL</span><span id="pkgTotal">Rp 0</span></div>
+                  <div class="summary-row" style="color:var(--sage-dark);font-weight:700"><span id="pkgDpLbl">DP (20%)</span><span id="pkgDp">Rp 0</span></div>
+                  <div class="summary-row" style="color:var(--danger);font-weight:700"><span>Sisa bayar</span><span id="pkgDue">Rp 0</span></div>
+                </div>
+                <div class="fg" style="margin-top:10px"><label>Catatan</label><textarea id="pNotes" rows="2" placeholder="Catatan paket (opsional)..."></textarea></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-ghost" onclick="closeModal()">Batal</button>
+              <button class="btn btn-primary" onclick="saveSchedulePackage()"><i class="fa fa-floppy-disk"></i> Simpan Paket</button>
+            </div>
+          </div>
+        </div>`;
+            pkgOnPackageChange();
+            pkgUpdateHint();
+            pkgCalcSummary();
+          });
+        });
+      });
+    }
+
+    // Paket yang sedang dipilih di modal (harga selalu dari sheet Treatments)
+    function pkgCurrent() {
+      const sel = $('pTrt');
+      if (!sel) return null;
+      const opt = sel.options[sel.selectedIndex];
+      if (!opt || !sel.value) return null;
+      const name = opt.getAttribute('data-name') || '';
+      const cat = opt.getAttribute('data-cat') || '';
+      const pk = parsePackageTreatment(name, cat);
+      return {
+        id: sel.value, name: name, cat: cat,
+        price: parseFloat(opt.getAttribute('data-price')) || 0,
+        days: pk.days, visitsPerDay: pk.visitsPerDay, visits: pk.days * pk.visitsPerDay
+      };
+    }
+
+    // Paket 1x hanya butuh satu jam, paket 2x butuh jam kedua
+    function pkgOnPackageChange() {
+      const pk = pkgCurrent();
+      const wrap = $('pTime2Wrap');
+      if (wrap) wrap.style.display = (pk && pk.visitsPerDay === 2) ? '' : 'none';
+      pkgCalcSummary();
+    }
+
+    function pkgUpdateHint() {
+      const el = $('pTransportHint');
+      if (!el) return;
+      const auto = !$('pTransportAuto') || $('pTransportAuto').checked;
+      el.innerHTML = `≤ 5 km gratis · 6 km = ${fmtRp(6 * tarifTransport())} · ` + (auto
+        ? '<span style="color:var(--sage-dark);font-weight:700">Hitung otomatis</span>'
+        : '<span style="color:var(--warning);font-weight:700">Ubah manual</span>');
+    }
+
+    function pkgCalcTransport() {
+      const kmEl = $('pKm'), trEl = $('pTransport');
+      const auto = !$('pTransportAuto') || $('pTransportAuto').checked;
+      if (kmEl && trEl && auto) trEl.value = hitungTransport(kmEl.value);
+      pkgUpdateHint();
+      pkgCalcSummary();
+    }
+
+    function pkgOnTransportInput() {
+      const autoEl = $('pTransportAuto');
+      if (autoEl && autoEl.checked) autoEl.checked = false;
+      pkgUpdateHint();
+      pkgCalcSummary();
+    }
+
+    function pkgToggleTransportAuto() {
+      const autoEl = $('pTransportAuto');
+      if (autoEl && autoEl.checked) pkgCalcTransport();
+      else { pkgUpdateHint(); pkgCalcSummary(); }
+    }
+
+    // Persen DP diubah → nominal kembali otomatis
+    function pkgOnPctInput() {
+      pkgManualDp = false;
+      pkgCalcSummary();
+    }
+
+    // Nominal DP diketik → pakai nominal itu (manual)
+    function pkgOnDpAmtInput() {
+      pkgManualDp = true;
+      pkgCalcSummary();
+    }
+
+    function pkgCalcSummary() {
+      const pk = pkgCurrent();
+      if (!pk) return;
+      const perVisit = parseFloat($('pTransport').value) || 0;
+      const transport = perVisit * pk.visits;
+      const disc = parseFloat($('pDiscount').value) || 0;
+      const subtotal = pk.price + transport;
+      const total = Math.max(0, subtotal - disc);
+      const pct = Math.min(100, Math.max(0, parseFloat($('pDpPct').value) || 0));
+      const auto = Math.round(total * pct / 100);
+      const amtRaw = parseFloat($('pDpAmt').value) || 0;
+      // Sama seperti backend: nominal tegas menang, kalau kosong/nol pakai persen
+      const dp = (pkgManualDp && amtRaw > 0) ? Math.min(total, Math.max(0, amtRaw)) : auto;
+      const due = Math.max(0, total - dp);
+      if (!pkgManualDp) $('pDpAmt').value = auto;
+      if ($('pkgVisits')) $('pkgVisits').textContent = `${pk.visits} (${pk.days} hari × ${pk.visitsPerDay} kunjungan)`;
+      if ($('pkgFee')) $('pkgFee').textContent = fmtRp(pk.price);
+      if ($('pkgTransportLbl')) $('pkgTransportLbl').textContent = `Transport (${pk.visits} × ${fmtRp(perVisit)})`;
+      if ($('pkgTransport')) $('pkgTransport').textContent = fmtRp(transport);
+      if ($('pkgDiscount')) $('pkgDiscount').textContent = fmtRp(disc);
+      if ($('pkgTotal')) $('pkgTotal').textContent = fmtRp(total);
+      if ($('pkgDpLbl')) $('pkgDpLbl').textContent = (pkgManualDp && amtRaw > 0) ? 'DP' : `DP (${pct}%)`;
+      if ($('pkgDp')) $('pkgDp').textContent = fmtRp(dp);
+      if ($('pkgDue')) $('pkgDue').textContent = fmtRp(due);
+    }
+
+    function saveSchedulePackage() {
+      const pk = pkgCurrent();
+      if (!$('pCust') || !$('pCust').value) { toast('Pelanggan wajib dipilih untuk paket NB', 'warning'); return; }
+      if (!pk) { toast('Paket NB wajib dipilih', 'warning'); return; }
+      const start = $('pStart').value || '';
+      const t1 = $('pTime1').value || '';
+      const t2 = pk.visitsPerDay === 2 ? ($('pTime2').value || '') : '';
+      if (!start) { toast('Tanggal mulai wajib diisi', 'warning'); return; }
+      if (!t1) { toast('Jam kunjungan wajib diisi', 'warning'); return; }
+      if (pk.visitsPerDay === 2 && !t2) { toast('Jam kunjungan kedua wajib diisi untuk paket 2x', 'warning'); return; }
+      // Tidak boleh ada undefined / Date yang dikirim: angka 0 dan teks kosong
+      const payload = {
+        customer_id: $('pCust').value,
+        therapist_id: $('pTherapist').value || '',
+        treatment_id: pk.id,
+        start_date: start,
+        time1: t1,
+        time2: t2,
+        location: $('pLoc').value || '',
+        maps_link: ($('pMaps').value || '').trim(),
+        km: parseFloat($('pKm').value) || 0,
+        transport_fee: parseFloat($('pTransport').value) || 0,
+        dp_percent: parseFloat($('pDpPct').value) || 0,
+        dp_amount: parseFloat($('pDpAmt').value) || 0,
+        discount: parseFloat($('pDiscount').value) || 0,
+        notes: $('pNotes').value || '',
+        payment_method: $('pMethod').value
+      };
+      loading(true, 'Menyimpan paket...');
+      ga('createSchedulePackage', [payload, S.user.id, S.user.role], res => {
+        loading(false);
+        if (!res.success) { toast(res.message, 'error'); return; }
+        toast(res.message || 'Paket berhasil dibuat', 'success');
+        closeModal();
+        loadSchedules();
+        // Ada DP → buka invoice DP induk, tanpa DP → invoice paket seperti biasa
+        if (res.data && res.data.master_id) {
+          const dpNominal = parseFloat(res.data.dp) || 0;
+          if (dpNominal > 0) setTimeout(() => printDpInvoiceById(res.data.master_id), 400);
+          else setTimeout(() => printInvoiceById(res.data.master_id), 400);
+        }
+      });
+    }
+
     function viewSchedule(id) {
       loading(true, 'Memuat detail...');
       ga('getScheduleDetail', [id, S.user.id, S.user.role], res => {
@@ -3648,6 +4058,8 @@
         const s = res.data;
         const waLink = s.customer_phone_wa ? `<a href="${URLBASE}wa.me/${sanitize(s.customer_phone_wa)}" target="_blank" rel="noopener" class="wa-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : '';
         const mapsBtn = s.maps_link ? `<a href="${attrUrl(s.maps_link)}" target="_blank" rel="noopener" class="btn btn-sm btn-outline"><i class="fa fa-map-location-dot"></i> Buka Maps</a>` : '';
+        // Kunjungan paket selain kunjungan pertama: uang ada di invoice induk
+        const isPkgVisit = !!s.is_package && String(s.master_id) !== String(s.id);
         $('modalContainer').innerHTML = `
     <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
       <div class="modal modal-lg">
@@ -3669,14 +4081,21 @@
               <div style="margin-top:10px"><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></div>
             </div>
           </div>
+          ${s.is_package ? `<div class="form-section" style="background:var(--cream-dark);border:1px solid var(--beige)">
+            <div class="form-section-title"><i class="fa fa-box-open"></i> Paket NB</div>
+            <div style="font-size:14px;font-weight:700;color:var(--sage-dark)">Paket: ${sanitize(s.package_name) || '—'}</div>
+            <div style="font-size:13px;color:var(--text-sec);margin-top:4px">Kunjungan ${parseInt(s.visit_no, 10) || 1} dari ${parseInt(s.total_visits, 10) || 1}</div>
+            ${s.master_invoice_no ? `<div style="font-size:13px;color:var(--text-muted);margin-top:4px">Invoice paket: <span style="font-family:monospace;font-weight:700">${sanitize(s.master_invoice_no)}</span></div>` : ''}
+            ${s.total_visits > 1 ? `<div style="font-size:12.5px;color:var(--text-muted);margin-top:4px">Satu invoice untuk ${parseInt(s.total_visits, 10)} kunjungan.</div>` : ''}
+          </div>` : ''}
           <div class="form-section">
             <div class="form-section-title"><i class="fa fa-spa"></i> Treatment</div>
             <table style="width:100%;font-size:14px">
               <thead><tr><th style="text-align:left;padding:8px;background:var(--cream-dark)">Layanan</th><th style="text-align:right;padding:8px;background:var(--cream-dark)">Harga</th><th style="text-align:center;padding:8px;background:var(--cream-dark)">Qty</th><th style="text-align:right;padding:8px;background:var(--cream-dark)">Subtotal</th></tr></thead>
-              <tbody>${s.items.map(i => `<tr><td style="padding:8px;border-bottom:1px solid var(--border-light)">${sanitize(i.treatment_name)}</td><td style="text-align:right;padding:8px;border-bottom:1px solid var(--border-light)">${fmtRp(i.price)}</td><td style="text-align:center;padding:8px;border-bottom:1px solid var(--border-light)">${i.qty}</td><td style="text-align:right;padding:8px;border-bottom:1px solid var(--border-light);font-weight:700">${fmtRp(i.subtotal)}</td></tr>`).join('')}</tbody>
+              <tbody>${s.items.length ? s.items.map(i => `<tr><td style="padding:8px;border-bottom:1px solid var(--border-light)">${sanitize(i.treatment_name)}</td><td style="text-align:right;padding:8px;border-bottom:1px solid var(--border-light)">${fmtRp(i.price)}</td><td style="text-align:center;padding:8px;border-bottom:1px solid var(--border-light)">${i.qty}</td><td style="text-align:right;padding:8px;border-bottom:1px solid var(--border-light);font-weight:700">${fmtRp(i.subtotal)}</td></tr>`).join('') : `<tr><td colspan="4" style="padding:8px;color:var(--text-muted)">Rincian treatment mengikuti invoice paket.</td></tr>`}</tbody>
             </table>
           </div>
-          <div class="summary-box">
+          <div class="summary-box"${isPkgVisit ? ' style="display:none"' : ''}>
             <div class="summary-row"><span>Fee Treatment</span><span>${fmtRp(s.fee_treatment)}</span></div>
             <div class="summary-row"><span>Transport (${s.km} km)</span><span>${fmtRp(s.transport_fee)}</span></div>
             <div class="summary-row"><span>Diskon</span><span>-${fmtRp(s.discount)}</span></div>
@@ -3684,6 +4103,7 @@
             <div class="summary-row" style="color:var(--success);font-weight:700"><span>Sudah Dibayar</span><span>${fmtRp(s.paid_amount)}</span></div>
             <div class="summary-row" style="color:${s.due_amount > 0 ? 'var(--danger)' : 'var(--success)'};font-weight:700"><span>Sisa</span><span>${fmtRp(s.due_amount)}</span></div>
           </div>
+          ${isPkgVisit ? `<div style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px"><i class="fa fa-circle-info"></i> Nilai dan pembayaran paket ada di invoice induk${s.master_invoice_no ? ' <strong>' + sanitize(s.master_invoice_no) + '</strong>' : ''}.</div>` : ''}
           ${s.payments.length ? `<div class="form-section" style="margin-top:14px"><div class="form-section-title"><i class="fa fa-receipt"></i> Riwayat Pembayaran</div>${s.payments.map(p => `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:13px"><div>${fmtDate(p.date)} · ${sanitize(p.method)}</div><div style="font-weight:700;color:var(--success)">${fmtRp(p.amount)}</div></div>`).join('')}</div>` : ''}
           ${s.keterangan ? `<div style="margin-top:10px;font-size:13px"><span class="badge badge-${keteranganClass(s.keterangan)}">${sanitize(s.keterangan)}</span></div>` : ''}
         </div>
@@ -3692,8 +4112,9 @@
           ${isWriter() ? `<button class="btn btn-beige" onclick="closeModal();openScheduleModal(${s.id})"><i class="fa fa-pen"></i> Ubah</button>` : ''}
           ${s.status === 'scheduled' && isWriter() ? `<button class="btn btn-outline" onclick="changeStatus(${s.id},'done')"><i class="fa fa-circle-check"></i> Tandai Selesai</button>` : ''}
           ${s.status !== 'cancelled' && isAdmin() ? `<button class="btn btn-danger" onclick="changeStatus(${s.id},'cancelled')"><i class="fa fa-ban"></i> Batalkan Jadwal</button>` : ''}
-          ${s.due_amount > 0 && isWriter() ? `<button class="btn btn-primary" onclick="closeModal();openPayModal(${s.id},${s.due_amount},'${s.customer_id}','${sanitize(s.invoice_no)}')"><i class="fa fa-money-bill"></i> Catat Pembayaran</button>` : ''}
-          <button class="btn btn-beige" onclick="printInvoiceById(${s.id})"><i class="fa fa-print"></i> Cetak Invoice</button>
+          ${s.due_amount > 0 && isWriter() && !isPkgVisit ? `<button class="btn btn-primary" onclick="closeModal();openPayModal(${s.id},${s.due_amount},'${s.customer_id}','${sanitize(s.invoice_no)}')"><i class="fa fa-money-bill"></i> Catat Pembayaran</button>` : ''}
+          ${isPkgVisit ? `<button class="btn btn-beige" onclick="printInvoiceById(${s.master_id})"><i class="fa fa-file-invoice"></i> Lihat Invoice Paket</button>` : `<button class="btn btn-beige" onclick="printInvoiceById(${s.id})"><i class="fa fa-print"></i> Cetak Invoice</button>`}
+          ${(Number(s.paid_amount) > 0 && Number(s.due_amount) > 0) ? `<button class="btn btn-outline" id="btnCetakInvDp" onclick="printDpInvoiceById(${s.id})"><i class="fa fa-file-invoice-dollar"></i> Cetak Invoice DP</button>` : ''}
         </div>
       </div>
     </div>`;
@@ -4077,7 +4498,10 @@
     function filterInvoices() {
       const q = ($('invSearch')?.value || '').toLowerCase();
       const st = $('invStatus')?.value || '';
-      const filtered = S.data.schedules.filter(s => (!q || (s.invoice_no || '').toLowerCase().includes(q) || (s.customer_name || '').toLowerCase().includes(q)) && (!st || s.status === st));
+      // Kunjungan paket NB tidak punya invoice sendiri: nilainya ada di invoice induk (kunjungan 1)
+      const filtered = S.data.schedules
+        .filter(s => s.invoice_no || !s.package_id)
+        .filter(s => (!q || (s.invoice_no || '').toLowerCase().includes(q) || (s.customer_name || '').toLowerCase().includes(q)) && (!st || s.status === st));
       $('invoiceList').innerHTML = `
   <div class="card">
     <div class="table-wrap">
@@ -4087,7 +4511,7 @@
           <td><span style="font-family:monospace;font-size:12px;font-weight:700">${sanitize(s.invoice_no)}</span></td>
           <td>${fmtDate(s.schedule_date)}</td>
           <td>${sanitize(s.customer_name)}</td>
-          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${sanitize(s.location)}</td>
+          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px">${sanitize(schedTreatmentsText(s)) || '—'}</td>
           <td style="font-weight:700">${fmtRp(s.grand_total)}</td>
           <td style="font-weight:700;color:var(--success)">${fmtRp(s.paid_amount)}</td>
           <td><span class="badge badge-${s.status}">${statusLabel(s.status)}</span></td>
@@ -4104,13 +4528,41 @@
       ga('getScheduleDetail', [id, S.user.id, S.user.role], res => {
         loading(false);
         if (!res.success) { toast(res.message, 'error'); return; }
+        // Kunjungan paket selalu dicetak lewat invoice induknya
+        if (res.data && res.data.is_package && Number(res.data.visit_no) > 1 && res.data.master_id) {
+          printInvoiceById(res.data.master_id);
+          return;
+        }
         renderInvoiceModal(res.data);
       });
     }
 
-    function renderInvoiceModal(s) {
+    // Invoice DP: kunjungan paket tetap memakai invoice induk
+    function printDpInvoiceById(id) {
+      loading(true, 'Memuat invoice DP...');
+      ga('getScheduleDetail', [id, S.user.id, S.user.role], res => {
+        loading(false);
+        if (!res.success) { toast(res.message, 'error'); return; }
+        if (res.data && res.data.is_package && Number(res.data.visit_no) > 1 && res.data.master_id) {
+          printDpInvoiceById(res.data.master_id);
+          return;
+        }
+        renderInvoiceModal(res.data, 'dp');
+      });
+    }
+
+    // mode: 'full' = invoice paket/total, 'dp' = invoice Down Payment
+    function renderInvoiceModal(s, mode) {
       S.invoiceData = s;
+      S.invoiceMode = mode === 'dp' ? 'dp' : 'full';
       S.openInvoiceId = s.id;
+      const isDp = S.invoiceMode === 'dp';
+      const paidAmt = parseFloat(s.paid_amount) || 0;
+      const dueAmt = parseFloat(s.due_amount) || 0;
+      const grandAmt = parseFloat(s.grand_total) || 0;
+      // Pembayaran terakhir (baris Payments berurutan sesuai waktu input)
+      const pays = s.payments || [];
+      const lastPay = pays.length ? pays[pays.length - 1] : null;
       const bizName = S.settings.business_name || 'Daisafacare';
       const bizTagline = S.settings.business_tagline || 'Mom & Baby Treatment';
       const bizPhone = S.settings.business_phone || '0822-3212-1081';
@@ -4118,13 +4570,18 @@
       const bizTT = S.settings.business_tiktok || 'daisafacare';
       const payInfo = S.settings.payment_info || 'BCA 3530674729 a.n Syifa Rasalhague or QRIS';
       const footer = S.settings.invoice_footer || 'Terima kasih atas kepercayaan Anda kepada kami.';
+      // Paket NB: transport ditagih per kunjungan, jadi labelnya memakai jumlah kunjungan
+      const pkgVisits = parseInt(s.total_visits, 10) || 0;
+      const transportLabel = pkgVisits > 1 ? `Transport (${pkgVisits} kunjungan)` : `Transport (${s.km} km)`;
 
       $('modalContainer').innerHTML = `
   <div class="modal-overlay" onclick="if(event.target===this)closeModal()" style="background:rgba(0,0,0,0.7)">
     <div class="modal modal-lg" style="max-width:760px">
-      <div class="modal-header"><h3><i class="fa fa-file-invoice"></i> Invoice ${sanitize(s.invoice_no)}</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+      <div class="modal-header"><h3><i class="fa fa-file-invoice"></i> ${isDp ? 'Invoice DP' : 'Invoice'} ${sanitize(s.invoice_no)}</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
       <div style="padding:20px 24px">
-        <div style="display:flex;gap:10px;margin-bottom:16px;justify-content:flex-end">
+        <div style="display:flex;gap:10px;margin-bottom:16px;justify-content:flex-end;flex-wrap:wrap">
+          ${isDp ? `<button class="btn btn-outline" id="btnInvKePaket" onclick="renderInvoiceModal(S.invoiceData, 'full')"><i class="fa fa-file-invoice"></i> Lihat Invoice Paket</button>` : ''}
+          ${!isDp && paidAmt > 0 && dueAmt > 0 ? `<button class="btn btn-outline" id="btnInvDp" onclick="renderInvoiceModal(S.invoiceData, 'dp')"><i class="fa fa-file-invoice-dollar"></i> Cetak Invoice DP</button>` : ''}
           <button class="btn btn-primary" onclick="printInv()"><i class="fa fa-print"></i> Cetak</button>
           <button class="btn btn-beige" onclick="saveInvImg()"><i class="fa fa-image"></i> Simpan Gambar</button>
           <button class="btn btn-ghost" onclick="closeModal()"><i class="fa fa-xmark"></i> Tutup</button>
@@ -4141,7 +4598,8 @@
               </div>
             </div>
             <div class="inv-title-block">
-              <div class="inv-title">INVOICE ✦</div>
+              <div class="inv-title">${isDp ? 'INVOICE DP ✦' : 'INVOICE ✦'}</div>
+              ${isDp ? `<div style="font-size:11.5px;font-weight:600;color:var(--text-muted);letter-spacing:0.4px">Down Payment</div>` : ''}
               <div class="inv-no-label">No.</div>
               <div class="inv-no-val">${sanitize(s.invoice_no)}</div>
             </div>
@@ -4168,7 +4626,7 @@
             <thead><tr><th>No.</th><th>Deskripsi Layanan</th><th>Harga</th><th>Qty</th><th>Total</th></tr></thead>
             <tbody>
               ${s.items.map((it, i) => `<tr><td>${i + 1}.</td><td>${sanitize(it.treatment_name)}</td><td>Rp ${(it.price || 0).toLocaleString('id-ID')}</td><td>${it.qty}</td><td>Rp ${(it.subtotal || 0).toLocaleString('id-ID')}</td></tr>`).join('')}
-              ${s.transport_fee > 0 ? `<tr><td></td><td>Transport (${s.km} km)</td><td>—</td><td>—</td><td>Rp ${s.transport_fee.toLocaleString('id-ID')}</td></tr>` : ''}
+              ${s.transport_fee > 0 ? `<tr><td></td><td>${transportLabel}</td><td>—</td><td>—</td><td>Rp ${s.transport_fee.toLocaleString('id-ID')}</td></tr>` : ''}
             </tbody>
           </table>
           <!-- Bottom -->
@@ -4176,6 +4634,7 @@
             <div class="inv-notes-box">
               <div class="inv-notes-title">Catatan: ♥</div>
               <div style="font-size:12px;color:var(--text-sec);margin-bottom:10px">${sanitize(s.notes || '')}</div>
+              ${(isDp && lastPay) ? `<div style="font-size:11.5px;font-weight:700;color:var(--sage);margin-bottom:6px">DP diterima: ${fmtRp(lastPay.amount)} (${sanitize(lastPay.method)}) — ${fmtDate(lastPay.date)}</div>` : ''}
               <div style="font-size:11px;font-weight:700;color:var(--sage-dark);margin-bottom:4px">Payment Method:</div>
               <div style="font-size:12px;font-weight:700">${sanitize(payInfo)}</div>
             </div>
@@ -4183,6 +4642,9 @@
               <div class="inv-total-row"><span>Subtotal</span><span>Rp ${(s.subtotal || s.fee_treatment + s.transport_fee || 0).toLocaleString('id-ID')}</span></div>
               ${s.discount > 0 ? `<div class="inv-total-row"><span>Diskon</span><span>- Rp ${(s.discount || 0).toLocaleString('id-ID')}</span></div>` : ''}
               <div class="inv-total-row grand"><span>TOTAL</span><span>Rp ${(s.grand_total || 0).toLocaleString('id-ID')}</span></div>
+              ${isDp ? `<div class="inv-total-row" style="font-size:14px;font-weight:800;color:var(--sage-dark);background:var(--sage-light);padding:8px 12px;border-radius:var(--radius-sm);margin-top:4px"><span>DP DIBAYAR</span><span>Rp ${paidAmt.toLocaleString('id-ID')}</span></div>
+              <div class="inv-total-row" style="font-weight:800;color:var(--danger);padding:8px 12px"><span>SISA TAGIHAN</span><span>Rp ${dueAmt.toLocaleString('id-ID')}</span></div>
+              <div style="font-size:11px;color:var(--text-muted);text-align:right;margin-top:2px">dari total Rp ${grandAmt.toLocaleString('id-ID')}</div>` : ''}
             </div>
           </div>
           <!-- Footer -->
@@ -4209,15 +4671,17 @@
     function printInv() {
       const tmpl = $('invoice-template');
       const printWin = window.open('', '_blank', 'width=800,height=1000');
-      printWin.document.write(`<!DOCTYPE html><html><head><title>Invoice</title><link href="${URLBASE}fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="${URLBASE}cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"><style>body{margin:0;font-family:'Plus Jakarta Sans',sans-serif;background:#FCF7F1;}${document.querySelector('style').textContent}</style></head><body>${tmpl.outerHTML}</body></html>`);
+      printWin.document.write(`<!DOCTYPE html><html><head><title>${S.invoiceMode === 'dp' ? 'Invoice DP' : 'Invoice'}</title><link href="${URLBASE}fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="${URLBASE}cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"><style>body{margin:0;font-family:'Plus Jakarta Sans',sans-serif;background:#FCF7F1;}${document.querySelector('style').textContent}</style></head><body>${tmpl.outerHTML}</body></html>`);
       printWin.document.close();
       setTimeout(() => printWin.print(), 800);
     }
 
     // Nama file gambar invoice: invoice-<no invoice>.png (karakter aman untuk file)
+    // Mode DP memakai awalan invoice-dp- supaya tidak tertukar dengan invoice paket
     function invImgName() {
       const no = String((S.invoiceData && S.invoiceData.invoice_no) || 'daisafacare').trim();
-      return 'invoice-' + no.replace(/[^A-Za-z0-9._-]/g, '-') + '.png';
+      const awalan = S.invoiceMode === 'dp' ? 'invoice-dp-' : 'invoice-';
+      return awalan + no.replace(/[^A-Za-z0-9._-]/g, '-') + '.png';
     }
 
     // Simpan gambar invoice. Di iPhone memakai menu bagikan bawaan (Simpan ke Foto / WhatsApp),
@@ -4473,15 +4937,6 @@
       </div>
       <div class="fg" style="margin-bottom:10px"><label>Email</label><input value="${sanitize(u.email)}" disabled style="opacity:0.6;background:var(--cream-dark)"></div>
       <button class="btn btn-primary" onclick="saveProfile()"><i class="fa fa-floppy-disk"></i> Simpan</button>
-    </div>
-    <div class="form-section">
-      <div class="form-section-title"><i class="fa fa-lock"></i> Ganti Password</div>
-      <div class="form-row cols-3">
-        <div class="fg"><label>Password Lama</label><input type="password" id="pwdOld"></div>
-        <div class="fg"><label>Password Baru</label><input type="password" id="pwdNew"></div>
-        <div class="fg"><label>Konfirmasi</label><input type="password" id="pwdCon"></div>
-      </div>
-      <button class="btn btn-outline" onclick="savePwd()"><i class="fa fa-key"></i> Ganti Password</button>
     </div>`;
       }
     }
@@ -4596,23 +5051,13 @@
     }
 
     // ═══════════════════════════════════════════════════════════════
-    //  AUTO-LOGIN (remember session)
+    //  AUTO-BOOT (aplikasi langsung masuk sebagai admin)
     // ═══════════════════════════════════════════════════════════════
     (function init() {
-      try {
-        const saved = localStorage.getItem('dsf_user');
-        if (saved) {
-          const user = JSON.parse(saved);
-          if (user && user.id && user.email) {
-            S.user = user;
-            startApp();
-            return;
-          }
-        }
-      } catch (e) { }
-      // Default: show login
-      $('loginPage').style.display = 'flex';
+      // Tidak ada lagi sesi tersimpan / halaman login.
+      // Splash tetap tampil sampai startApp() dipanggil, jadi layar tidak pernah kosong.
       $('app').style.display = 'none';
+      bootstrapApp();
     })();
   </script>
 </body>

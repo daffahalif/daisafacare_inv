@@ -46,7 +46,17 @@ const SC = {
   PAID:13, DUE:14, METHOD:15, STATUS:16,
   KETERANGAN:17, NOTES:18, CREATED_BY:19, CREATED:20, UPDATED:21,
   // Tautan Google Maps lokasi kunjungan (teks)
-  MAPS_LINK:22
+  MAPS_LINK:22,
+  // ID paket NB yang sama untuk semua kunjungan dalam satu paket (teks, contoh PKG-000012)
+  PKG_ID:23,
+  // Nama paket yang dibeli, contoh: NB 2x - 7 Hari (teks)
+  PKG_NAME:24,
+  // Nomor kunjungan di dalam paket (1 sampai jumlah kunjungan)
+  VISIT_NO:25,
+  // Jumlah seluruh kunjungan dalam paket (contoh: NB 2x 7 Hari berisi 14 kunjungan)
+  TOTAL_VISITS:26,
+  // ID jadwal kunjungan pertama yang memegang invoice dan uang paket; kosong untuk booking normal
+  MASTER_ID:27
 };
 
 // Schedule_Items: id, schedule_id, treatment_id, treatment_name, price, qty, subtotal
@@ -232,6 +242,27 @@ function calcTransportFee(km, rate) {
   return Math.max(0, whole * rateVal);
 }
 
+// Baca paket NB dari nama treatment: '7 Hari' berisi 7 hari,
+// kategori 'NB 2x' berarti 2 kunjungan per hari, 'NB 1x' berarti 1 kunjungan per hari.
+function parsePackageTreatment(name, category) {
+  const cat = String(category === null || category === undefined ? '' : category).toLowerCase().replace(/\s+/g, '');
+  const visitsPerDay = cat.indexOf('2x') !== -1 ? 2 : 1;
+  const m = String(name === null || name === undefined ? '' : name).match(/\d+/);
+  let days = m ? parseInt(m[0], 10) : 1;
+  if (!isFinite(days) || days < 1) days = 1;
+  if (days > 60) days = 60;
+  return { days: days, visitsPerDay: visitsPerDay };
+}
+
+// Tambah sejumlah hari pada teks tanggal yyyy-MM-dd memakai tanggal lokal,
+// supaya tidak bergeser karena zona waktu atau perubahan bulan/tahun.
+function addDaysStr(dateStr, days) {
+  const m = String(dateStr === null || dateStr === undefined ? '' : dateStr).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return '';
+  const d = new Date(parseInt(m[1], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10) + (parseInt(days, 10) || 0));
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
 // ─── Auth ──────────────────────────────────────────────────────────────────────
 function login(email, password) {
   try {
@@ -251,6 +282,27 @@ function login(email, password) {
 }
 
 // ─── Users ─────────────────────────────────────────────────────────────────────
+// Halaman login dihapus, jadi aplikasi memakai pengguna admin aktif pertama.
+// Kalau data Users belum siap, dipakai admin bawaan supaya aplikasi tetap terbuka.
+function getAppUser() {
+  try {
+    const data = getSheetDataClient(SHEETS.USERS);
+    const active = data.filter(r => isActive(r[U.ACTIVE]));
+    const admin = active.filter(r => String(r[U.ROLE] || '').toLowerCase().trim() === 'admin')[0];
+    const u = admin || active[0];
+    if (!u) {
+      return { success: true, data: { id: 1, full_name: 'Admin Daisafa', email: '', role: 'admin', phone: '', phone_wa: '' } };
+    }
+    return {
+      success: true,
+      data: {
+        id: u[U.ID], full_name: u[U.NAME], email: u[U.EMAIL], role: u[U.ROLE],
+        phone: formatPhone(u[U.PHONE]), phone_wa: normalizePhoneWa(u[U.PHONE])
+      }
+    };
+  } catch(e) { console.error('getAppUser:', e); return { success: false, message: 'Gagal memuat pengguna' }; }
+}
+
 function getUsers(userId, role) {
   try {
     if (role !== 'admin') return { success: false, message: 'Akses ditolak' };
@@ -584,10 +636,47 @@ function genInvoiceNo() {
 }
 
 // ─── Schedules ─────────────────────────────────────────────────────────────────
+
+// Kelompokkan baris Schedule_Items per id jadwal. Dipakai daftar jadwal, detail jadwal,
+// dan dashboard supaya teks treatment-nya selalu sama dan sheet cukup dibaca sekali.
+function groupScheduleItems(siRows) {
+  const out = {};
+  (siRows || []).forEach(si => {
+    const raw = si[SI.SCHED_ID];
+    if (raw === null || raw === undefined || raw === '') return;
+    const key = String(raw).trim();
+    if (!key) return;
+    if (!out[key]) out[key] = [];
+    out[key].push({ name: si[SI.TR_NAME], qty: si[SI.QTY] });
+  });
+  return out;
+}
+
+function getScheduleItemMap() {
+  return groupScheduleItems(getSheetDataClient(SHEETS.SCHEDULE_ITEMS));
+}
+
+// Teks ringkas treatment: "Nama ×qty" dipisah koma, nama tetap seperti di sheet.
+// Kunjungan paket NB tidak memegang item sendiri (hanya kunjungan pertama),
+// jadi untuk kunjungan itu dipakai nama paketnya. Tanpa apa pun hasilnya ''.
+function joinTreatmentText(list, pkgName) {
+  const parts = [];
+  (list || []).forEach(it => {
+    const rawName = it && it.name !== undefined && it.name !== null ? it.name : '';
+    const name = String(rawName).trim();
+    if (!name) return;
+    const qty = parseInt(it.qty, 10);
+    parts.push(name + ' ×' + (isFinite(qty) && qty > 0 ? qty : 1));
+  });
+  if (parts.length) return parts.join(', ');
+  return String(pkgName === null || pkgName === undefined ? '' : pkgName).trim();
+}
+
 function getSchedules(userId, role, filters) {
   try {
     const data = getSheetDataClient(SHEETS.SCHEDULES);
     const timeById = getScheduleTimeById();
+    const itemMap = getScheduleItemMap();
     const cuData = getSheetDataClient(SHEETS.CUSTOMERS);
     const uData = getSheetDataClient(SHEETS.USERS);
     const cuMap = {}; cuData.forEach(r => { cuMap[r[CU.ID]] = { name: r[CU.NAME], phone: formatPhone(r[CU.PHONE]), phoneWa: normalizePhoneWa(r[CU.PHONE]) }; });
@@ -601,6 +690,7 @@ function getSchedules(userId, role, filters) {
       customer_phone_wa: cuMap[r[SC.CUST_ID]] ? cuMap[r[SC.CUST_ID]].phoneWa : '',
       therapist_id: r[SC.THERAPIST_ID], therapist_name: uMap[r[SC.THERAPIST_ID]]||'',
       schedule_date: fmtDate(r[SC.DATE]), schedule_time: fmtTime(timeById[r[SC.ID]] || r[SC.TIME]),
+      treatments: joinTreatmentText(itemMap[String(r[SC.ID])], r[SC.PKG_NAME]),
       location: r[SC.LOCATION]||'', maps_link: r[SC.MAPS_LINK]||'', km: parseFloat(r[SC.KM])||0,
       fee_treatment: parseFloat(r[SC.FEE])||0, transport_fee: parseFloat(r[SC.TRANSPORT])||0,
       subtotal: parseFloat(r[SC.SUBTOTAL])||0, discount: parseFloat(r[SC.DISCOUNT])||0,
@@ -608,7 +698,11 @@ function getSchedules(userId, role, filters) {
       due_amount: parseFloat(r[SC.DUE])||0, payment_method: paymentMethodLabel(r[SC.METHOD]),
       status: r[SC.STATUS]||'scheduled', keterangan: r[SC.KETERANGAN]||'', notes: r[SC.NOTES]||'',
       created_by: r[SC.CREATED_BY], cashier_name: uMap[r[SC.CREATED_BY]]||'',
-      created_at: fmtTs(r[SC.CREATED])
+      created_at: fmtTs(r[SC.CREATED]),
+      // Data paket NB (kosong / 0 untuk booking biasa atau baris lama)
+      package_id: r[SC.PKG_ID]||'', package_name: r[SC.PKG_NAME]||'',
+      visit_no: parseInt(r[SC.VISIT_NO], 10)||0, total_visits: parseInt(r[SC.TOTAL_VISITS], 10)||0,
+      master_id: r[SC.MASTER_ID]||''
     }));
 
     if (f.dateFrom) schedules = schedules.filter(s => s.schedule_date >= f.dateFrom);
@@ -710,7 +804,7 @@ function addSchedule(scData, userId, role) {
       sh.appendRow([sId, invNo, customer_id ? parseInt(customer_id) : '', therapist_id ? parseInt(therapist_id) : '',
         dateStr, schedule_time||'', location||'', kmDist,
         feeTreatment, transportFee, subtotal, disc, grandTotal, paid, due,
-        method, due <= 0 ? 'done' : 'scheduled',
+        method, 'scheduled',
         ket, notes||'', userId, now, now, maps_link||'']);
 
       // Simpan nomor invoice terakhir di Settings (di dalam lock) supaya tidak pernah dipakai ulang
@@ -742,6 +836,148 @@ function addSchedule(scData, userId, role) {
   } catch(e) { console.error('addSchedule:', e); return { success: false, message: 'Gagal menyimpan jadwal' }; }
 }
 
+// ─── Paket NB (satu invoice untuk banyak kunjungan) ────────────────────────────
+// Membuat semua baris kunjungan sekaligus. Uang dan nomor invoice hanya ada di
+// baris pertama (master), kunjungan lain bernilai 0 supaya laporan tidak dobel.
+function createSchedulePackage(payload, userId, role) {
+  try {
+    if (!canWrite(role)) return { success: false, message: 'Akses ditolak' };
+    const p = payload || {};
+
+    // ── Validasi tanggal mulai ──
+    const startStr = parseDateInput(p.start_date);
+    if (!startStr) return { success: false, message: 'Tanggal mulai tidak valid' };
+
+    // ── Treatment wajib ada dan kategorinya paket NB; harga selalu dari sheet Treatments ──
+    const trId = p.treatment_id ? parseInt(p.treatment_id, 10) : NaN;
+    if (!trId || isNaN(trId)) return { success: false, message: 'Treatment wajib dipilih' };
+    const trRow = findRowByValue(SHEETS.TREATMENTS, TR.ID, trId);
+    if (!trRow) return { success: false, message: 'Treatment tidak ditemukan' };
+    const catText = String(trRow.data[TR.CAT] || '').trim();
+    if (catText.toLowerCase().indexOf('nb') !== 0) {
+      return { success: false, message: 'Treatment yang dipilih bukan paket NB' };
+    }
+    const price = Math.max(0, parseFloat(trRow.data[TR.PRICE]) || 0);
+    const trName = String(trRow.data[TR.NAME] || '').trim();
+    const pkgName = catText + ' - ' + trName;
+    const pkg = parsePackageTreatment(trName, catText);
+    const totalVisits = pkg.days * pkg.visitsPerDay;
+
+    // ── Jam kunjungan: paket 2x butuh dua jam, paket 1x cukup satu ──
+    const t1 = fmtTime(p.time1);
+    if (!t1) return { success: false, message: 'Jam kunjungan wajib diisi' };
+    let t2 = '';
+    if (pkg.visitsPerDay === 2) {
+      t2 = fmtTime(p.time2);
+      if (!t2) return { success: false, message: 'Jam kunjungan kedua wajib diisi untuk paket 2x' };
+    }
+
+    // ── Angka tidak boleh negatif ──
+    const kmDist = parseFloat(p.km) || 0;
+    const disc = parseFloat(p.discount) || 0;
+    if (kmDist < 0 || disc < 0) return { success: false, message: 'Nilai tidak boleh negatif' };
+
+    // ── Transport dihitung per kunjungan, lalu dikalikan jumlah kunjungan ──
+    const ratePerKm = parseFloat(getSetting('transport_rate_per_km', 2000)) || 0;
+    const perVisit = (p.transport_fee !== undefined && p.transport_fee !== null && p.transport_fee !== '')
+      ? (parseFloat(p.transport_fee) || 0)
+      : calcTransportFee(kmDist, ratePerKm);
+    if (perVisit < 0) return { success: false, message: 'Nilai tidak boleh negatif' };
+    const transportTotal = Math.round(perVisit * totalVisits * 100) / 100;
+    const subtotal = Math.round((price + transportTotal) * 100) / 100;
+    if (disc > subtotal) return { success: false, message: 'Diskon tidak boleh melebihi subtotal' };
+    const grandTotal = Math.max(0, Math.round((subtotal - disc) * 100) / 100);
+
+    // ── DP: boleh nominal tegas dari klien, kalau tidak ada pakai persen (bawaan 20%) ──
+    const dpSent = parseFloat(p.dp_amount);
+    let dpPct = parseFloat(p.dp_percent);
+    if (!isFinite(dpPct)) dpPct = 20;
+    dpPct = Math.min(100, Math.max(0, dpPct));
+    let dp = (isFinite(dpSent) && dpSent > 0) ? dpSent : Math.round(grandTotal * dpPct / 100);
+    dp = Math.round(Math.min(Math.max(0, dp), grandTotal) * 100) / 100;
+    const due = Math.round((grandTotal - dp) * 100) / 100;
+
+    // ── Keterangan mengikuti aturan addSchedule ──
+    const method = normalizePaymentMethod(p.payment_method);
+    let ket;
+    if (due <= 0) ket = 'LUNAS ' + (String(method).toLowerCase() === 'cash' ? 'CASH' : 'TF/QRIS');
+    else if (dp > 0) ket = 'DP';
+    else ket = 'BELUM BAYAR';
+
+    const custId = p.customer_id ? parseInt(p.customer_id) : '';
+    if (!custId) return { success: false, message: 'Pelanggan wajib dipilih' };
+    const therapistId = p.therapist_id ? parseInt(p.therapist_id) : '';
+    const location = p.location || '';
+    const mapsLink = p.maps_link || '';
+    const notes = p.notes || '';
+
+    const sh = getSheet(SHEETS.SCHEDULES);
+    const lock = LockService.getScriptLock(); lock.waitLock(20000);
+    try {
+      const baseId = getNextId(SHEETS.SCHEDULES);
+      const invNo = genInvoiceNo();
+      const pkgId = 'PKG-' + String(baseId).padStart(6, '0');
+      const now = ts();
+
+      // Semua baris kunjungan disusun dulu, baru ditulis sekali supaya cepat
+      const rows = [];
+      let visitNo = 0;
+      for (let d = 0; d < pkg.days; d++) {
+        const dateStr = addDaysStr(startStr, d);
+        const slots = pkg.visitsPerDay === 2 ? [t1, t2] : [t1];
+        for (let k = 0; k < slots.length; k++) {
+          visitNo++;
+          const isMaster = visitNo === 1;
+          rows.push([
+            baseId + visitNo - 1,
+            isMaster ? invNo : '',
+            custId, therapistId, dateStr, slots[k], location, kmDist,
+            isMaster ? price : 0, isMaster ? transportTotal : 0, isMaster ? subtotal : 0,
+            isMaster ? disc : 0, isMaster ? grandTotal : 0, isMaster ? dp : 0, isMaster ? due : 0,
+            isMaster ? method : '', 'scheduled', isMaster ? ket : '',
+            isMaster ? notes : '', userId, now, now, mapsLink,
+            pkgId, pkgName, visitNo, totalVisits, baseId
+          ]);
+        }
+      }
+
+      // Spreadsheet lama mungkin belum punya kolom paket, jadi lebarkan dulu
+      const needCols = SC.MASTER_ID + 1;
+      if (typeof sh.getMaxColumns === 'function' && sh.getMaxColumns() < needCols) {
+        sh.insertColumnsAfter(sh.getMaxColumns(), needCols - sh.getMaxColumns());
+      }
+      sh.getRange(sh.getLastRow() + 1, 1, rows.length, rows[0].length).setValues(rows);
+
+      setSetting('last_invoice_no', invNo, userId);
+
+      // Satu baris treatment hanya di kunjungan pertama
+      const siSh = getSheet(SHEETS.SCHEDULE_ITEMS);
+      siSh.appendRow([getNextId(SHEETS.SCHEDULE_ITEMS), baseId, trId, pkgName, price, 1, Math.round(price * 100) / 100]);
+
+      // DP dicatat sebagai pembayaran sungguhan pada invoice paket
+      if (dp > 0) {
+        getSheet(SHEETS.PAYMENTS).appendRow([getNextId(SHEETS.PAYMENTS), baseId, custId, dp, method, '', startStr, 'DP paket', userId, now]);
+      }
+
+      const cr = findRowByValue(SHEETS.CUSTOMERS, CU.ID, custId);
+      if (cr) {
+        const crow = cr.data.slice();
+        crow[CU.TOTAL] = Math.round(((parseFloat(crow[CU.TOTAL]) || 0) + grandTotal) * 100) / 100;
+        crow[CU.PAID] = Math.round(((parseFloat(crow[CU.PAID]) || 0) + dp) * 100) / 100;
+        crow[CU.DUE] = Math.max(0, Math.round((crow[CU.TOTAL] - crow[CU.PAID]) * 100) / 100);
+        getSheet(SHEETS.CUSTOMERS).getRange(cr.row, 1, 1, crow.length).setValues([crow]);
+      }
+
+      logActivity(userId, '', 'CREATE', 'Schedules', baseId, invNo + ' paket ' + totalVisits + ' kunjungan Rp' + grandTotal);
+      return {
+        success: true,
+        message: 'Paket dibuat: ' + totalVisits + ' kunjungan',
+        data: { master_id: baseId, package_id: pkgId, invoice_no: invNo, visits: totalVisits, grand_total: grandTotal, dp: dp, due: due }
+      };
+    } finally { lock.releaseLock(); }
+  } catch(e) { console.error('createSchedulePackage:', e); return { success: false, message: 'Gagal membuat paket' }; }
+}
+
 // Ubah input tanggal (Date atau teks yyyy-MM-dd) menjadi teks yyyy-MM-dd, '' kalau tidak valid
 function parseDateInput(v) {
   if (!v) return '';
@@ -764,6 +1000,38 @@ function updateSchedule(userId, role, scheduleId, payload) {
     const p = payload || {};
     if (!scheduleId) return { success: false, message: 'Jadwal tidak ditemukan' };
     if (!p.schedule_date) return { success: false, message: 'Tanggal jadwal wajib diisi' };
+
+    // ── Kunjungan paket: hanya jadwal dan lokasi yang boleh diubah ──
+    // Uang paket disimpan di kunjungan pertama dan satu invoice dipakai untuk semua
+    // kunjungan, jadi nominal, item, dan diskon tidak boleh diubah dari sini.
+    const found = findRowByValue(SHEETS.SCHEDULES, SC.ID, parseInt(scheduleId));
+    if (!found) return { success: false, message: 'Jadwal tidak ditemukan' };
+    if (String(found.data[SC.PKG_ID] || '').trim() !== '') {
+      const pkgDate = parseDateInput(p.schedule_date);
+      if (!pkgDate) return { success: false, message: 'Tanggal jadwal tidak valid' };
+      const pkgLock = LockService.getScriptLock(); pkgLock.waitLock(15000);
+      try {
+        const pr = findRowByValue(SHEETS.SCHEDULES, SC.ID, parseInt(scheduleId));
+        if (!pr) return { success: false, message: 'Jadwal tidak ditemukan' };
+        const prow = pr.data.slice();
+        prow[SC.DATE] = pkgDate;
+        prow[SC.TIME] = p.schedule_time || '';
+        prow[SC.LOCATION] = p.location || '';
+        prow[SC.MAPS_LINK] = p.maps_link || '';
+        prow[SC.NOTES] = p.notes || '';
+        prow[SC.UPDATED] = ts();
+        getSheet(SHEETS.SCHEDULES).getRange(pr.row, 1, 1, prow.length).setValues([prow]);
+        logActivity(userId, '', 'UPDATE', 'Schedules', parseInt(scheduleId), 'Kunjungan paket: ' + (prow[SC.INV_NO] || prow[SC.PKG_ID]));
+        return {
+          success: true, message: 'Jadwal kunjungan paket diperbarui',
+          data: {
+            id: parseInt(scheduleId), invoice_no: prow[SC.INV_NO] || '',
+            grand_total: parseFloat(prow[SC.TOTAL]) || 0, due_amount: parseFloat(prow[SC.DUE]) || 0
+          }
+        };
+      } finally { pkgLock.releaseLock(); }
+    }
+
     const items = p.items || [];
     if (!items.length) return { success: false, message: 'Tambahkan minimal satu treatment' };
 
@@ -829,8 +1097,9 @@ function updateSchedule(userId, role, scheduleId, payload) {
       if (due <= 0) ket = 'LUNAS ' + (String(method).toLowerCase() === 'cash' ? 'CASH' : 'TF/QRIS');
       else if (paid > 0) ket = 'DP';
       else ket = 'BELUM BAYAR';
-      // Jadwal yang sudah dibatalkan tetap dibatalkan
-      const newStatus = oldStatus === 'cancelled' ? 'cancelled' : (due <= 0 ? 'done' : 'scheduled');
+      // Jadwal yang sudah dibatalkan tetap dibatalkan; status lain tidak lagi
+      // berubah karena pembayaran, hanya updateScheduleStatus yang mengubahnya.
+      const newStatus = (oldStatus === 'done' || oldStatus === 'cancelled') ? oldStatus : 'scheduled';
 
       const row = old.slice();
       row[SC.CUST_ID] = newCustId;
@@ -914,6 +1183,14 @@ function getScheduleDetail(id, userId, role) {
       date: fmtDate(p[PAY.DATE]), notes: p[PAY.NOTES]||''
     }));
     const custInfo = cuMap[s[SC.CUST_ID]] || {};
+    // Kunjungan paket tidak memegang nomor invoice, jadi nomornya dibaca dari baris pertama
+    const pkgId = String(s[SC.PKG_ID] || '').trim();
+    const masterId = s[SC.MASTER_ID] === null || s[SC.MASTER_ID] === undefined ? '' : String(s[SC.MASTER_ID]).trim();
+    let masterInvoiceNo = String(s[SC.INV_NO] || '');
+    if (pkgId && masterId && masterId !== String(s[SC.ID])) {
+      const mr = findRowByValue(SHEETS.SCHEDULES, SC.ID, parseInt(masterId, 10));
+      if (mr) masterInvoiceNo = String(mr.data[SC.INV_NO] || '');
+    }
     return {
       success: true,
       data: {
@@ -930,6 +1207,11 @@ function getScheduleDetail(id, userId, role) {
         due_amount: parseFloat(s[SC.DUE])||0, payment_method: paymentMethodLabel(s[SC.METHOD]),
         status: s[SC.STATUS]||'scheduled', keterangan: s[SC.KETERANGAN]||'',
         notes: s[SC.NOTES]||'', cashier_name: uMap[s[SC.CREATED_BY]]||'',
+        // Data paket NB (kosong / 0 untuk booking biasa)
+        package_id: pkgId, package_name: s[SC.PKG_NAME]||'',
+        visit_no: parseInt(s[SC.VISIT_NO], 10)||0, total_visits: parseInt(s[SC.TOTAL_VISITS], 10)||0,
+        master_id: masterId, master_invoice_no: masterInvoiceNo, is_package: pkgId !== '',
+        treatments: joinTreatmentText(items.map(it => ({ name: it.treatment_name, qty: it.qty })), s[SC.PKG_NAME]),
         items, payments
       }
     };
@@ -1023,8 +1305,9 @@ function addSchedulePayment(payData, userId, role) {
       let sDue = Math.round(((parseFloat(srow[SC.TOTAL])||0) - srow[SC.PAID]) * 100) / 100;
       if (sDue < 0) sDue = 0;
       srow[SC.DUE] = sDue;
+      // Lunas atau belum, status tidak diubah di sini: hanya updateScheduleStatus
+      // yang boleh menandai selesai, supaya booking tidak otomatis jadi 'done'.
       if (sDue <= 0) {
-        srow[SC.STATUS] = 'done';
         srow[SC.KETERANGAN] = 'LUNAS ' + (String(payMethod).toLowerCase() === 'cash' ? 'CASH' : 'TF/QRIS');
       } else {
         srow[SC.KETERANGAN] = 'DP';
@@ -1055,8 +1338,62 @@ function deleteSchedule(id, userId, role) {
     if (!r) return { success: false, message: 'Jadwal tidak ditemukan' };
     const row = r.data;
     const invNo = row[SC.INV_NO];
+    const pkgId = String(row[SC.PKG_ID] || '').trim();
+    const visitNo = parseInt(row[SC.VISIT_NO], 10) || 0;
+    const masterIdTxt = (row[SC.MASTER_ID] === null || row[SC.MASTER_ID] === undefined) ? '' : String(row[SC.MASTER_ID]).trim();
+    const isPkgMaster = pkgId !== '' && ((masterIdTxt !== '' && masterIdTxt === String(row[SC.ID])) || visitNo === 1);
+    const isPkgVisit = pkgId !== '' && !isPkgMaster;
+
+    // Hapus Schedule_Items milik beberapa jadwal sekaligus (dari bawah ke atas)
+    const deleteItemsOfIds = (ids) => {
+      const siSh = getSheet(SHEETS.SCHEDULE_ITEMS);
+      const siAll = getSheetData(SHEETS.SCHEDULE_ITEMS);
+      siAll.map((si, idx) => ids.indexOf(parseInt(si[SI.SCHED_ID], 10)) !== -1 ? idx + 2 : null)
+        .filter(Boolean).reverse().forEach(rn => siSh.deleteRow(rn));
+    };
+
     const lock = LockService.getScriptLock(); lock.waitLock(15000);
     try {
+      // ── Kunjungan paket selain baris pertama: hapus baris itu saja, uang tidak berubah ──
+      if (isPkgVisit) {
+        deleteItemsOfIds([parseInt(id)]);
+        getSheet(SHEETS.SCHEDULES).deleteRow(r.row);
+        logActivity(userId, '', 'DELETE', 'Schedules', parseInt(id), 'Hapus kunjungan ' + visitNo + ' paket ' + pkgId);
+        return { success: true, message: 'Kunjungan paket berhasil dihapus' };
+      }
+
+      // ── Baris pertama paket: hapus semua kunjungan, total pelanggan dikembalikan sekali ──
+      if (isPkgMaster) {
+        const scAll = getSheetData(SHEETS.SCHEDULES);
+        const targets = [];
+        scAll.forEach((s, idx) => {
+          if (String(s[SC.PKG_ID] || '').trim() === pkgId) targets.push({ row: idx + 2, data: s });
+        });
+        if (!targets.length) targets.push({ row: r.row, data: row });
+
+        if (row[SC.CUST_ID] && String(row[SC.STATUS] || '') !== 'cancelled') {
+          const cr = findRowByValue(SHEETS.CUSTOMERS, CU.ID, parseInt(row[SC.CUST_ID]));
+          if (cr) {
+            const crow = cr.data.slice();
+            crow[CU.TOTAL] = Math.max(0, Math.round(((parseFloat(crow[CU.TOTAL]) || 0) - (parseFloat(row[SC.TOTAL]) || 0)) * 100) / 100);
+            crow[CU.PAID] = Math.max(0, Math.round(((parseFloat(crow[CU.PAID]) || 0) - (parseFloat(row[SC.PAID]) || 0)) * 100) / 100);
+            crow[CU.DUE] = Math.max(0, Math.round((crow[CU.TOTAL] - crow[CU.PAID]) * 100) / 100);
+            getSheet(SHEETS.CUSTOMERS).getRange(cr.row, 1, 1, crow.length).setValues([crow]);
+          }
+        }
+
+        deleteItemsOfIds(targets.map(t => parseInt(t.data[SC.ID], 10)));
+
+        // Hapus dari baris paling bawah supaya nomor baris lain tidak bergeser
+        const scSh = getSheet(SHEETS.SCHEDULES);
+        targets.slice().sort((a, b) => b.row - a.row).forEach(t => scSh.deleteRow(t.row));
+
+        // Riwayat pembayaran (termasuk DP) sengaja TIDAK dihapus, sebagai jejak uang yang sudah masuk
+        logActivity(userId, '', 'DELETE', 'Schedules', parseInt(id), 'Deleted: ' + (invNo || pkgId) + ' paket ' + targets.length + ' kunjungan');
+        return { success: true, message: 'Paket berhasil dihapus (' + targets.length + ' kunjungan)' };
+      }
+
+      // ── Booking biasa: perilaku lama tetap sama ──
       if (row[SC.CUST_ID] && row[SC.STATUS] !== 'cancelled') {
         const cr = findRowByValue(SHEETS.CUSTOMERS, CU.ID, parseInt(row[SC.CUST_ID]));
         if (cr) {
@@ -1067,9 +1404,7 @@ function deleteSchedule(id, userId, role) {
           getSheet(SHEETS.CUSTOMERS).getRange(cr.row, 1, 1, crow.length).setValues([crow]);
         }
       }
-      const siSh = getSheet(SHEETS.SCHEDULE_ITEMS);
-      const siAll = getSheetData(SHEETS.SCHEDULE_ITEMS);
-      siAll.map((si, idx) => si[SI.SCHED_ID] == parseInt(id) ? idx+2 : null).filter(Boolean).reverse().forEach(rn => siSh.deleteRow(rn));
+      deleteItemsOfIds([parseInt(id)]);
       const pySh = getSheet(SHEETS.PAYMENTS);
       const pyAll = getSheetData(SHEETS.PAYMENTS);
       pyAll.map((p, idx) => p[PAY.SCHED_ID] == parseInt(id) ? idx+2 : null).filter(Boolean).reverse().forEach(rn => pySh.deleteRow(rn));
@@ -1086,12 +1421,16 @@ function getDashboardStats(userId, role) {
     const now = new Date();
     const tz = Session.getScriptTimeZone();
     const todayStr = Utilities.formatDate(now, tz, 'yyyy-MM-dd');
+    // Tanggal besok disusun dari teks tanggal lokal hari ini, bukan dari objek Date
+    // hasil parsing, supaya tidak bergeser sehari karena zona waktu.
+    const tomorrowStr = addDaysStr(todayStr, 1);
     // mStart adalah tengah malam lokal awal bulan, jadi tanggal jadwal harus dibandingkan sebagai waktu lokal juga
     const mStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const scData = getSheetDataClient(SHEETS.SCHEDULES);
     const timeById = getScheduleTimeById();
     const activeScheds = scData.filter(s => s[SC.STATUS] !== 'cancelled');
     const todayScheds = activeScheds.filter(s => fmtDate(s[SC.DATE]) === todayStr);
+    const tomorrowScheds = activeScheds.filter(s => fmtDate(s[SC.DATE]) === tomorrowStr);
     const cuData = getSheetDataClient(SHEETS.CUSTOMERS);
     const totalCustDue = cuData.reduce((s, c) => s + (parseFloat(c[CU.DUE])||0), 0);
     const monthScheds = activeScheds.filter(s => {
@@ -1111,6 +1450,7 @@ function getDashboardStats(userId, role) {
     }
 
     const siData = getSheetDataClient(SHEETS.SCHEDULE_ITEMS);
+    const itemMap = groupScheduleItems(siData);
     const monthSchedIds = new Set(monthScheds.map(s => s[SC.ID]));
     const trBreakdown = {};
     siData.filter(si => monthSchedIds.has(si[SI.SCHED_ID])).forEach(si => {
@@ -1130,6 +1470,19 @@ function getDashboardStats(userId, role) {
     const uData = getSheetDataClient(SHEETS.USERS);
     const uMap = {}; uData.forEach(u => { uMap[u[U.ID]] = u[U.NAME]; });
     const cuMap = {}; cuData.forEach(c => { cuMap[c[CU.ID]] = c[CU.NAME]; });
+    const cuWaMap = {}; cuData.forEach(c => { cuWaMap[c[CU.ID]] = normalizePhoneWa(c[CU.PHONE]); });
+
+    // Paket NB yang belum disetor DP sama sekali. DP bukan syarat sahnya booking,
+    // jadi paket tetap tampil di sini sampai ada pembayaran pertama.
+    const belumDp = activeScheds
+      .filter(s => String(s[SC.PKG_ID] || '').trim() !== '' && (parseInt(s[SC.VISIT_NO], 10) || 0) === 1 && (parseFloat(s[SC.PAID]) || 0) <= 0)
+      .map(s => ({
+        id: s[SC.ID], invoice_no: s[SC.INV_NO] || '',
+        customer_name: cuMap[s[SC.CUST_ID]] || 'Walk-in',
+        customer_phone_wa: cuWaMap[s[SC.CUST_ID]] || '',
+        date: fmtDate(s[SC.DATE]), grand_total: parseFloat(s[SC.TOTAL]) || 0
+      }))
+      .reverse();
 
     const recentSchedules = activeScheds.slice(-8).reverse().map(s => ({
       invoice_no: s[SC.INV_NO], customer: cuMap[s[SC.CUST_ID]]||'Walk-in',
@@ -1141,11 +1494,22 @@ function getDashboardStats(userId, role) {
       .map(c => ({ name: c[CU.NAME], phone: formatPhone(c[CU.PHONE]), phone_wa: normalizePhoneWa(c[CU.PHONE]), due: parseFloat(c[CU.DUE])||0 }))
       .sort((a, b) => b.due - a.due).slice(0, 5);
 
-    const upcomingToday = todayScheds.map(s => ({
+    // Urut jam dari pagi; jadwal yang belum punya jam ditaruh paling bawah
+    const byTime = (a, b) => {
+      if (a.time === b.time) return 0;
+      if (!a.time) return 1;
+      if (!b.time) return -1;
+      return a.time < b.time ? -1 : 1;
+    };
+    const schedBrief = s => ({
       id: s[SC.ID], invoice_no: s[SC.INV_NO], customer: cuMap[s[SC.CUST_ID]]||'Walk-in',
       time: fmtTime(timeById[s[SC.ID]] || s[SC.TIME]), location: s[SC.LOCATION]||'',
-      therapist: uMap[s[SC.THERAPIST_ID]]||'', status: s[SC.STATUS]||''
-    }));
+      therapist: uMap[s[SC.THERAPIST_ID]]||'', status: s[SC.STATUS]||'',
+      treatments: joinTreatmentText(itemMap[String(s[SC.ID])], s[SC.PKG_NAME])
+    });
+
+    const upcomingToday = todayScheds.map(schedBrief);
+    const upcomingTomorrow = tomorrowScheds.map(schedBrief).sort(byTime);
 
     return {
       success: true,
@@ -1156,7 +1520,9 @@ function getDashboardStats(userId, role) {
         totalCustDue: Math.round(totalCustDue*100)/100,
         totalSchedules: activeScheds.length,
         dailyData, trBreakdown, statusDist, topCustomers,
-        recentSchedules, overdueCustomers, upcomingToday
+        recentSchedules, overdueCustomers, upcomingToday,
+        upcomingTomorrow, tomorrowCount: tomorrowScheds.length,
+        belumDp, belumDpCount: belumDp.length
       }
     };
   } catch(e) { console.error('getDashboardStats:', e); return { success: false, message: 'Gagal memuat statistik' }; }
@@ -1371,7 +1737,7 @@ function setupSheets() {
   ].forEach(t => trsh.appendRow(t));
 
   // Schedules
-  const scsh = mkSheet(SHEETS.SCHEDULES, ['ID','Invoice No','Customer ID','Therapist ID','Schedule Date','Schedule Time','Location','KM Distance','Fee Treatment','Transport Fee','Subtotal','Discount','Grand Total','Paid Amount','Due Amount','Payment Method','Status','Keterangan','Notes','Created By','Created At','Updated At','Maps Link']);
+  const scsh = mkSheet(SHEETS.SCHEDULES, ['ID','Invoice No','Customer ID','Therapist ID','Schedule Date','Schedule Time','Location','KM Distance','Fee Treatment','Transport Fee','Subtotal','Discount','Grand Total','Paid Amount','Due Amount','Payment Method','Status','Keterangan','Notes','Created By','Created At','Updated At','Maps Link','Package ID','Package Name','Visit No','Total Visits','Master Schedule ID']);
   scsh.appendRow([1,'DSF-20261001-001',1,2,'2026-10-01','09:00','Kalisari Dharma',10,200000,24000,224000,0,224000,224000,0,'TF/QRIS','done','LUNAS TF/QRIS','',1,now,now]);
   scsh.appendRow([2,'DSF-20261005-001',2,2,'2026-10-05','10:00','Jalan Bogangin Baru',5,85000,0,85000,0,85000,85000,0,'TF/QRIS','done','LUNAS TF/QRIS','',1,now,now]);
   scsh.appendRow([3,'DSF-20261010-001',3,2,'2026-10-10','14:00','Educity Apartemen',8,100000,0,100000,0,100000,0,100000,'TF/QRIS','scheduled','BELUM BAYAR','',1,now,now]);

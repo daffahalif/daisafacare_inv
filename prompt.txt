@@ -1,6 +1,12 @@
-The program works pretty much okay and fine.
+Here are the updates for this version:
+- can add maps, map link shown as buka maps (work)
+- newborn 2x should add morning and evening schedule (such as 07.00 and 15.30)
+- the newborn 2x still marked only on the book date, not increment every day (i tried add for 2 weeks newborn treatment)
+- the login not removed, still there.
+- need a down payment invoice, not just auto detect the 20% down payment.
+- on Jadwal Page list, there is one column wrong. the header is "Treatment" but the data is the address of the cust. the treatment not listed there. 
 
-But, here are the next steps for next update and what i have found:
+our update list (for reference):
 - read the new spreadsheet to understand and implement Database: DAISAFACARE - INVOICE WEB APP.xlsx. this new sheet is an implemented and a real data of my recent sheet. 
 - need to do the NB 1x or NB 2x (new born) treatment handling. the treatment is not once in one day, but every day based on how long the customer orders (1 day, 1 week, or 2 weeks). so, the schedule must go on every day, but the payment is one based on the menu. this treatment must do DOWN PAYMENT for locking in the customer so they do not scam us.
 - the transport fee roundup and roundown handling. the rule is when the transport is above 5km. if the distance is 5km then = 0, but if 6km then = 6km * Rp2000 = Rp12.000. do round down also, for example if there is 5,8km, then its 5km (free), if 6,3km then 6km or 12.000.
@@ -11,4 +17,5 @@ But, here are the next steps for next update and what i have found:
 - auto count the baby age (optional). so, I can input the baby age or date of birth. if i type the age without the date of birth, then increment next month for the baby age by data i input
 - add pricelist generator. some new moms need a pricelist. sometimes i cannot find the pricelist or maybe I have no time to send updated PL, so we need the pricelist generator with pretty background
 - add edit Jadwal, especially the walk-in moms. the case is when suddenly there are a mom edit or maybe wrong input treatment, I need to edit the Schedule.
-- delete login, no need that login because only me uses this page. cuts the bussiness process and lighten the app
+- delete login, no need that login because only me uses this page. cuts the bussiness process and lighten the app.
+- [new] need the tomorrow schedule also for dashboard. 
