@@ -141,4 +141,103 @@ t.eq('getSchedules: master_id dari kolom AB', pRow.master_id, 98);
 t.eq('detail kunjungan paket: teks treatment memakai nama paket', app.getScheduleDetail(100, 1, 'admin').data.treatments, 'NB 2x - 3 Hari');
 t.eq('detail kunjungan paket: maps_link kolom W', app.getScheduleDetail(100, 1, 'admin').data.maps_link, 'goo.gl/maps-visit100');
 
+// ── 10. getSchedules berhalaman: page/pageSize/q/sort/from/to di sisi server ──
+mock.addExtraSchedules(app, 25, 101);
+const legacyRep = app.getSchedules(1, 'admin', {});
+t.eq('tanpa page: respons lama hanya punya success+data', Object.keys(legacyRep).sort().join(','), 'data,success');
+const legacy = legacyRep.data;
+t.eq('tanpa page: daftar tetap penuh (9 seed + baris 100 + 25 tambahan)', legacy.length, 35);
+
+// Miror pecis logika tampilan client (scheduleSortedFiltered) untuk membandingkan server.
+function mirrorPaged(all, p) {
+  // `all` = hasil panggilan tanpa page (urutan pembalikan seperti kirim server),
+  // jadi jangan dibalik lagi di sini.
+  let rows = all.slice();
+  const q = String(p.q || '').trim().toLowerCase();
+  const qDigit = q.replace(/\D/g, '');
+  if (q) {
+    rows = rows.filter(s => {
+      const teks = [s.customer_name, s.customer_phone, s.invoice_no, s.treatments, s.location, s.notes, s.keterangan, s.therapist_name]
+        .map(x => String(x || '').toLowerCase()).join(' ');
+      if (teks.indexOf(q) !== -1) return true;
+      if (!qDigit) return false;
+      return String(s.customer_phone || '').replace(/\D/g, '').indexOf(qDigit) !== -1;
+    });
+  }
+  const mode = String(p.sort || 'date_desc');
+  const tgl = s => String((s && s.schedule_date) || '');
+  const jamx = s => String((s && s.schedule_time) || '').trim();
+  if (p.from) rows = rows.filter(s => tgl(s) >= String(p.from));
+  if (p.to) rows = rows.filter(s => tgl(s) <= String(p.to));
+  if (mode === 'date_asc' || mode === 'time_asc') {
+    rows = rows.slice().sort((a, b) => tgl(a).localeCompare(tgl(b)) || (jamx(a) || '99:99').localeCompare(jamx(b) || '99:99'));
+  } else if (mode === 'name_asc') {
+    rows = rows.slice().sort((a, b) => String(a.customer_name || '').localeCompare(String(b.customer_name || ''), 'id'));
+  } else if (mode === 'total_desc') {
+    rows = rows.slice().sort((a, b) => (parseFloat(b.grand_total) || 0) - (parseFloat(a.grand_total) || 0));
+  } else {
+    rows = rows.slice().sort((a, b) => tgl(b).localeCompare(tgl(a)));
+  }
+  const ps = parseInt(p.pageSize, 10) || 10;
+  const pages = Math.max(1, Math.ceil(rows.length / ps));
+  const page = Math.min(Math.max(1, parseInt(p.page, 10) || 1), pages);
+  return { rows: rows.slice((page - 1) * ps, page * ps), total: rows.length, page, totalPages: pages };
+}
+
+function callPage(payload) { return app.getSchedules(1, 'admin', Object.assign({}, payload)); }
+
+// Halaman 1 bawaan (sort date_desc)
+const r1 = callPage({ page: 1, pageSize: 10 });
+const m1 = mirrorPaged(legacy, {});
+t.eq('halaman 1: success', r1.success, true);
+t.eq('halaman 1: berisi 10 baris', r1.data.length, 10);
+t.eq('halaman 1: total pas daftar penuh', r1.total, 35);
+t.eq('halaman 1: totalPages', r1.totalPages, 4);
+t.eq('halaman 1: posisi halaman', r1.page, 1);
+t.eq('halaman 1: id baris sama persis dengan hasil klien', r1.data.map(s => s.id), m1.rows.map(s => s.id));
+t.eq('halaman 1: isi baris identik piksel-demi-piksel dengan daftar penuh', JSON.stringify(r1.data), JSON.stringify(m1.rows));
+t.ok('halaman 1: JSON-aman', mock.deepScan(r1).length === 0);
+
+// Halaman 2: baris berbeda, urutan sesuai klien
+const r2 = callPage({ page: 2, pageSize: 10 });
+t.eq('halaman 2: tidak ada baris dari laman 1', r2.data.filter(x => r1.data.some(y => y.id === x.id)).length, 0);
+t.eq('halaman 2: id baris sama persis dengan hasil klien', r2.data.map(s => s.id), mirrorPaged(legacy, { page: 2 }).rows.map(s => s.id));
+
+// Pencarian teks server (lokasi customer terapis)
+const rq = callPage({ page: 1, pageSize: 10, q: 'Educity' });
+t.eq('cari "Educity": total', rq.total, 10);
+t.eq('cari "Educity": totalPages', rq.totalPages, 1);
+t.ok('cari "Educity": semua baris memuat lokasi itu', rq.data.every(s => String(s.location).indexOf('Educity') !== -1));
+const rpd = callPage({ page: 1, pageSize: 10, q: '362678' });
+t.eq('cari No. HP digits: total', rpd.total, 10);
+t.eq('cari No. HP digits: hanya pelanggan itu', rpd.data.every(s => String(s.customer_id) === '1'), true);
+t.eq('cari No. HP digits: id sama dengan klien', rpd.data.map(s => s.id), mirrorPaged(legacy, { q: '362678' }).rows.map(s => s.id));
+
+// Urutan server
+const rt = callPage({ page: 1, pageSize: 10, sort: 'total_desc' });
+t.ok('sort total_desc: 10 teratas menurun', rt.data.every((s, i) => i === 0 || (parseFloat(rt.data[i - 1].grand_total) || 0) >= (parseFloat(s.grand_total) || 0)));
+t.eq('sort total_desc: id sama dengan klien', rt.data.map(s => s.id), mirrorPaged(legacy, { sort: 'total_desc' }).rows.map(s => s.id));
+const rn = callPage({ page: 1, pageSize: 10, sort: 'name_asc' });
+t.ok('sort name_asc: nama naik', rn.data.every((s, i) => i === 0 || String(rn.data[i - 1].customer_name).localeCompare(String(s.customer_name), 'id') <= 0));
+t.eq('sort name_asc: id sama dengan klien', rn.data.map(s => s.id), mirrorPaged(legacy, { sort: 'name_asc' }).rows.map(s => s.id));
+const rta = callPage({ page: 1, pageSize: 10, sort: 'time_asc' });
+t.eq('sort time_asc: id sama dengan klien', rta.data.map(s => s.id), mirrorPaged(legacy, { sort: 'time_asc' }).rows.map(s => s.id));
+
+// Rentang tanggal server lewat from/to (alias dateFrom/dateTo)
+const rf = callPage({ page: 1, pageSize: 10, from: '2026-08-10', to: '2026-08-20' });
+t.eq('filter from/to: total', rf.total, 11);
+t.eq('filter from/to: totalPages', rf.totalPages, 2);
+t.ok('filter from/to: baris dalam rentang', rf.data.every(s => s.schedule_date >= '2026-08-10' && s.schedule_date <= '2026-08-20'));
+t.eq('filter from/to: id sama dengan klien', rf.data.map(s => s.id), mirrorPaged(legacy, { from: '2026-08-10', to: '2026-08-20' }).rows.map(s => s.id));
+
+// pageSize lain & halaman di luar rentang dipotong aman
+const r5 = callPage({ page: 3, pageSize: 5 });
+t.eq('pageSize 5 page 3: totalPages', r5.totalPages, 7);
+t.eq('pageSize 5 page 3: posisi', r5.page, 3);
+t.eq('pageSize 5 page 3: data sesuai mirror', r5.data.length, mirrorPaged(legacy, { page: 3, pageSize: 5 }).rows.length);
+const rx = callPage({ page: 99, pageSize: 10 });
+t.eq('halaman melebihi rentang: pages', rx.totalPages, 4);
+t.eq('halaman melebihi rentang: dipotong ke akhir', rx.page, 4);
+t.eq('halaman melebihi rentang: sisa baris', rx.data.length, 5);
+
 t.finish();

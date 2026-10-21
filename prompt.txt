@@ -1,9 +1,8 @@
-Understand all the files.
+next handle:
+- the pricelist is not compact enough if I add description for each treatment. reduce the font size and space between items.
+- unfortunately, I do not need signature for invoice. but keep the feature for now, just build a signature toggle button on settings
+- the UI in Mobile Phone is still overlapping for some containers (especially Jadwal Hari ini and Jadwal Besok)
 
-Code.gs and index.html is our main character.
-
-CHANGELOG.md is the change we have done.
-daisafa_architecture.md is our base. mostly changed already.
-DAISAFACARE - INVOICE WEB APP.xlsx is the database structure.
-
-also understand the rest other files.
+our update queue:
+- [TBD] sort option for jadwal list
+- [TBD] pagination for jadwal (for lighter load)

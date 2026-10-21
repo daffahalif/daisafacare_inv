@@ -158,11 +158,11 @@ blocks.forEach((b, i) => {
   t.ok('index.html blok #' + i + ': tidak ada "//" dalam string literal', scanDoubleSlash(b).length === 0);
 });
 
-// â”€â”€ 4. Seed Settings: 15 kunci unik; daftar allowlist memadai â”€â”€
+// â”€â”€ 4. Seed Settings: 16 kunci unik; daftar allowlist memadai â”€â”€
 const stRows = app.__ss.getSheetByName('Settings')._data.slice(1);
 const seedKeys = stRows.map(r => String(r[1]));
-t.eq('seed Settings berisi 15 kunci', seedKeys.filter(Boolean).length, 15);
-t.eq('semua kunci seed unik', new Set(seedKeys).size === 15, true);
+t.eq('seed Settings berisi 16 kunci', seedKeys.filter(Boolean).length, 16);
+t.eq('semua kunci seed unik', new Set(seedKeys).size === 16, true);
 t.eq('business_name = Daisafacare', seedKeys.indexOf('business_name') !== -1 && app.getSettings().data.business_name === 'Daisafacare', true);
 t.eq('nilai tertentu tersedia (telepon, prefix, tarif, kaki invoice)', [app.getSetting('business_phone', ''), app.getSetting('invoice_prefix', ''), String(app.getSetting('transport_rate_per_km', ''))].join('|'), '0822-3212-1081|DSF|2000');
 t.eq('logo_url & qris_url default Cloudinary', [t0(app.getSetting('logo_url', '')), t0(app.getSetting('qris_url', ''))].join('|'), 'logo|qris');
@@ -199,7 +199,7 @@ t.eq('pemilih pelanggan modal paket: pCustSearch/pCustResults/pCustPicked',
 t.eq('custPhoneShow didefinisikan sekali', (htmlText.match(/function custPhoneShow\(/g) || []).length, 1);
 t.ok('custPhoneShow dipakai baris daftar & chip terpilih', (htmlText.match(/custPhoneShow\(/g) || []).length >= 3);
 t.ok('templat invoice memuat blok QRIS', htmlText.indexOf('inv-qris-row') !== -1 && htmlText.indexOf('Scan untuk bayar') !== -1);
-t.ok('templat invoice memuat cabang tanda tangan', htmlText.indexOf('inv-signature') !== -1 && /\$\{sigImg\s*\?/.test(htmlText));
+t.ok('templat invoice memuat cabang tanda tangan', htmlText.indexOf('inv-signature') !== -1 && /\$\{sigShow\s*\?/.test(htmlText));
 t.ok('markup slide pricelist memuat pls-cols', htmlText.indexOf('pls-cols') !== -1);
 {
   const h2s = [...htmlText.matchAll(/html2canvas\(/g)];

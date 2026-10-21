@@ -887,11 +887,14 @@
 
     @media(max-width:1100px) {
 
+      /* minmax(0,1fr):.track tidak boleh membesar melebihi lebar kartu gara-gara
+         teks nowrap (ellipsis) di dalam baris jadwal; 1fr polos bisa membengkak
+         sampai min-content dan membuat kartu saling tumpang tindih di layar kecil */
       .grid-2,
       .grid-3,
       .grid-1-2,
       .grid-2-1 {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
       }
     }
 
@@ -2112,7 +2115,7 @@
 
     @media(max-width:600px) {
       .kpi-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .inv-info-grid {
@@ -2533,6 +2536,7 @@
       }
 
       .today-info {
+        flex: 1 1 50%;
         min-width: 0
       }
 
@@ -2550,15 +2554,42 @@
         white-space: nowrap
       }
 
+      /* Baris jadwal boleh melipat: info (nama/treatment) tetap di samping jam,
+         terapis + badge + tombol maps pindah ke baris kedua agar tidak menumpuk */
+      .today-item {
+        flex-wrap: wrap;
+        row-gap: 6px
+      }
+
+      .today-therapist:empty {
+        display: none
+      }
+
       .today-time {
         min-width: 44px;
         font-size: 13px
       }
 
       .today-maps {
-        width: 24px;
-        height: 24px;
-        font-size: 11px
+        width: 40px;
+        height: 40px;
+        font-size: 14px
+      }
+
+      /* Baris Piutang / Belum DP / Jadwal Terbaru: nama boleh menyusut dan patah,
+         tidak menempel ke angka di kanan saat layar sempit */
+      #overdueList>div,
+      #belumDpList>div,
+      #recentList>div>div {
+        gap: 8px
+      }
+
+      #overdueList>div>div:first-child,
+      #belumDpList>div>div:first-child,
+      #recentList>div>div>div:first-child {
+        min-width: 0;
+        flex: 1;
+        overflow-wrap: anywhere
       }
 
       .cust-card {
@@ -3351,6 +3382,55 @@
       text-overflow: ellipsis
     }
 
+    /* Mode padat: dipakai saat deskripsi tampil, supaya katalog tetap muat 1 halaman */
+    .pls-dense .pls-cat {
+      margin-bottom: 9px
+    }
+
+    .pls-dense .pls-cat-head {
+      gap: 9px
+    }
+
+    .pls-dense .pls-cat-name {
+      font-size: 19px
+    }
+
+    .pls-dense .pls-cat-head+.pls-it {
+      margin-top: 2px
+    }
+
+    .pls-dense .pls-it {
+      padding: 3px 0 3px 14px
+    }
+
+    .pls-dense .pls-nm {
+      font-size: 19px;
+      line-height: 1.2
+    }
+
+    .pls-dense .pls-dur {
+      font-size: 14px;
+      margin-left: 8px
+    }
+
+    .pls-dense .pls-lead {
+      margin: 0 8px
+    }
+
+    .pls-dense .pls-amt {
+      font-size: 19px
+    }
+
+    .pls-dense .pls-desc {
+      font-size: 13px;
+      line-height: 1.25;
+      margin-top: 1px;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
     .pls-foot {
       flex: none;
       padding-top: 26px
@@ -3651,6 +3731,50 @@
         flex: 1 1 100%
       }
     }
+
+    /* ── Paginasi daftar jadwal: tombol navigasi halaman + Muat lebih ── */
+    .jadwal-pager {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+      min-width: 0
+    }
+
+    .jadwal-pg {
+      min-width: 42px;
+      min-height: 40px;
+      padding: 0 12px;
+      font-size: 13.5px;
+      font-weight: 700;
+      flex: 0 0 auto
+    }
+
+    .jadwal-pg-on {
+      background: var(--sage);
+      color: #fff
+    }
+
+    .jadwal-pg:disabled,
+    .jadwal-pg-on:disabled {
+      opacity: .65;
+      cursor: default
+    }
+
+    .jadwal-pg-gap {
+      padding: 0 2px;
+      color: var(--text-muted);
+      font-weight: 700
+    }
+
+    .jadwal-pager-info {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      min-width: 0
+    }
   </style>
 </head>
 
@@ -3868,9 +3992,14 @@
       return `<img src="${src}" alt="${isQris ? 'QRIS Daisafacare' : 'Logo Daisafacare'}" loading="eager" decoding="sync" crossorigin="anonymous" style="${gaya}" onerror="this.style.display='none'">`;
     };
 
+    // Tanda tangan dicetak di invoice hanya bila saklar "Tampilkan tanda tangan di invoice" aktif.
+    // Kunci hilang bukan '1' → dianggap mati (bawaan mati).
+    const signatureOn = () => String((S.settings && S.settings.signature_show)) === '1';
+
     // Tag <img> tanda tangan untuk blok tanda tangan invoice.
-    // Tanpa URL → string kosong (tidak pernah membuat src kosong).
+    // Saklar mati atau tanpa URL → string kosong (tidak pernah membuat src kosong).
     const signatureImg = (w) => {
+      if (!signatureOn()) return '';
       const url = signatureUrl();
       if (!url) return '';
       const src = (S.brand && S.brand.sign) || url;
@@ -3900,7 +4029,8 @@
       };
       ambil(logoUrl(), 'logo');
       ambil(qrisUrl(), 'qris');
-      ambil(signatureUrl(), 'sign');
+      // Tanda tangan hanya diambil saat saklarnya aktif; saat mati tidak ada unduhan sia-sia.
+      if (signatureOn()) ambil(signatureUrl(), 'sign');
     }
 
     // Logo di sidebar (44px). Bila gambar gagal dimuat, kembali ke 🌸.
@@ -4272,10 +4402,10 @@
       $('pageContent').innerHTML = `
   <div class="filter-bar">
     <div class="fg"><label>Cari</label><input type="text" id="fSearch" placeholder="Cari pelanggan, No. HP, invoice, treatment..." oninput="applyJadwalFilters()"></div>
-    <div class="fg"><label>Status</label><select class="fg" id="fStatus" onchange="loadSchedules()"><option value="">Semua</option><option value="scheduled">Terjadwal</option><option value="done">Selesai</option><option value="cancelled">Dibatalkan</option></select></div>
-    <div class="fg"><label>Urutkan</label><select id="fSort" onchange="applyJadwalFilters()"><option value="date_desc" selected>Tanggal terbaru</option><option value="date_asc">Tanggal terlama</option><option value="time_asc">Waktu (pagi ke sore)</option><option value="name_asc">Nama pelanggan (A-Z)</option><option value="total_desc">Total tertinggi</option></select></div>
-    <div class="fg"><label>Dari Tanggal</label><input type="date" id="fFrom" onchange="loadSchedules()"></div>
-    <div class="fg"><label>Sampai</label><input type="date" id="fTo" onchange="loadSchedules()"></div>
+    <div class="fg"><label>Status</label><select class="fg" id="fStatus" onchange="jadwalFilterChange()"><option value="">Semua</option><option value="scheduled">Terjadwal</option><option value="done">Selesai</option><option value="cancelled">Dibatalkan</option></select></div>
+    <div class="fg"><label>Urutkan</label><select id="fSort" onchange="applyJadwalFilters(true)"><option value="date_desc" selected>Tanggal terbaru</option><option value="date_asc">Tanggal terlama</option><option value="time_asc">Waktu (pagi ke sore)</option><option value="name_asc">Nama pelanggan (A-Z)</option><option value="total_desc">Total tertinggi</option></select></div>
+    <div class="fg"><label>Dari Tanggal</label><input type="date" id="fFrom" onchange="jadwalFilterChange()"></div>
+    <div class="fg"><label>Sampai</label><input type="date" id="fTo" onchange="jadwalFilterChange()"></div>
     <div class="fg"><label>&nbsp;</label><button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i class="fa fa-rotate-left"></i> Reset</button></div>
     ${isWriter() ? `<div class="fg"><label>&nbsp;</label><button class="btn btn-outline btn-sm" onclick="openPackageModal()" style="width:100%"><i class="fa fa-box-open"></i> Tambah Paket NB</button></div>` : ''}
     <div class="fg" style="margin-left:auto"><label>&nbsp;</label>
@@ -4290,8 +4420,14 @@
     }
 
     let currentView = 'list';
+    // ── Keadaan paginasi daftar jadwal: 10 jadwal per halaman, muat di server ──
+    const SCHED_PAGE_SIZE = 10;
+    let schedPage = 1, schedTotal = 0, schedTotalPages = 1, schedRows = [];
+    let schedSearchTimer = null;
     function setView(v) {
       currentView = v;
+      schedPage = 1;
+      clearTimeout(schedSearchTimer);
       $('viewList').style.cssText = v === 'list' ? 'background:var(--sage);color:#fff' : '';
       $('viewCal').style.cssText = v === 'cal' ? 'background:var(--sage);color:#fff' : '';
       loadSchedules();
@@ -4300,24 +4436,61 @@
       $('fStatus').value = ''; $('fFrom').value = ''; $('fTo').value = '';
       if ($('fSearch')) $('fSearch').value = '';
       if ($('fSort')) $('fSort').value = 'date_desc';
+      clearTimeout(schedSearchTimer);
+      schedPage = 1;
       loadSchedules();
     }
-    function loadSchedules() {
+    function jadwalFilterChange() {
+      clearTimeout(schedSearchTimer);
+      schedPage = 1;
+      loadSchedules();
+    }
+    function jadwalGoPage(p) {
+      const tp = Math.max(1, schedTotalPages);
+      schedPage = Math.min(Math.max(1, parseInt(p, 10) || 1), tp);
+      clearTimeout(schedSearchTimer);
+      loadSchedules();
+    }
+    function jadwalLoadMore() {
+      if (schedPage >= schedTotalPages) return;
+      schedPage += 1;
+      loadSchedules(true);
+    }
+    function loadSchedules(append) {
       const filters = { status: $('fStatus').value, dateFrom: $('fFrom').value, dateTo: $('fTo').value };
-      ga('getSchedules', [S.user.id, S.user.role, filters], res => {
+      if (currentView !== 'list') {
+        ga('getSchedules', [S.user.id, S.user.role, filters], res => {
+          if (!res.success) { toast(res.message, 'error'); return; }
+          S.data.schedules = res.data;
+          renderCalendar(res.data);
+        });
+        return;
+      }
+      // Mode daftar: saring, urutkan, dan halamankan di server (10 per halaman).
+      const payload = {
+        page: schedPage, pageSize: SCHED_PAGE_SIZE,
+        q: String((($('fSearch') || {}).value) || '').trim(),
+        sort: ($('fSort') && $('fSort').value) || 'date_desc',
+        from: filters.dateFrom, to: filters.dateTo, status: filters.status
+      };
+      ga('getSchedules', [S.user.id, S.user.role, payload], res => {
         if (!res.success) { toast(res.message, 'error'); return; }
+        schedTotal = res.total || 0;
+        schedTotalPages = res.totalPages || 1;
+        schedPage = res.page || schedPage;
+        schedRows = append && schedRows.length ? schedRows.concat(res.data || []) : (res.data || []).slice();
         S.data.schedules = res.data;
-        if (currentView === 'cal') renderCalendar(res.data);
-        else renderScheduleList(res.data);
+        renderScheduleList(schedRows, true);
       });
     }
 
-    // Pencarian & urutan di sisi klien: tidak memanggil server, S.data.schedules tetap utuh.
-    // Dipakai input #fSearch dan pilihan #fSort.
-    function applyJadwalFilters() {
-      if (currentView === 'cal') return; // tampilan kalender tidak diubah
-      if (!Array.isArray(S.data.schedules) || !S.data.schedules.length) return; // data belum termuat
-      renderScheduleList(S.data.schedules);
+    // Pencarian & urutan kini dikerjakan server: ketikan ditunggu berhenti,
+    // lalu halaman kembali ke 1 dan daftar dimuat ulang.
+    function applyJadwalFilters(immediate) {
+      if (currentView !== 'list') return; // tampilan kalender tidak diubah
+      clearTimeout(schedSearchTimer);
+      if (immediate) { schedPage = 1; loadSchedules(); return; }
+      schedSearchTimer = setTimeout(() => { schedPage = 1; loadSchedules(); }, 350);
     }
 
     // Kolom yang ikut dicari (teks digabung, pencarian tidak peka huruf besar/kecil)
@@ -4359,12 +4532,14 @@
       return rows;
     }
 
-    function renderScheduleList(data) {
+    function renderScheduleList(data, paged) {
       const semua = Array.isArray(data) ? data : [];
-      const rows = scheduleSortedFiltered(semua);
+      const cari = String((($('fSearch') || {}).value) || '').trim();
+      // Mode berhalaman: filter dan urutan sudah dikerjakan server.
+      const rows = paged ? semua.slice() : scheduleSortedFiltered(semua);
       if (!rows.length) {
-        const cari = String((($('fSearch') || {}).value) || '').trim();
-        const kosong = semua.length
+        const adaKonteks = semua.length > 0 || (paged && (schedTotal > 0 || cari));
+        const kosong = adaKonteks
           ? `<div class="table-empty" style="background:var(--white);border-radius:var(--radius-md);padding:48px"><i class="fa fa-magnifying-glass"></i>Tidak ada jadwal yang cocok${cari ? ' dengan "' + sanitize(cari) + '"' : ''}</div>`
           : `<div class="table-empty" style="background:var(--white);border-radius:var(--radius-md);padding:48px"><i class="fa fa-calendar-plus"></i>Belum ada jadwal.${isWriter() ? ' Klik + Tambah Jadwal untuk mulai.' : ''}</div>`;
         $('jadwalContent').innerHTML = kosong;
@@ -4399,7 +4574,39 @@
         </tr>`).join('')}</tbody>
       </table>
     </div>
-  </div>`;
+  </div>` + (paged ? jadwalPagerHtml() : '');
+    }
+
+    // ─── Batang paginasi daftar jadwal: navigasi halaman 1/2/3 + Muat lebih ───
+    function jadwalPageNumbers(tp) {
+      const nomor = [];
+      if (tp <= 7) {
+        for (let i = 1; i <= tp; i++) nomor.push(i);
+      } else {
+        let mulai = Math.max(2, schedPage - 2), akhir = Math.min(tp - 1, schedPage + 2);
+        if (schedPage <= 4) { mulai = 2; akhir = 5; }
+        if (schedPage >= tp - 3) { mulai = tp - 4; akhir = tp - 1; }
+        nomor.push(1);
+        if (mulai > 2) nomor.push('...');
+        for (let i = mulai; i <= akhir; i++) nomor.push(i);
+        if (akhir < tp - 1) nomor.push('...');
+        nomor.push(tp);
+      }
+      return nomor;
+    }
+    function jadwalPagerHtml() {
+      const tp = Math.max(1, schedTotalPages);
+      if (tp <= 1) return `<div class="jadwal-pager" style="justify-content:flex-end"><span class="jadwal-pager-info">Menampilkan halaman ${schedPage} dari ${tp} · ${schedTotal} jadwal</span></div>`;
+      const tombol = jadwalPageNumbers(tp).map(x => x === '...'
+        ? `<span class="jadwal-pg-gap" aria-hidden="true">…</span>`
+        : `<button type="button" class="btn jadwal-pg${x === schedPage ? ' jadwal-pg-on' : ''}" aria-label="Halaman ${x}" onclick="jadwalGoPage(${x})"${x === schedPage ? ' disabled' : ''}>${x}</button>`).join('');
+      return `<div class="jadwal-pager">
+  <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">${tombol}</div>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+    <b class="jadwal-pager-info">Menampilkan halaman ${schedPage} dari ${tp} · ${schedTotal} jadwal</b>
+    <button type="button" class="btn" id="jadwalMore" aria-label="Muat halaman berikutnya" onclick="jadwalLoadMore()"${schedPage >= tp ? ' disabled' : ''}><i class="fa fa-angles-down"></i> Muat lebih</button>
+  </div>
+</div>`;
     }
 
     // ─── Penanda paket NB di daftar jadwal ───
@@ -6092,7 +6299,10 @@
       }
       const nomor = total > 1 ? `<div class="pls-page">${page}/${total}</div>` : '';
 
-      return `<div class="pls-slide pls-${tema}">
+      // Deskripsi tampil → mode padat supaya slide tetap kompak
+      const kelasSlide = 'pls-slide pls-' + tema + (o.showDesc ? ' pls-dense' : '');
+
+      return `<div class="${kelasSlide}">
         <div class="pls-motif"><span class="pls-dot-a"></span><span class="pls-dot-b"></span><span class="pls-dot-c"></span></div>
         <div class="pls-head">
           <div class="pls-brand">${logoBox}<div class="pls-brand-txt"><div class="pls-mark">DAISAFACARE</div><div class="pls-brand-sub">Mom &amp; Baby Treatment</div></div><div class="pls-city">SURABAYA</div></div>
@@ -6687,7 +6897,13 @@
       const payInfo = S.settings.payment_info || 'BCA 3530674729 a.n Syifa Rasalhague or QRIS';
       const footer = S.settings.invoice_footer || 'Terima kasih atas kepercayaan Anda kepada kami.';
       // Gambar tanda tangan pemilik (dari Pengaturan). Kosong = tampilan lama tanpa gambar.
-      const sigImg = signatureImg(220);
+      // Saat saklar "Tampilkan tanda tangan" mati → blok tanda tangan tidak dirender sama sekali.
+      const sigShow = signatureOn();
+      const sigImg = sigShow ? signatureImg(220) : '';
+      const sigBlock = !sigShow ? ''
+        : sigImg
+          ? `<div class="inv-sig-line">${sigImg}<div class="inv-sig-dot inv-sig-dot-sm"></div><div class="inv-sig-label">${sanitize(bizName)}</div></div>`
+          : `<div class="inv-sig-line"><div class="inv-sig-dot"></div><div class="inv-sig-label">Tanda Tangan</div></div>`;
       // Paket NB: transport ditagih per kunjungan, jadi labelnya memakai jumlah kunjungan
       const pkgVisits = parseInt(s.total_visits, 10) || 0;
       const transportLabel = pkgVisits > 1 ? `Transport (${pkgVisits} kunjungan)` : `Transport (${s.km} km)`;
@@ -6776,11 +6992,7 @@
             <div class="inv-footer-thanks">Terima kasih ♥</div>
             <div class="inv-footer-sub">${sanitize(footer)}</div>
             <div style="height:24px;border-bottom:1px dashed var(--beige);margin:0 auto 16px;width:60px"></div>
-            <div class="inv-signature">
-              ${sigImg
-          ? `<div class="inv-sig-line">${sigImg}<div class="inv-sig-dot inv-sig-dot-sm"></div><div class="inv-sig-label">${sanitize(bizName)}</div></div>`
-          : `<div class="inv-sig-line"><div class="inv-sig-dot"></div><div class="inv-sig-label">Tanda Tangan</div></div>`}
-            </div>
+            ${sigShow ? `<div class="inv-signature">${sigBlock}</div>` : ''}
             <div class="inv-contacts">
               <div class="inv-contact-item"><i class="fa fa-location-dot"></i> ${sanitize(bizName)} Homecare Baby Spa</div>
               <div class="inv-contact-item"><i class="fab fa-whatsapp"></i> ${sanitize(bizPhone)}</div>
@@ -7057,6 +7269,7 @@
         <div class="fg"><label>Tanda Tangan URL</label><input id="sBizSign" value="${sanitize(s.signature_url || '')}" placeholder="${URLBASE}..." oninput="previewBrandImg()"><div style="font-size:11px;color:var(--text-muted);margin-top:4px">Kosongkan bila invoice tidak perlu gambar tanda tangan.</div></div>
         <div class="fg"><label style="font-size:11px">Pratinjau Tanda Tangan</label><div id="sBizSignPrev" style="display:none;align-items:center;min-height:40px"></div></div>
       </div>
+      <div class="fg" style="margin-bottom:12px"><label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--text-sec);cursor:pointer"><input type="checkbox" id="sBizSignShow" ${String(s.signature_show) === '1' ? 'checked' : ''} style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer"> Tampilkan tanda tangan di invoice</label><div style="font-size:11px;color:var(--text-muted);margin-top:4px;margin-left:26px">Matikan jika tanda tangan tidak perlu dicetak di invoice.</div></div>
       <div class="form-row cols-2">
         <div class="fg"><label style="font-size:11px">Pratinjau Logo</label><div id="sBizLogoPrev" style="display:none;align-items:center;min-height:40px"></div></div>
         <div class="fg"><label style="font-size:11px">Pratinjau QRIS</label><div id="sBizQrisPrev" style="display:none;align-items:center;min-height:40px"></div></div>
@@ -7121,7 +7334,7 @@
     }
 
     function saveBizSettings() {
-      const settings = { business_name: $('sBizName').value, business_tagline: $('sBizTag').value, business_phone: $('sBizPhone').value, business_address: $('sBizAddr').value, business_instagram: $('sBizIG').value, business_tiktok: $('sBizTT').value, payment_info: $('sBizPay').value, transport_rate_per_km: $('sTransRate').value, invoice_footer: $('sInvFooter').value, invoice_prefix: ($('sInvPrefix').value || 'DSF').trim(), currency_symbol: ($('sCurrency').value || 'Rp').trim(), logo_url: ($('sBizLogo') ? $('sBizLogo').value.trim() : ''), qris_url: ($('sBizQris') ? $('sBizQris').value.trim() : ''), signature_url: ($('sBizSign') ? $('sBizSign').value.trim() : '') };
+      const settings = { business_name: $('sBizName').value, business_tagline: $('sBizTag').value, business_phone: $('sBizPhone').value, business_address: $('sBizAddr').value, business_instagram: $('sBizIG').value, business_tiktok: $('sBizTT').value, payment_info: $('sBizPay').value, transport_rate_per_km: $('sTransRate').value, invoice_footer: $('sInvFooter').value, invoice_prefix: ($('sInvPrefix').value || 'DSF').trim(), currency_symbol: ($('sCurrency').value || 'Rp').trim(), logo_url: ($('sBizLogo') ? $('sBizLogo').value.trim() : ''), qris_url: ($('sBizQris') ? $('sBizQris').value.trim() : ''), signature_url: ($('sBizSign') ? $('sBizSign').value.trim() : ''), signature_show: ($('sBizSignShow') && $('sBizSignShow').checked ? '1' : '0') };
       loading(true, 'Menyimpan...');
       ga('saveAllSettings', [settings, S.user.id, S.user.role], res => {
         loading(false);

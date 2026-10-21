@@ -161,6 +161,7 @@ const saved = app.saveAllSettings({
   logo_url: 'https:contoh-cdn.test/logo.png',
   qris_url: 'https:contoh-cdn.test/qris.png',
   signature_url: 'https:contoh-cdn.test/ttd.png',
+  signature_show: '1',
   kunci_asing: 'dua'
 }, 1, 'admin');
 t.ok('admin berhasil menyimpan pengaturan', saved.success === true);
@@ -169,9 +170,15 @@ t.eq('business_phone tersimpan', st1.business_phone, '0811-1111-1111');
 t.eq('logo_url diterima', st1.logo_url, 'https:contoh-cdn.test/logo.png');
 t.eq('qris_url diterima', st1.qris_url, 'https:contoh-cdn.test/qris.png');
 t.eq('signature_url diterima', st1.signature_url, 'https:contoh-cdn.test/ttd.png');
+t.eq('signature_show 1 diterima', st1.signature_show, '1');
 t.ok('kunci asing diabaikan', st1.kunci_asing === undefined);
 t.ok('last_invoice_no tidak dilayani getSettings', st1.last_invoice_no === undefined);
-t.eq('getSettings menyediakan 14 kunci (15 − last_invoice_no)', Object.keys(st1).length, 14);
+t.eq('getSettings menyediakan 15 kunci (16 − last_invoice_no)', Object.keys(st1).length, 15);
+t.ok('terapis ditolak saat mengubah signature_show', app.saveAllSettings({ signature_show: '1' }, 2, 'therapist').success === false);
+t.eq('signature_show terapis tetap tidak berubah', app.getSettings().data.signature_show, '1');
+const savedHide = app.saveAllSettings({ signature_show: '0' }, 1, 'admin');
+t.ok('admin berhasil menyimpan signature_show 0', savedHide.success === true);
+t.eq('signature_show 0 tersimpan', app.getSettings().data.signature_show, '0');
 
 // ── G. genInvoiceNo: nomor berikutnya, terhapus tidak dipakai ulang, prefix dari Settings ──
 const g1 = app.genInvoiceNo();

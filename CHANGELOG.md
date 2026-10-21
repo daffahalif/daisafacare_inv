@@ -6,6 +6,25 @@ Newest release first, grouped as `Added` / `Changed` / `Fixed`.
 
 ---
 
+## 1.6 - 2026-10-21
+
+### Added
+
+- Jadwal pagination (owner's shape): list loads **10 per page** — filtering/sorting/search run server-side in `getSchedules` (`{page, q, sort, from, to, status}`) which returns `total`/`totalPages` with the page. Pager bar `[«] 1 2 3 [»]` + `Muat lebih` (appends the next page), page resets on every filter change, server clamps out-of-range pages. Calendar mode still fetches by month; `getSchedules` called without `page` behaves exactly as before.
+- `Settings` key `signature_show` (allowed list + setup seed id 16, default `'0'`). `saveAllSettings` appends missing key rows, so the live spreadsheet gains it on the first save — no manual sheet edit.
+
+### Changed
+
+- Invoice signature behind a master toggle: Pengaturan > Info Bisnis checkbox "Tampilkan tanda tangan di invoice" stores `signature_show`. Invoice renders the image only when on AND `signature_url` set; off omits the whole block. `prefetchBrandAssets` skips the fetch while off.
+- Pricelist dense mode (`pls-dense`, on when `Tampilkan deskripsi` is on): tighter rows, description clipped to one muted 13px line with ellipsis, name/price 19px — 26 items + descriptions still fit one 1080 × 1350 slide. Layout without descriptions unchanged.
+- Harness states: 286 → **324 assertions** (paging 33, `signature_show` 5, mock seeds Settings id 16).
+
+### Fixed
+
+- Dashboard overlap on mobile (390px): `1fr` grid tracks inflated by `nowrap` dashboard text pushed rows past the card edges. `.grid-*` now `minmax(0,1fr)` ≤1100px, `today-item` wraps to a second line (badge + 40px maps button), Piutang/DP/recent rows get gap + `min-width:0`. Desktop verified byte-identical.
+
+---
+
 ## 1.5 - 2026-10-21
 
 ### Added

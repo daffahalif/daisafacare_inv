@@ -705,11 +705,56 @@ function getSchedules(userId, role, filters) {
       master_id: r[SC.MASTER_ID]||''
     }));
 
+    // Alias `from`/`to` (dipakai daftar jadwal berhalaman) ke filter tanggal lama.
+    if (!f.dateFrom && f.from) f.dateFrom = f.from;
+    if (!f.dateTo && f.to) f.dateTo = f.to;
+
     if (f.dateFrom) schedules = schedules.filter(s => s.schedule_date >= f.dateFrom);
     if (f.dateTo) schedules = schedules.filter(s => s.schedule_date <= f.dateTo);
     if (f.status) schedules = schedules.filter(s => s.status === f.status);
     if (f.therapist_id) schedules = schedules.filter(s => s.therapist_id == f.therapist_id);
     if (f.customer_id) schedules = schedules.filter(s => s.customer_id == f.customer_id);
+
+    // ── Mode daftar berhalaman: bila payload membawa `page`, saring dan urutkan
+    // di sisi server (meniru scheduleSortedFiltered di tampilan), lalu potong
+    // satu halaman. Tanpa `page` respons persis seperti sebelumnya: daftar
+    // penuh tanpa field tambahan, agar pemanggil lama tidak berubah ──
+    const hasPage = f.page !== undefined && f.page !== null && f.page !== '';
+    if (hasPage) {
+      const q = String(f.q || '').trim().toLowerCase();
+      const qDigit = q.replace(/\D/g, '');
+      // Urutan dasar dibalik lebih dulu, sama seperti respons lama, supaya
+      // urutan baris bernama sama tanggal identik dengan sisi klien.
+      let rows = schedules.slice().reverse();
+      if (q) {
+        rows = rows.filter(s => {
+          const teks = [s.customer_name, s.customer_phone, s.invoice_no, s.treatments, s.location, s.notes, s.keterangan, s.therapist_name]
+            .map(x => String(x || '').toLowerCase()).join(' ');
+          if (teks.indexOf(q) !== -1) return true;
+          if (!qDigit) return false;
+          return String(s.customer_phone || '').replace(/\D/g, '').indexOf(qDigit) !== -1;
+        });
+      }
+      const mode = String(f.sort || 'date_desc');
+      const tgl = s => String((s && s.schedule_date) || '');
+      const jam = s => String((s && s.schedule_time) || '').trim();
+      if (mode === 'date_asc' || mode === 'time_asc') {
+        rows = rows.slice().sort((a, b) => tgl(a).localeCompare(tgl(b)) || (jam(a) || '99:99').localeCompare(jam(b) || '99:99'));
+      } else if (mode === 'name_asc') {
+        rows = rows.slice().sort((a, b) => String((a && a.customer_name) || '').localeCompare(String((b && b.customer_name) || ''), 'id'));
+      } else if (mode === 'total_desc') {
+        rows = rows.slice().sort((a, b) => (parseFloat(b && b.grand_total) || 0) - (parseFloat(a && a.grand_total) || 0));
+      } else {
+        // date_desc — hanya tanggal dibandingkan, sama seperti di klien.
+        rows = rows.slice().sort((a, b) => tgl(b).localeCompare(tgl(a)));
+      }
+      const total = rows.length;
+      const pageSize = Math.max(1, parseInt(f.pageSize, 10) || 10);
+      const totalPages = Math.max(1, Math.ceil(total / pageSize));
+      const page = Math.min(Math.max(1, parseInt(f.page, 10) || 1), totalPages);
+      const data = rows.slice((page - 1) * pageSize, page * pageSize);
+      return { success: true, data: data, total: total, page: page, totalPages: totalPages };
+    }
 
     return { success: true, data: schedules.reverse() };
   } catch(e) { console.error('getSchedules:', e); return { success: false, message: 'Gagal memuat jadwal' }; }
@@ -1645,7 +1690,7 @@ function getSettings() {
 function saveAllSettings(settingsObj, userId, role) {
   try {
     if (role !== 'admin') return { success: false, message: 'Hanya admin yang bisa mengubah pengaturan' };
-    const allowed = ['business_name','business_tagline','business_phone','business_address','business_instagram','business_tiktok','payment_info','currency_symbol','invoice_prefix','transport_rate_per_km','invoice_footer','last_invoice_no','logo_url','qris_url','signature_url'];
+    const allowed = ['business_name','business_tagline','business_phone','business_address','business_instagram','business_tiktok','payment_info','currency_symbol','invoice_prefix','transport_rate_per_km','invoice_footer','last_invoice_no','logo_url','qris_url','signature_url','signature_show'];
     const lock = LockService.getScriptLock(); lock.waitLock(10000);
     try {
       Object.entries(settingsObj || {}).forEach(([key, value]) => {
@@ -1775,7 +1820,8 @@ function setupSheets() {
    [12,'last_invoice_no','',1,now],
    [13,'logo_url','https:' + String.fromCharCode(47, 47) + 'res.cloudinary.com/dlrxxfy7f/image/upload/w_320,q_auto:good,f_png/v1792500542/LOGO_DAISAFACARE_NO_TEXT-removebg-preview_yyopiu.png',1,now],
    [14,'qris_url','https:' + String.fromCharCode(47, 47) + 'res.cloudinary.com/dlrxxfy7f/image/upload/w_500,q_auto:best,f_png/v1792500651/QRIS_DAISAFA_CARE_srnnbg.png',1,now],
-   [15,'signature_url','',1,now]
+   [15,'signature_url','',1,now],
+   [16,'signature_show','0',1,now]
   ].forEach(s => stsh.appendRow(s));
 
   mkSheet(SHEETS.LOGS, ['ID','User ID','Username','Action','Table','Record ID','Details','Created At']);

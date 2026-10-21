@@ -8,7 +8,7 @@
  * harness ikut rusak (inilah tujuannya).
  *
  * Data meniru workbook produksi (DAISAFACARE - INVOICE WEB APP.xlsx):
- * - Settings 15 kunci persis, Treatment 26 baris aktif, 4 pelanggan
+ * - Settings 16 kunci persis, Treatment 26 baris aktif, 4 pelanggan
  *   (dua telepon legacy numerik tanpa nol depan), sejumlah booking.
  *
  * reset() menanam ulang seluruh seed, jadi tiap file harness mulai dari keadaan sama.
@@ -218,7 +218,8 @@ function settingsRows(TS) {
     [12, 'last_invoice_no', '', 1, TS],
     [13, 'logo_url', LOGO_URL, 1, TS],
     [14, 'qris_url', QRIS_URL, 1, TS],
-    [15, 'signature_url', '', 1, TS]
+    [15, 'signature_url', '', 1, TS],
+    [16, 'signature_show', '0', 1, TS]
   ];
 }
 
@@ -342,6 +343,32 @@ function buildSpreadsheet() {
 const rowId8 = { row: 9, dateCol: 5 };   // Schedules baris id 8
 const rowLog1 = { row: 2, createdCol: 8 }; // Activity_Logs baris pertama
 
+// ─── jadwal tambahan untuk uji paginasi (id mulai dari startId) ───────────────
+// Tidak ditanam ke seed bawaan supaya hitungan dasar di file harness lama tetap
+// sama; file harness memanggil helper ini di titik aman tepat sebelum uji paginasi.
+function addExtraSchedules(app, count, startId) {
+  const sh = app.__ss.getSheetByName('Schedules');
+  const TS0 = '2026-08-01T08:00:00.000Z';
+  const lokasi = { 1: 'Kalisari Dharma', 2: 'Jalan Bogangin Baru', 3: 'Educity Apartemen' };
+  const jam = ['07:00', '10:00', '15:30', ''];
+  const firstId = startId || 101;
+  let lastId = firstId - 1;
+  for (let i = 0; i < count; i++) {
+    const id = firstId + i;
+    const cust = ((id - 1) % 3) + 1;               // 1,2,3 berulang
+    const date = addDaysLocal('2026-08-31', -i);   // 2026-08-31 mundur tiap baris
+    const total = 50000 + id * 1000;               // unik & naik mengikuti id
+    sh.appendRow([
+      id, '', cust, 2, date, jam[i % 4], lokasi[cust], 5.1,
+      total, 0, total, 0, total, 0, total,
+      'TF/QRIS', 'scheduled', 'BELUM BAYAR', '', 1, TS0, TS0,
+      '', '', '', '', '', ''
+    ]);
+    lastId = id;
+  }
+  return { added: count, firstId, lastId };
+}
+
 function reset(codePath) {
   const file = codePath || process.argv[2] || DEFAULT_CODE_GS;
   const { ss, meta } = buildSpreadsheet();
@@ -388,6 +415,7 @@ function deepScan(obj) {
 module.exports = {
   reset,
   deepScan,
+  addExtraSchedules,
   addDaysLocal,
   localDateStr,
   ymd8,
