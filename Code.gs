@@ -1645,7 +1645,7 @@ function getSettings() {
 function saveAllSettings(settingsObj, userId, role) {
   try {
     if (role !== 'admin') return { success: false, message: 'Hanya admin yang bisa mengubah pengaturan' };
-    const allowed = ['business_name','business_tagline','business_phone','business_address','business_instagram','business_tiktok','payment_info','currency_symbol','invoice_prefix','transport_rate_per_km','invoice_footer','last_invoice_no','logo_url','qris_url'];
+    const allowed = ['business_name','business_tagline','business_phone','business_address','business_instagram','business_tiktok','payment_info','currency_symbol','invoice_prefix','transport_rate_per_km','invoice_footer','last_invoice_no','logo_url','qris_url','signature_url'];
     const lock = LockService.getScriptLock(); lock.waitLock(10000);
     try {
       Object.entries(settingsObj || {}).forEach(([key, value]) => {
@@ -1774,7 +1774,8 @@ function setupSheets() {
    [11,'invoice_footer','Terima kasih atas kepercayaan Anda kepada kami.',1,now],
    [12,'last_invoice_no','',1,now],
    [13,'logo_url','https:' + String.fromCharCode(47, 47) + 'res.cloudinary.com/dlrxxfy7f/image/upload/w_320,q_auto:good,f_png/v1792500542/LOGO_DAISAFACARE_NO_TEXT-removebg-preview_yyopiu.png',1,now],
-   [14,'qris_url','https:' + String.fromCharCode(47, 47) + 'res.cloudinary.com/dlrxxfy7f/image/upload/w_500,q_auto:best,f_png/v1792500651/QRIS_DAISAFA_CARE_srnnbg.png',1,now]
+   [14,'qris_url','https:' + String.fromCharCode(47, 47) + 'res.cloudinary.com/dlrxxfy7f/image/upload/w_500,q_auto:best,f_png/v1792500651/QRIS_DAISAFA_CARE_srnnbg.png',1,now],
+   [15,'signature_url','',1,now]
   ].forEach(s => stsh.appendRow(s));
 
   mkSheet(SHEETS.LOGS, ['ID','User ID','Username','Action','Table','Record ID','Details','Created At']);

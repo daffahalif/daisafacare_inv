@@ -1688,6 +1688,21 @@
       color: var(--text-sec);
     }
 
+    /* ─── TANDA TANGAN DI INVOICE (gambar dari Pengaturan) ─── */
+    .inv-sig-img {
+      display: block;
+      max-height: 64px;
+      max-width: 220px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      margin: 0 auto 2px;
+    }
+
+    .inv-sig-dot-sm {
+      height: 8px;
+    }
+
     .inv-contacts {
       display: flex;
       justify-content: center;
@@ -2892,6 +2907,15 @@
       margin-top: 10px
     }
 
+    /* Keterangan jumlah gambar yang akan dibuat saat ekspor */
+    .pl-count {
+      text-align: center;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--sage-dark);
+      margin-top: 8px
+    }
+
     .pl-nav-btn {
       width: 34px;
       height: 34px;
@@ -3022,7 +3046,7 @@
       position: relative;
       width: 1080px;
       height: 1350px;
-      padding: 70px 72px 58px;
+      padding: 54px 60px 46px;
       box-sizing: border-box;
       overflow: hidden;
       display: flex;
@@ -3068,30 +3092,30 @@
     }
 
     .pls-dot-a {
-      width: 300px;
-      height: 300px;
-      top: -108px;
-      right: -86px;
+      width: 230px;
+      height: 230px;
+      top: -84px;
+      right: -68px;
       background: var(--pls-accent);
-      opacity: .07
+      opacity: .05
     }
 
     .pls-dot-b {
-      width: 224px;
-      height: 224px;
-      top: 46px;
-      right: -128px;
+      width: 168px;
+      height: 168px;
+      top: 36px;
+      right: -98px;
       background: var(--pls-accent);
-      opacity: .06
+      opacity: .045
     }
 
     .pls-dot-c {
-      width: 156px;
-      height: 156px;
-      top: -76px;
-      right: -162px;
+      width: 118px;
+      height: 118px;
+      top: -58px;
+      right: -122px;
       background: var(--pls-accent);
-      opacity: .08
+      opacity: .06
     }
 
     .pls-head,
@@ -3108,36 +3132,41 @@
     .pls-brand {
       display: flex;
       align-items: flex-start;
-      gap: 20px
+      gap: 16px
     }
 
     .pls-logo-tile {
-      width: 116px;
-      height: 116px;
+      width: 64px;
+      height: 64px;
       flex: none;
       display: flex;
       align-items: center;
       justify-content: center;
       background: #FCF7F1;
-      border-radius: 18px
+      border-radius: 14px
     }
 
     .pls-logo {
-      width: 84px;
-      height: 84px;
+      width: 64px;
+      height: 64px;
       flex: none;
       display: block;
       object-fit: contain
     }
 
+    .pls-logo-tile .pls-logo {
+      width: 46px;
+      height: 46px
+    }
+
     .pls-brand-txt {
       min-width: 0;
       flex: 1 1 auto;
-      padding-top: 4px
+      padding-top: 2px
     }
 
     .pls-mark {
-      font-size: 26px;
+      font-size: 22px;
       font-weight: 700;
       letter-spacing: .16em;
       line-height: 1.15;
@@ -3145,69 +3174,93 @@
     }
 
     .pls-brand-sub {
-      font-size: 21px;
+      font-size: 18px;
       letter-spacing: .04em;
       color: var(--pls-muted);
-      margin-top: 8px
+      margin-top: 5px
     }
 
     .pls-city {
       flex: none;
-      font-size: 18px;
+      font-size: 16px;
       letter-spacing: .3em;
       color: var(--pls-muted);
-      padding-top: 10px
+      padding-top: 6px
     }
 
     .pls-hero {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: 96px;
+      font-size: 64px;
       font-weight: 700;
       line-height: 1;
       letter-spacing: -0.01em;
-      margin: 50px 0 0;
+      margin: 22px 0 0;
       overflow-wrap: anywhere
     }
 
     .pls-rule {
-      width: 96px;
+      width: 80px;
       height: 3px;
       background: var(--pls-accent);
       border-radius: 2px;
-      margin: 26px 0 20px
+      margin: 14px 0 10px
     }
 
     .pls-tagline {
-      font-size: 23px;
+      font-size: 18px;
       line-height: 1.35;
       color: var(--pls-muted);
       letter-spacing: .01em
+    }
+
+    /* Dua kolom sejajar: 1 garis rambut di tengah, top-aligned */
+    .pls-cols {
+      display: flex;
+      align-items: stretch
+    }
+
+    .pls-col {
+      flex: 1 1 0;
+      min-width: 0
+    }
+
+    .pls-col-side {
+      padding-right: 22px
+    }
+
+    .pls-col-side:last-child {
+      padding-right: 0;
+      padding-left: 22px
+    }
+
+    .pls-div {
+      width: 1px;
+      flex: none;
+      align-self: stretch;
+      background: var(--pls-hair);
+      opacity: .3
     }
 
     .pls-body {
       flex: 1 1 auto;
       min-height: 0;
       overflow: hidden;
-      padding-top: 40px
+      padding-top: 26px
     }
 
     .pls-cat {
-      padding-top: 30px
-    }
-
-    .pls-cat:first-child {
-      padding-top: 0
+      margin-bottom: 14px
     }
 
     .pls-cat-head {
       display: flex;
       align-items: center;
-      gap: 16px
+      gap: 10px
     }
 
     .pls-dot {
-      width: 9px;
-      height: 9px;
+      width: 7px;
+      height: 7px;
       flex: none;
       border-radius: 50%;
       background: var(--pls-accent);
@@ -3217,7 +3270,7 @@
     /* Nama kategori pakai sans 800 (bukan Playfair) supaya angka seperti "1x" tetap jelas */
     .pls-cat-name {
       font-family: 'Plus Jakarta Sans', Arial, sans-serif;
-      font-size: 31px;
+      font-size: 22px;
       font-weight: 800;
       line-height: 1.1;
       letter-spacing: 0.01em;
@@ -3234,15 +3287,15 @@
     }
 
     .pls-it {
-      padding-left: 25px
+      padding: 9px 0 9px 17px
     }
 
     .pls-cat-head+.pls-it {
-      margin-top: 20px
+      margin-top: 4px
     }
 
     .pls-it+.pls-it {
-      margin-top: 26px
+      margin-top: 0
     }
 
     .pls-item {
@@ -3253,31 +3306,34 @@
     .pls-nm {
       flex: 0 1 auto;
       min-width: 0;
-      font-size: 25px;
+      font-size: 21px;
       font-weight: 700;
-      line-height: 1.25
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
     }
 
     .pls-dur {
       flex: none;
-      font-size: 20px;
+      font-size: 15px;
       color: var(--pls-muted);
-      margin-left: 14px;
+      margin-left: 10px;
       white-space: nowrap
     }
 
     .pls-lead {
-      flex: 1 1 40px;
-      min-width: 20px;
+      flex: 1 1 24px;
+      min-width: 12px;
       align-self: center;
       height: 0;
       border-bottom: 2px dotted var(--pls-hair);
-      margin: 0 14px
+      margin: 0 10px
     }
 
     .pls-amt {
       flex: none;
-      font-size: 27px;
+      font-size: 21px;
       font-weight: 800;
       text-align: right;
       white-space: nowrap;
@@ -3286,10 +3342,10 @@
     }
 
     .pls-desc {
-      font-size: 20px;
+      font-size: 17px;
       color: var(--pls-muted);
-      margin-top: 5px;
-      max-width: 780px;
+      margin-top: 3px;
+      max-width: 458px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis
@@ -3297,16 +3353,16 @@
 
     .pls-foot {
       flex: none;
-      padding-top: 36px
+      padding-top: 26px
     }
 
     .pls-card {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 30px;
-      padding: 30px 34px;
-      border-radius: 26px;
+      gap: 24px;
+      padding: 22px 28px;
+      border-radius: 24px;
       background: #85957A;
       color: #FCF7F1
     }
@@ -3321,7 +3377,7 @@
     }
 
     .pls-card-label {
-      font-size: 20px;
+      font-size: 18px;
       letter-spacing: .14em;
       opacity: .7;
       line-height: 1.2
@@ -3330,63 +3386,63 @@
     .pls-card-phone {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 34px;
+      gap: 10px;
+      font-size: 28px;
       font-weight: 800;
       line-height: 1.15;
-      margin-top: 8px;
+      margin-top: 6px;
       letter-spacing: -0.01em;
       font-variant-numeric: tabular-nums;
       white-space: nowrap
     }
 
     .pls-card-phone i {
-      font-size: 30px;
+      font-size: 24px;
       opacity: .92
     }
 
     .pls-card-r {
       flex: none;
-      max-width: 340px;
+      max-width: 380px;
       text-align: right
     }
 
     .pls-card-ig {
-      font-size: 23px;
+      font-size: 20px;
       font-weight: 700;
       line-height: 1.2
     }
 
     .pls-card-addr {
-      font-size: 19px;
+      font-size: 16px;
       line-height: 1.32;
       opacity: .8;
-      margin-top: 7px;
-      max-height: 50px;
+      margin-top: 5px;
+      max-height: 44px;
       overflow: hidden
     }
 
     .pls-note {
-      font-size: 19px;
+      font-size: 16px;
       line-height: 1.35;
       text-align: center;
       color: var(--pls-muted);
-      margin-top: 26px
+      margin-top: 18px
     }
 
     .pls-endline {
       border-top: 1px solid var(--pls-hair);
-      padding-top: 18px;
-      font-size: 18px;
+      padding-top: 14px;
+      font-size: 15px;
       text-align: center;
       color: var(--pls-muted)
     }
 
     .pls-page {
-      font-size: 16px;
+      font-size: 15px;
       text-align: right;
       color: var(--pls-muted);
-      margin-top: 14px;
+      margin-top: 10px;
       letter-spacing: .06em;
       font-variant-numeric: tabular-nums
     }
@@ -3414,6 +3470,186 @@
       border-radius: 10px;
       background: #FCF7F1;
       display: block
+    }
+
+    /* ═══ CUST PICKER — cari pelanggan (Tambah Jadwal / Tambah Paket NB) ═══ */
+    .cust-pick {
+      position: relative;
+      flex: 1 1 130px;
+      min-width: 0
+    }
+
+    .cust-pick-sel {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      border: 0;
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
+      clip: rect(0 0 0 0)
+    }
+
+    .cust-pick-field {
+      position: relative;
+      display: flex;
+      align-items: center
+    }
+
+    .cust-pick-ico {
+      position: absolute;
+      left: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+      pointer-events: none
+    }
+
+    .cust-pick-field input {
+      width: 100%;
+      padding-left: 34px
+    }
+
+    .cust-pick-picked {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 7px 9px;
+      background: var(--cream-dark);
+      border: 1.5px solid var(--beige);
+      border-radius: var(--radius-sm)
+    }
+
+    .cust-pick-who {
+      flex: 1 1 auto;
+      min-width: 0
+    }
+
+    .cust-pick-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .cust-pick-phone {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .cust-pick-change {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      font-family: var(--font);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--sage-dark);
+      background: var(--white);
+      border: 1px solid var(--beige);
+      border-radius: 999px;
+      cursor: pointer
+    }
+
+    .cust-pick-change:hover {
+      border-color: var(--sage)
+    }
+
+    .cust-pick-panel {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      margin-top: 4px;
+      max-height: 240px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      padding: 4px;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      z-index: 60
+    }
+
+    .cust-pick-row {
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer
+    }
+
+    .cust-pick-row.hl,
+    .cust-pick-row:hover {
+      background: var(--cream)
+    }
+
+    .cust-pick-row-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .cust-pick-row-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .cust-pick-more {
+      padding: 7px 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      border-top: 1px solid var(--border-light)
+    }
+
+    .cust-pick-empty {
+      padding: 12px 10px;
+      font-size: 12.5px;
+      color: var(--text-sec);
+      text-align: center
+    }
+
+    .cust-pick-empty i {
+      margin-right: 4px;
+      color: var(--text-muted)
+    }
+
+    .cust-pick-add {
+      display: block;
+      margin: 8px auto 0;
+      padding: 0;
+      font-family: var(--font);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--sage-dark);
+      background: none;
+      border: none;
+      text-decoration: underline;
+      cursor: pointer
+    }
+
+    /* Di layar kecil kolom cari memakai satu baris penuh supaya panel hasil terbaca */
+    @media (max-width:600px) {
+      .cust-pick {
+        flex: 1 1 100%
+      }
     }
   </style>
 </head>
@@ -3522,7 +3758,7 @@
       user: null,
       page: 'dashboard',
       settings: {},
-      brand: { logo: '', qris: '' },
+      brand: { logo: '', qris: '', sign: '' },
       data: { schedules: [], customers: [], treatments: [], payments: [], users: [], customerDetail: null },
       calYear: new Date().getFullYear(),
       calMonth: new Date().getMonth(),
@@ -3617,6 +3853,8 @@
     };
     const logoUrl = () => brandUrlOk(S.settings && S.settings.logo_url) || DEFAULT_LOGO_URL;
     const qrisUrl = () => brandUrlOk(S.settings && S.settings.qris_url) || DEFAULT_QRIS_URL;
+    // Tanda tangan pemilik: tanpa gambar bawaan. Kosong = invoice tanpa gambar tanda tangan.
+    const signatureUrl = () => brandUrlOk(S.settings && S.settings.signature_url);
     // Tag <img> untuk logo / QRIS. Bila data URI hasil prefetch sudah ada, itu yang dipakai
     // supaya "Simpan Gambar" tidak pernah gagal karena kanvas tercemar (tainted).
     const brandImg = (kind, w, extra) => {
@@ -3628,6 +3866,16 @@
       const lebar = parseInt(w, 10) || 44;
       const gaya = 'display:block;width:' + lebar + 'px;height:auto;object-fit:contain;' + (extra || '');
       return `<img src="${src}" alt="${isQris ? 'QRIS Daisafacare' : 'Logo Daisafacare'}" loading="eager" decoding="sync" crossorigin="anonymous" style="${gaya}" onerror="this.style.display='none'">`;
+    };
+
+    // Tag <img> tanda tangan untuk blok tanda tangan invoice.
+    // Tanpa URL → string kosong (tidak pernah membuat src kosong).
+    const signatureImg = (w) => {
+      const url = signatureUrl();
+      if (!url) return '';
+      const src = (S.brand && S.brand.sign) || url;
+      const lebar = parseInt(w, 10) || 220;
+      return `<img src="${src}" alt="Tanda tangan" class="inv-sig-img" loading="eager" decoding="sync" crossorigin="anonymous" style="max-width:${lebar}px" onerror="this.style.display='none'">`;
     };
 
     // Ambil logo & QRIS sekali saat aplikasi dibuka, simpan sebagai data URI.
@@ -3652,6 +3900,7 @@
       };
       ambil(logoUrl(), 'logo');
       ambil(qrisUrl(), 'qris');
+      ambil(signatureUrl(), 'sign');
     }
 
     // Logo di sidebar (44px). Bila gambar gagal dimuat, kembali ke 🌸.
@@ -3724,6 +3973,7 @@
     function closePopup() { $('popupContainer').innerHTML = ''; }
 
     function closeModal() {
+      custPickClose();
       $('modalContainer').innerHTML = '';
       S.editingScheduleId = null;
       S.openInvoiceId = null;
@@ -4301,7 +4551,15 @@
                   <div class="fg">
                     <label>Pelanggan <span style="color:var(--text-muted);font-weight:400">(kosongkan untuk walk-in)</span></label>
                     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                      <select id="fCust" onchange="fillLocFromCust('nc')" style="flex:1 1 130px;min-width:0"><option value="">— Walk-in —</option>${custOpts}</select>
+                      <div class="cust-pick">
+                        <select id="fCust" onchange="fillLocFromCust('nc')" class="cust-pick-sel" tabindex="-1" aria-hidden="true"><option value="">— Walk-in —</option>${custOpts}</select>
+                        <div class="cust-pick-field">
+                          <i class="fa fa-magnifying-glass cust-pick-ico"></i>
+                          <input type="text" id="fCustSearch" placeholder="Cari nama atau No. HP..." autocomplete="off" oninput="custFilter('nc')" onfocus="custOpen('nc')" onkeydown="custKey(event,'nc')">
+                        </div>
+                        <div class="cust-pick-picked" id="fCustPicked" style="display:none"></div>
+                        <div class="cust-pick-panel" id="fCustResults" style="display:none"></div>
+                      </div>
                       <button type="button" id="fCustNew" class="btn btn-ghost btn-sm" onclick="toggleNewCust('nc')" style="flex:0 0 auto;padding:9px 11px;font-size:12px;white-space:nowrap">+ Pelanggan Baru</button>
                     </div>
                   </div>
@@ -4382,6 +4640,7 @@
           </div>
         </div>`;
             ensureCustCache();
+            syncCustPick('nc');
             if (isEdit) {
               ga('getScheduleDetail', [scheduleId, S.user.id, S.user.role], dres => {
                 loading(false);
@@ -4424,6 +4683,16 @@
         S.data.customers = res.data;
         fillLocFromCust('nc');
         fillLocFromCust('pc');
+        // Panel pencarian yang sudah terbuka ikut diperbarui begitu data tiba
+        if (custPickState.prefix) custPickRows(custPickState.prefix);
+        // Chip yang sudah terpilih dilengkapi nomor HP tanpa mengganggu isian yang sedang diketik
+        Object.keys(CUSTPICK_MAP).forEach(k => {
+          const cfg = CUSTPICK_MAP[k];
+          const sel = $(cfg.sel), picked = $(cfg.picked);
+          if (!sel || !picked || !sel.value || picked.style.display === 'none') return;
+          const c = (S.data.customers || []).find(x => String(x.id) === String(sel.value));
+          if (c) picked.innerHTML = custChipHtml(k, c.name, c.phone);
+        });
       });
     }
 
@@ -4476,6 +4745,243 @@
       loc.value = addr;
     }
 
+    // ─── PICKER PELANGGAN (cari nama / No. HP, tanpa panggilan server) ───
+    // <select> aslinya tetap jadi sumber data; yang terlihat hanya input + chip.
+    const CUSTPICK_MAP = {
+      nc: { sel: 'fCust', input: 'fCustSearch', panel: 'fCustResults', picked: 'fCustPicked' },
+      pc: { sel: 'pCust', input: 'pCustSearch', panel: 'pCustResults', picked: 'pCustPicked' }
+    };
+    const CUSTPICK_LIMIT = 40;
+    const custPickState = { prefix: null, idx: -1, items: [], onDoc: null };
+
+    // Angka saja — supaya "3212" tetap menemukan "0822-3212-1081"
+    const custDigits = v => String(v || '').replace(/\D/g, '');
+
+    // Cocokkan nomor HP; baris lama kadang tanpa angka 0 di depan
+    function custPhoneMatch(phone, term) {
+      const q = custDigits(term);
+      if (!q) return false;
+      const d = custDigits(phone);
+      if (!d) return false;
+      if (d.indexOf(q) !== -1) return true;
+      const qNo0 = q.replace(/^0+/, '');
+      const dNo0 = d.replace(/^0+/, '');
+      if (!qNo0 || !dNo0) return false;
+      return dNo0.indexOf(qNo0) !== -1;
+    }
+
+    // Tampilkan No. HP rapi dengan tanda hubung; baris lama tanpa 0 di depan tetap terbaca
+    function custPhoneShow(phone) {
+      const raw = String(phone || '');
+      let d = custDigits(raw);
+      if (!d) return raw;
+      if (d.length >= 10 && d.length <= 12 && d.charAt(0) !== '0' && d.slice(0, 2) !== '62') d = '0' + d;
+      if (d.length < 10 || d.length > 12) return raw;
+      const parts = [];
+      while (d.length > 4) { parts.unshift(d.slice(-4)); d = d.slice(0, -4); }
+      parts.unshift(d);
+      return parts.join('-');
+    }
+
+    // Urut nama, filter nama / nama bayi / No. HP
+    function custFilteredList(term) {
+      const q = String(term || '').trim().toLowerCase();
+      const list = (S.data.customers || []).filter(c => {
+        if (!q) return true;
+        const name = String(c.name || '').toLowerCase();
+        const baby = String(c.baby_name || '').toLowerCase();
+        if (name.indexOf(q) !== -1 || baby.indexOf(q) !== -1) return true;
+        return custPhoneMatch(c.phone, q);
+      });
+      return list.sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), 'id', { sensitivity: 'base' }));
+    }
+
+    function custPickRows(prefix) {
+      const cfg = CUSTPICK_MAP[prefix];
+      if (!cfg) return;
+      const inp = $(cfg.input), panel = $(cfg.panel);
+      if (!inp || !panel) return;
+      const all = custFilteredList(inp.value);
+      const rows = all.slice(0, CUSTPICK_LIMIT);
+      custPickState.items = rows;
+      custPickState.idx = rows.length ? 0 : -1;
+      let html = '';
+      if (!rows.length) {
+        html = `<div class="cust-pick-empty"><i class="fa fa-user-slash"></i> Tidak ada pelanggan yang cocok<button type="button" class="cust-pick-add" onclick="custPickAddNew('${prefix}')">+ Tambah pelanggan baru</button></div>`;
+      } else {
+        html = rows.map((c, i) => `<div class="cust-pick-row${i === 0 ? ' hl' : ''}" data-i="${i}" onclick="custPickChoose('${prefix}',${i})">
+          <div class="cust-pick-row-name">${sanitize(c.name)}</div>
+          <div class="cust-pick-row-sub">${sanitize(custPhoneShow(c.phone || ''))}${c.baby_name ? ' · Bayi: ' + sanitize(c.baby_name) : ''}</div>
+        </div>`).join('');
+        if (all.length > rows.length) html += `<div class="cust-pick-more">${all.length} hasil</div>`;
+      }
+      panel.innerHTML = html;
+    }
+
+    function custOpen(prefix) {
+      const cfg = CUSTPICK_MAP[prefix];
+      if (!cfg) return;
+      const panel = $(cfg.panel);
+      if (!panel) return;
+      custPickClose();
+      custPickState.prefix = prefix;
+      custPickRows(prefix);
+      panel.style.display = '';
+      custPickState.onDoc = ev => {
+        const inp = $(cfg.input);
+        if (!inp) { custPickClose(); return; }
+        const box = inp.closest ? inp.closest('.cust-pick') : null;
+        if (box && box.contains(ev.target)) return;
+        custPickClose();
+      };
+      document.addEventListener('mousedown', custPickState.onDoc);
+      document.addEventListener('touchstart', custPickState.onDoc);
+    }
+
+    function custPickClose() {
+      Object.keys(CUSTPICK_MAP).forEach(k => {
+        const p = $(CUSTPICK_MAP[k].panel);
+        if (p) p.style.display = 'none';
+      });
+      if (custPickState.onDoc) {
+        document.removeEventListener('mousedown', custPickState.onDoc);
+        document.removeEventListener('touchstart', custPickState.onDoc);
+        custPickState.onDoc = null;
+      }
+      custPickState.prefix = null;
+      custPickState.idx = -1;
+      custPickState.items = [];
+    }
+
+    function custFilter(prefix) {
+      const cfg = CUSTPICK_MAP[prefix];
+      if (!cfg) return;
+      const panel = $(cfg.panel);
+      if (!panel) return;
+      if (panel.style.display === 'none') { custOpen(prefix); return; }
+      custPickRows(prefix);
+    }
+
+    function custHighlight(prefix) {
+      const cfg = CUSTPICK_MAP[prefix];
+      if (!cfg) return;
+      const panel = $(cfg.panel);
+      if (!panel) return;
+      const rows = panel.querySelectorAll('.cust-pick-row');
+      for (let i = 0; i < rows.length; i++) rows[i].classList.toggle('hl', i === custPickState.idx);
+      const cur = rows[custPickState.idx];
+      if (!cur) return;
+      const top = cur.offsetTop, h = cur.offsetHeight, pt = panel.scrollTop, ph = panel.clientHeight;
+      if (top < pt) panel.scrollTop = top;
+      else if (top + h > pt + ph) panel.scrollTop = top + h - ph;
+    }
+
+    function custPickChoose(prefix, i) {
+      const cfg = CUSTPICK_MAP[prefix];
+      if (!cfg) return;
+      const c = (custPickState.items || [])[i];
+      if (!c) return;
+      const sel = $(cfg.sel);
+      if (sel) sel.value = String(c.id);
+      fillLocFromCust(prefix);
+      syncCustPick(prefix, c);
+      custPickClose();
+    }
+
+    // Ganti = kosongkan pilihan, tampilkan input lagi lalu fokus
+    function custClear(prefix) {
+      const cfg = CUSTPICK_MAP[prefix];
+      if (!cfg) return;
+      const sel = $(cfg.sel);
+      if (sel) sel.value = '';
+      const picked = $(cfg.picked);
+      if (picked) { picked.style.display = 'none'; picked.innerHTML = ''; }
+      const inp = $(cfg.input);
+      if (!inp) return;
+      inp.value = '';
+      const field = inp.parentElement;
+      if (field) field.style.display = '';
+      inp.style.display = '';
+      inp.focus();
+    }
+
+    // Panah atas/bawah, Enter pilih, Escape tutup
+    function custKey(ev, prefix) {
+      if (!ev) return;
+      const cfg = CUSTPICK_MAP[prefix];
+      if (!cfg) return;
+      const panel = $(cfg.panel);
+      const open = !!panel && panel.style.display !== 'none';
+      if (ev.key === 'Escape') { custPickClose(); return; }
+      if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') {
+        if (!open) { custOpen(prefix); return; }
+        const items = custPickState.items || [];
+        if (!items.length) return;
+        ev.preventDefault();
+        let i = custPickState.idx + (ev.key === 'ArrowDown' ? 1 : -1);
+        if (i < 0) i = items.length - 1;
+        if (i >= items.length) i = 0;
+        custPickState.idx = i;
+        custHighlight(prefix);
+        return;
+      }
+      if (ev.key === 'Enter' && open) {
+        ev.preventDefault();
+        const i = custPickState.idx;
+        if (i >= 0 && (custPickState.items || [])[i]) custPickChoose(prefix, i);
+      }
+    }
+
+    function custPickAddNew(prefix) {
+      const m = NEWCUST_MAP[prefix];
+      custPickClose();
+      if (!m) return;
+      const box = $(m.block);
+      if (box && box.style.display === 'none') { toggleNewCust(prefix); return; }
+      const el = $(m.name);
+      if (el) el.focus();
+    }
+
+    // Isi chip pelanggan terpilih: nama (tebal) + No. HP (redup) + tombol Ganti
+    function custChipHtml(prefix, name, phone) {
+      return `<div class="cust-pick-who"><div class="cust-pick-name">${sanitize(name)}</div>${phone ? `<div class="cust-pick-phone">${sanitize(custPhoneShow(phone))}</div>` : ''}</div><button type="button" class="cust-pick-change" onclick="custClear('${prefix}')"><i class="fa fa-pen"></i> Ganti</button>`;
+    }
+
+    // Baca nilai <select> tersembunyi lalu perbarui chip + input.
+    // Dipakai saat memilih, setelah prefill jadwal, dan setelah pelanggan baru dibuat.
+    function syncCustPick(prefix, cust) {
+      const cfg = CUSTPICK_MAP[prefix];
+      if (!cfg) return;
+      const sel = $(cfg.sel), inp = $(cfg.input), picked = $(cfg.picked);
+      if (!sel || !inp || !picked) return;
+      const id = String(sel.value || '');
+      let c = cust || null;
+      if (!c && id) c = (S.data.customers || []).find(x => String(x.id) === id) || null;
+      const field = inp.parentElement;
+      if (!id) {
+        picked.style.display = 'none';
+        picked.innerHTML = '';
+        if (field) field.style.display = '';
+        inp.style.display = '';
+        return;
+      }
+      let name = c ? String(c.name || '') : '';
+      let phone = c ? String(c.phone || '') : '';
+      if (!c) {
+        const opt = sel.options[sel.selectedIndex];
+        const txt = String((opt && opt.textContent) || '');
+        const pisah = txt.split(' - ');
+        name = pisah[0] || '';
+        phone = pisah.length > 1 ? pisah.slice(1).join(' - ') : '';
+      }
+      picked.innerHTML = custChipHtml(prefix, name, phone);
+      picked.style.display = '';
+      inp.value = '';
+      if (field) field.style.display = 'none';
+      inp.style.display = 'none';
+      custPickClose();
+    }
+
     function saveNewCust(prefix) {
       const m = NEWCUST_MAP[prefix];
       if (!m) return;
@@ -4516,6 +5022,7 @@
           S.data.customers.push({ id: data.id, name: newName, phone: phone, address: address, baby_name: babyName, dob: '', maps_link: '', notes: '', total_purchase: 0, total_paid: 0, total_due: 0 });
         }
         addCustOption(m.sel, data.id, newName, phone);
+        syncCustPick(prefix);
         const box = $(m.block);
         if (box) box.style.display = 'none';
         clearNewCust(prefix);
@@ -4595,6 +5102,7 @@
         }
       };
       setSelect('fCust', s.customer_id, s.customer_name);
+      syncCustPick('nc');
       setSelect('fTherapist', s.therapist_id, s.therapist_name);
       setVal('fDate', fmtDateInput(s.schedule_date));
       setVal('fTime', s.schedule_time || '');
@@ -4867,7 +5375,15 @@
                   <div class="fg">
                     <label>Pelanggan *</label>
                     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                      <select id="pCust" onchange="fillLocFromCust('pc')" style="flex:1 1 130px;min-width:0"><option value="">— Pilih Pelanggan —</option>${custOpts}</select>
+                      <div class="cust-pick">
+                        <select id="pCust" onchange="fillLocFromCust('pc')" class="cust-pick-sel" tabindex="-1" aria-hidden="true"><option value="">— Pilih Pelanggan —</option>${custOpts}</select>
+                        <div class="cust-pick-field">
+                          <i class="fa fa-magnifying-glass cust-pick-ico"></i>
+                          <input type="text" id="pCustSearch" placeholder="Cari nama atau No. HP..." autocomplete="off" oninput="custFilter('pc')" onfocus="custOpen('pc')" onkeydown="custKey(event,'pc')">
+                        </div>
+                        <div class="cust-pick-picked" id="pCustPicked" style="display:none"></div>
+                        <div class="cust-pick-panel" id="pCustResults" style="display:none"></div>
+                      </div>
                       <button type="button" id="pCustNew" class="btn btn-ghost btn-sm" onclick="toggleNewCust('pc')" style="flex:0 0 auto;padding:9px 11px;font-size:12px;white-space:nowrap">+ Pelanggan Baru</button>
                     </div>
                   </div>
@@ -4940,6 +5456,7 @@
             pkgUpdateHint();
             pkgCalcSummary();
             ensureCustCache();
+            syncCustPick('pc');
           });
         });
       });
@@ -5500,7 +6017,7 @@
         subtitle: nilai('plSubtitle', plSubJudul()),
         theme: PL.theme === 'sage' ? 'sage' : 'cream',
         cats: cats,
-        showDur: cek('plTogDur', true),
+        showDur: cek('plTogDur', false),
         showContact: cek('plTogKontak', true),
         showNote: cek('plTogNote', true),
         showDesc: cek('plTogDesc', false),
@@ -5558,9 +6075,8 @@
       const src = (S.brand && S.brand.logo) || logoUrl();
       const logo = src ? `<img class="pls-logo" src="${src}" alt="Logo Daisafacare" crossorigin="anonymous" loading="eager" decoding="sync">` : '';
       const logoBox = tema === 'sage' ? `<span class="pls-logo-tile">${logo}</span>` : logo;
-      const groups = (desc && desc.groups) || [];
 
-      const isi = groups.map(g => `<div class="pls-cat">${plCatHeadHtml(g.category)}${(g.items || []).map(t => plItemHtml(t, o)).join('')}</div>`).join('');
+      const isi = sisi => (sisi || []).map(g => `<div class="pls-cat">${plCatHeadHtml(g.category)}${(g.items || []).map(t => plItemHtml(t, o)).join('')}</div>`).join('');
 
       let kaki = '';
       if (last) {
@@ -5584,34 +6100,33 @@
           <div class="pls-rule"></div>
           <div class="pls-tagline">${sanitize(o.subtitle || '')}</div>
         </div>
-        <div class="pls-body">${isi}</div>
+        <div class="pls-body"><div class="pls-cols"><div class="pls-col pls-col-side">${isi(desc.left)}</div><div class="pls-div"></div><div class="pls-col pls-col-side">${isi(desc.right)}</div></div></div>
         <div class="pls-foot">${kaki}${nomor}</div>
       </div>`;
     }
 
-    // Halaman terakhir saja: kalau sisa ruang di bawah baris akhir masih > 120 px,
-    // bagikan ruang itu ke sela antar kategori (maks +48 px per sela) supaya tidak
-    // ada lubang kosong besar di atas kartu kontak. Satu kategori → ditengahkan.
+    // Halaman terakhir: sisa ruang tiap kolom dibagikan ke sela antar kategori
+    // di kolom itu sendiri (maks +36 px per sela) supaya tidak ada lubang kosong
+    // besar di atas kartu kontak. Satu kategori di kolom → ditengahkan.
     function plSeimbangkan(el) {
       if (!el) return;
-      const body = el.querySelector('.pls-body');
-      if (!body) return;
-      const cats = body.querySelectorAll('.pls-cat');
-      if (!cats.length) return;
-      // Jarak dari tepi atas .pls-body ke sebuah simpul (offsetTop relatif ke offsetParent-nya)
-      const posY = node => { let y = 0, n = node; while (n && n !== body) { y += n.offsetTop; n = n.offsetParent; } return y; };
-      const akhir = cats[cats.length - 1];
-      const bawah = parseFloat(getComputedStyle(body).paddingBottom) || 0;
-      const bebas = body.clientHeight - (posY(akhir) + akhir.offsetHeight) - bawah;
-      if (bebas <= 120) return;
-      if (cats.length === 1) {
-        cats[0].style.marginTop = Math.floor(bebas / 2) + 'px';
-        return;
+      const kolom = el.querySelectorAll('.pls-col');
+      for (const col of kolom) {
+        const cats = col.querySelectorAll('.pls-cat');
+        if (!cats.length) continue;
+        const atasKol = col.getBoundingClientRect().top;
+        const akhir = cats[cats.length - 1];
+        const bawah = parseFloat(getComputedStyle(col).paddingBottom) || 0;
+        const bebas = col.clientHeight - bawah - (akhir.getBoundingClientRect().top - atasKol + akhir.offsetHeight);
+        if (bebas <= 120) continue;
+        if (cats.length === 1) {
+          cats[0].style.marginTop = Math.floor(bebas / 2) + 'px';
+          continue;
+        }
+        const tambah = Math.min(36, Math.floor(bebas / (cats.length - 1)));
+        if (tambah < 1) continue;
+        for (let i = 1; i < cats.length; i++) cats[i].style.marginTop = tambah + 'px';
       }
-      const sela = cats.length - 1;
-      const tambah = Math.min(48, Math.floor(bebas / sela));
-      if (tambah < 1) return;
-      for (let i = 1; i < cats.length; i++) cats[i].style.paddingTop = (30 + tambah) + 'px';
     }
 
     // Wadah tak terlihat berisi slide ukur 1080 px (di luar layar)
@@ -5626,83 +6141,118 @@
       return el;
     }
 
-    // Bagi item ke beberapa slide dengan mengukur tinggi isi sungguhan, bukan menebak.
-    // footerAkhir = true → slide ukur memakai kartu kontak (footer halaman terakhir).
-    function plMeasure(groups, opts, footerAkhir) {
-      const out = [];
+    // Lingkungan ukur: slide nyata (kosong) di staging, lengkap dengan referensi kolom
+    function plEnv(opts) {
       const stage = plStaging();
-      stage.innerHTML = priceSlideHtml({ groups: [] }, opts, footerAkhir ? { page: 2, total: 2 } : { page: 1, total: 2 });
-      const body = stage.querySelector('.pls-body');
-      if (!body) { stage.innerHTML = ''; return [{ groups: (groups || []).slice() }]; }
-      const luber = () => body.scrollHeight > body.clientHeight + 1;
-
-      let cur = { groups: [] };
-      const tutupSlide = () => { out.push(cur); cur = { groups: [] }; };
-
-      (groups || []).forEach(g => {
-        let i = 0;
-        while (i < g.items.length) {
-          const catEl = document.createElement('div');
-          catEl.className = 'pls-cat';
-          catEl.innerHTML = plCatHeadHtml(g.category);
-          body.appendChild(catEl);
-          if (luber() && cur.groups.length) {
-            // judul kategori tidak muat lagi → pindah slide, ulangi kategori ini
-            body.removeChild(catEl);
-            tutupSlide();
-            body.innerHTML = '';
-            continue;
-          }
-          const sec = { category: g.category, items: [] };
-          cur.groups.push(sec);
-
-          let taruh = 0;
-          let ulangi = false;
-          while (i < g.items.length) {
-            const bungkus = document.createElement('div');
-            bungkus.innerHTML = plItemHtml(g.items[i], opts);
-            const node = bungkus.firstElementChild;
-            catEl.appendChild(node);
-            if (luber()) {
-              catEl.removeChild(node);
-              if (taruh > 0) break;                        // lanjut di slide berikutnya
-              if (cur.groups.length > 1) {                 // slide sudah berisi kategori lain
-                cur.groups.pop();
-                body.removeChild(catEl);
-                tutupSlide();
-                body.innerHTML = '';
-                ulangi = true;
-                break;
-              }
-              // slide kosong: item tinggi tetap ditampilkan sendiri (tidak boleh berulang tanpa henti)
-              catEl.appendChild(node);
-            }
-            sec.items.push(g.items[i]);
-            i++;
-            taruh++;
-          }
-          if (ulangi) continue;
-          // kategori habis? lanjut ke kategori berikutnya di slide yang sama.
-          if (i < g.items.length) { tutupSlide(); body.innerHTML = ''; }
-        }
-      });
-      if (cur.groups.length) out.push(cur);
-      stage.innerHTML = '';
-      return out.length ? out : [{ groups: [] }];
+      stage.innerHTML = priceSlideHtml({ left: [], right: [] }, opts, { page: 1, total: 1 });
+      const slide = stage.querySelector('.pls-slide');
+      const body = slide.querySelector('.pls-body');
+      const cols = body.querySelectorAll('.pls-col');
+      return {
+        stage: stage,
+        body: body,
+        kiri: cols[0],
+        kanan: cols[1],
+        H: body.clientHeight,
+        W: cols[0].clientWidth,
+        opts: opts
+      };
     }
 
-    // Halaman terakhir memakai kartu kontak yang lebih tinggi, jadi isinya dicek ulang.
-    function plRapikan(groups, opts, dalam) {
-      const slides = plMeasure(groups, opts, false);
-      if (slides.length <= 1) return plMeasure(groups, opts, true);
-      const ekor = slides.pop();
-      if ((dalam || 0) > 8) return slides.concat([ekor]);
-      return slides.concat(plRapikan(ekor.groups, opts, (dalam || 0) + 1));
+    function plNodeKategori(opts, blok) {
+      const el = document.createElement('div');
+      el.className = 'pls-cat';
+      el.innerHTML = plCatHeadHtml(blok.category) + blok.items.map(t => plItemHtml(t, opts)).join('');
+      return el;
     }
 
+    // Tinggi satu blok kategori (termasuk margin) diukur di kolom nyata
+    function plKategoriTinggi(env, blok) {
+      const el = plNodeKategori(env.opts, blok);
+      env.kiri.appendChild(el);
+      const cs = getComputedStyle(el);
+      const h = el.offsetHeight + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0);
+      el.remove();
+      return h;
+    }
+
+    // Bagi daftar kategori ke slide: isi kolom kiri dulu, baru kanan, tanpa memecah
+    // blok kategori antar kolom. Titik pembagi dipilih yang membedakan tinggi kedua
+    // kolom seminimal mungkin; setiap slide diambil sebanyak mungkin kategori muat.
+    // Pelindung: blok lebih tinggi dari satu kolom dipotong per item (selalu ≥1 item,
+    // supaya tidak berputar tanpa henti).
     function paginatePricelist(groups, opts) {
-      if (!groups || !groups.length) return [{ groups: [] }];
-      return plRapikan(groups, opts);
+      if (!groups || !groups.length) return [{ left: [], right: [] }];
+      const env = plEnv(opts);
+      const keluar = [];
+      const bloks = groups.map(g => ({ category: g.category, items: (g.items || []).slice() }));
+      const tinggi = bloks.map(b => plKategoriTinggi(env, b));
+      const jml = (dari, sampai) => { let s = 0; for (let i = dari; i < sampai; i++) s += tinggi[i]; return s; };
+      const H = env.H;
+
+      const bagiTerbaik = (s, cnt) => {
+        let best = null;
+        for (let i = 1; i <= cnt; i++) {
+          const L = jml(s, s + i);
+          const R = jml(s + i, s + cnt);
+          if (L > H || R > H) continue;
+          const diff = Math.abs(L - R);
+          if (!best || diff < best.diff) best = { i: i, diff: diff };
+        }
+        return best;
+      };
+
+      let s = 0;
+      let pelindung = 0;
+      while (s < bloks.length && pelindung++ < 60) {
+        let dibuat = false;
+        for (let j = bloks.length - s; j >= 1; j--) {
+          const b = bagiTerbaik(s, j);
+          if (!b) continue;
+          const kiri = [], kanan = [];
+          for (let i = 0; i < j; i++) (i < b.i ? kiri : kanan).push(bloks[s + i]);
+          keluar.push({ left: kiri, right: kanan });
+          s += j;
+          dibuat = true;
+          break;
+        }
+        if (dibuat) continue;
+        const blk = bloks[s];
+        let m = 0;
+        const uji = document.createElement('div');
+        uji.className = 'pls-cat';
+        const tinggiKepala = plKategoriTinggi(env, { category: blk.category, items: [] });
+        const tersedia = H - tinggiKepala;
+        env.kiri.appendChild(uji);
+        let h = 0;
+        const tambahNode = node => {
+          const cs = getComputedStyle(node);
+          return node.offsetHeight + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0);
+        };
+        for (; m < blk.items.length; m++) {
+          const w = document.createElement('div');
+          w.innerHTML = plItemHtml(blk.items[m], opts);
+          const node = w.firstElementChild;
+          uji.appendChild(node);
+          const th = tambahNode(node);
+          if (h + th > tersedia && m > 0) {
+            node.remove();
+            break;
+          }
+          h += th;
+        }
+        uji.remove();
+        keluar.push({ left: [{ category: blk.category, items: blk.items.slice(0, Math.max(1, m)) }], right: [] });
+        const sisa = blk.items.slice(Math.max(1, m));
+        if (sisa.length) {
+          const lanjut = { category: blk.category, items: sisa };
+          bloks.splice(s + 1, 0, lanjut);
+          tinggi.splice(s + 1, 0, plKategoriTinggi(env, lanjut));
+        }
+        s++;
+      }
+      env.stage.innerHTML = '';
+      return keluar.length ? keluar : [{ left: [], right: [] }];
     }
 
     // ─── Pratinjau di dalam modal ───
@@ -5725,6 +6275,8 @@
       $('plPrev').disabled = PL.page <= 1;
       $('plNext').disabled = PL.page >= jumlah;
       $('plCounter').textContent = PL.page + '/' + jumlah;
+      const info = $('plCount');
+      if (info) info.textContent = jumlah > 1 ? 'Akan dibuat ' + jumlah + ' gambar saat disimpan' : 'Akan dibuat 1 gambar saat disimpan';
     }
 
     function plShowPage() {
@@ -5744,6 +6296,8 @@
       PL.page = 1;
       const nav = $('plNav');
       if (nav) nav.style.display = 'none';
+      const info = $('plCount');
+      if (info) info.textContent = '';
     }
 
     function renderPricelistPreview() {
@@ -5808,7 +6362,7 @@
             <div>
               <div class="pl-label">Tampilan</div>
               <div class="pl-togs">
-                <label class="pl-chk on"><input type="checkbox" id="plTogDur" checked onchange="plChip(this)">Tampilkan durasi</label>
+                <label class="pl-chk"><input type="checkbox" id="plTogDur" onchange="plChip(this)">Tampilkan durasi</label>
                 <label class="pl-chk on"><input type="checkbox" id="plTogKontak" checked onchange="plChip(this)">Tampilkan kontak</label>
                 <label class="pl-chk on"><input type="checkbox" id="plTogNote" checked onchange="plChip(this)">Tampilkan catatan</label>
                 <label class="pl-chk"><input type="checkbox" id="plTogDesc" onchange="plChip(this)">Tampilkan deskripsi</label>
@@ -5819,6 +6373,7 @@
           </div>
           <div class="pl-preview">
             <div class="pl-frame" id="plFrame"></div>
+            <div class="pl-count" id="plCount"></div>
             <div class="pl-nav" id="plNav" style="display:none">
               <button type="button" class="pl-nav-btn" id="plPrev" onclick="plGantiHalaman(-1)"><i class="fa fa-chevron-left"></i></button>
               <span class="pl-nav-txt" id="plCounter">1/1</span>
@@ -6131,6 +6686,8 @@
       const bizTT = S.settings.business_tiktok || 'daisafacare';
       const payInfo = S.settings.payment_info || 'BCA 3530674729 a.n Syifa Rasalhague or QRIS';
       const footer = S.settings.invoice_footer || 'Terima kasih atas kepercayaan Anda kepada kami.';
+      // Gambar tanda tangan pemilik (dari Pengaturan). Kosong = tampilan lama tanpa gambar.
+      const sigImg = signatureImg(220);
       // Paket NB: transport ditagih per kunjungan, jadi labelnya memakai jumlah kunjungan
       const pkgVisits = parseInt(s.total_visits, 10) || 0;
       const transportLabel = pkgVisits > 1 ? `Transport (${pkgVisits} kunjungan)` : `Transport (${s.km} km)`;
@@ -6220,7 +6777,9 @@
             <div class="inv-footer-sub">${sanitize(footer)}</div>
             <div style="height:24px;border-bottom:1px dashed var(--beige);margin:0 auto 16px;width:60px"></div>
             <div class="inv-signature">
-              <div class="inv-sig-line"><div class="inv-sig-dot"></div><div class="inv-sig-label">Tanda Tangan</div></div>
+              ${sigImg
+          ? `<div class="inv-sig-line">${sigImg}<div class="inv-sig-dot inv-sig-dot-sm"></div><div class="inv-sig-label">${sanitize(bizName)}</div></div>`
+          : `<div class="inv-sig-line"><div class="inv-sig-dot"></div><div class="inv-sig-label">Tanda Tangan</div></div>`}
             </div>
             <div class="inv-contacts">
               <div class="inv-contact-item"><i class="fa fa-location-dot"></i> ${sanitize(bizName)} Homecare Baby Spa</div>
@@ -6494,6 +7053,10 @@
         <div class="fg"><label>QRIS URL</label><input id="sBizQris" value="${sanitize(s.qris_url || '')}" placeholder="${URLBASE}..." oninput="previewBrandImg()"></div>
       </div>
       <div style="font-size:11px;color:var(--text-muted);margin-top:-6px;margin-bottom:10px">Kosongkan untuk memakai gambar bawaan.</div>
+      <div class="form-row cols-2" style="margin-bottom:10px">
+        <div class="fg"><label>Tanda Tangan URL</label><input id="sBizSign" value="${sanitize(s.signature_url || '')}" placeholder="${URLBASE}..." oninput="previewBrandImg()"><div style="font-size:11px;color:var(--text-muted);margin-top:4px">Kosongkan bila invoice tidak perlu gambar tanda tangan.</div></div>
+        <div class="fg"><label style="font-size:11px">Pratinjau Tanda Tangan</label><div id="sBizSignPrev" style="display:none;align-items:center;min-height:40px"></div></div>
+      </div>
       <div class="form-row cols-2">
         <div class="fg"><label style="font-size:11px">Pratinjau Logo</label><div id="sBizLogoPrev" style="display:none;align-items:center;min-height:40px"></div></div>
         <div class="fg"><label style="font-size:11px">Pratinjau QRIS</label><div id="sBizQrisPrev" style="display:none;align-items:center;min-height:40px"></div></div>
@@ -6554,10 +7117,11 @@
       };
       pasang('sBizLogoPrev', 'sBizLogo', 'Pratinjau logo');
       pasang('sBizQrisPrev', 'sBizQris', 'Pratinjau QRIS');
+      pasang('sBizSignPrev', 'sBizSign', 'Pratinjau tanda tangan');
     }
 
     function saveBizSettings() {
-      const settings = { business_name: $('sBizName').value, business_tagline: $('sBizTag').value, business_phone: $('sBizPhone').value, business_address: $('sBizAddr').value, business_instagram: $('sBizIG').value, business_tiktok: $('sBizTT').value, payment_info: $('sBizPay').value, transport_rate_per_km: $('sTransRate').value, invoice_footer: $('sInvFooter').value, invoice_prefix: ($('sInvPrefix').value || 'DSF').trim(), currency_symbol: ($('sCurrency').value || 'Rp').trim(), logo_url: ($('sBizLogo') ? $('sBizLogo').value.trim() : ''), qris_url: ($('sBizQris') ? $('sBizQris').value.trim() : '') };
+      const settings = { business_name: $('sBizName').value, business_tagline: $('sBizTag').value, business_phone: $('sBizPhone').value, business_address: $('sBizAddr').value, business_instagram: $('sBizIG').value, business_tiktok: $('sBizTT').value, payment_info: $('sBizPay').value, transport_rate_per_km: $('sTransRate').value, invoice_footer: $('sInvFooter').value, invoice_prefix: ($('sInvPrefix').value || 'DSF').trim(), currency_symbol: ($('sCurrency').value || 'Rp').trim(), logo_url: ($('sBizLogo') ? $('sBizLogo').value.trim() : ''), qris_url: ($('sBizQris') ? $('sBizQris').value.trim() : ''), signature_url: ($('sBizSign') ? $('sBizSign').value.trim() : '') };
       loading(true, 'Menyimpan...');
       ga('saveAllSettings', [settings, S.user.id, S.user.role], res => {
         loading(false);
@@ -6565,7 +7129,7 @@
           Object.assign(S.settings, settings);
           toast('Pengaturan disimpan!', 'success');
           // Gambar bisa berubah: bersihkan cache data URI lalu ambil ulang di latar belakang
-          S.brand.logo = ''; S.brand.qris = '';
+          S.brand.logo = ''; S.brand.qris = ''; S.brand.sign = '';
           setSidebarLogo();
           prefetchBrandAssets();
         }

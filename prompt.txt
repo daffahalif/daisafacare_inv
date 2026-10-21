@@ -1,28 +1,9 @@
-Here are the updates for this version:
-- can add maps, map link shown as buka maps (work). but i need the link also accessible in jadwal dashboard so i can easily open maps.
-- newborn 2x should add morning and evening schedule (such as 07.00 and 15.30) - works. 
-- the newborn 2x still marked only on the book date, not increment every day (i tried add for 2 weeks newborn treatment) - works.
-- also, if i delete the parent of newborn, all the rests is deleted. perfect.
-- the login was removed - handled
-- need a down payment invoice, not just auto detect the 20% down payment. - works
-- on Jadwal Page list, there is one column wrong. the header is "Treatment" but the data is the address of the cust. the treatment not listed there. - handled, but also need the maps link like the dashboard jadwal.
-- the dashboard positioning is a bit not neat. jadwal hari ini and jadwal besok is good, side by side. but, jadwal baru on left, right container is blank, instead, the other container is below it. is it okay? actually this is minor, the phone UI is fine.
-- the jadwal calendar is not sorted. the 15.30 is shown first, then the 07.00. there is a case: 1. 15.30, 2. 07.00, 3. 09.00 (not sorted properly)
+Understand all the files.
 
-our update list (for reference):
-- read the new spreadsheet to understand and implement Database: DAISAFACARE - INVOICE WEB APP.xlsx. this new sheet is an implemented and a real data of my recent sheet. 
-- need to do the NB 1x or NB 2x (new born) treatment handling. the treatment is not once in one day, but every day based on how long the customer orders (1 day, 1 week, or 2 weeks). so, the schedule must go on every day, but the payment is one based on the menu. this treatment must do DOWN PAYMENT for locking in the customer so they do not scam us.
-- the transport fee roundup and roundown handling. the rule is when the transport is above 5km. if the distance is 5km then = 0, but if 6km then = 6km * Rp2000 = Rp12.000. do round down also, for example if there is 5,8km, then its 5km (free), if 6,3km then 6km or 12.000.
-- the google maps handling. for the address, i want to add a precise location with copy and paste google map if there is one. if none, then type manually the address.
-- daisafa logo. I want to add the logo for the web app, invoice, and other that needs logo. how to handle it? do i need to make the logo as URL?
-- invoice signature handling. do i need a signature? or can I make a 1 static QR code that shows it signs by me? maybe leads to image url. 
-- the mobile phone view handling. some UI is overlapping such as calendar, tables, and some data is shown a bit big enough on my phone. I use Iphone 12 Pro and 13 basic.
-- auto count the baby age (optional). so, I can input the baby age or date of birth. if i type the age without the date of birth, then increment next month for the baby age by data i input
-- add pricelist generator. some new moms need a pricelist. sometimes i cannot find the pricelist or maybe I have no time to send updated PL, so we need the pricelist generator with pretty background
-- add edit Jadwal, especially the walk-in moms. the case is when suddenly there are a mom edit or maybe wrong input treatment, I need to edit the Schedule.
-- delete login, no need that login because only me uses this page. cuts the bussiness process and lighten the app.
-- need the tomorrow schedule also for dashboard.
-- [new] add map link (if available) in jadwal dashboard, so I can easily open the google maps
-- [new] sort option for jadwal list
-- [new] search for moms, in case the mom data is too many.
-- [new] I wonder, is it possible to add jadwal + add new customer? because it will be easy if the step is one way, not add customer first then add schedule separately.
+Code.gs and index.html is our main character.
+
+CHANGELOG.md is the change we have done.
+daisafa_architecture.md is our base. mostly changed already.
+DAISAFACARE - INVOICE WEB APP.xlsx is the database structure.
+
+also understand the rest other files.

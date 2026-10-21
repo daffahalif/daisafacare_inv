@@ -17,6 +17,7 @@
 - Split the plan into parts that can run in parallel, and act only as the coordinator.
 - Use a strong model for hard tasks (like coding) and a cheaper one for easy tasks (like docs).
 - After every change, check your work. This project has no automatic checks, so manually confirm that the front end and back end still match up.
+- Always update code changes to CHANGELOG.md efficiently. do not make it too wordy.
 
 ### Data changes
 - If you change the sheet columns, update everything that uses them (the column maps, the setup headers, and all code that reads or writes them).
@@ -42,7 +43,7 @@
 - `JADWAL DAISAFACARE.xlsx` is old business data, for reference only.
 
 ### What the app does
-Pages: Login, Dashboard, Jadwal (schedule), Pelanggan (customers), Treatment catalog, Invoice, Keuangan (payments), Laporan (reports), Pengaturan (settings), Log Aktivitas (admin only).
+Pages: Dashboard, Jadwal (schedule), Pelanggan (customers), Treatment catalog, Invoice, Keuangan (payments), Laporan (reports), Pengaturan (settings), Log Aktivitas (admin only).
 
 ### Users
 Three roles: `admin`, `therapist`, `receptionist`. Any new feature that changes data must check the user's role.
@@ -58,5 +59,5 @@ Users, Customers, Treatments, Schedules, Schedule_Items, Payments, Settings, Act
 
 ### Design
 - Use the brand colors: green `#85957A`, beige `#D4C2AA`, cream `#FCF7F1`. See `DAISAFA_PALETTE.png`.
-- Invoices should look like `invoice daisafa.jpeg`: DAISAFACARE header, service table, payment info, signature. Users can print or save them as an image.
-- Must work well on mobile.
+- Invoices should look like `invoice daisafa.jpeg`: DAISAFACARE header, service table, payment info. Users can print or save them as an image.
+- Must work well on mobile, especially Iphone 12 Pro and 13 Basic.
