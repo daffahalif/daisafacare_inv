@@ -16,4 +16,14 @@ const targetB = "\n      maps_link: s[SC.MAPS_LINK] || ''";
 if (src.indexOf(targetB) === -1) throw new Error('target maps_link tidak ketemu');
 fs.writeFileSync(path.join(out, 'Code_sabotageB.gs'), src.replace(targetB, '\n'));
 
+// C: batas atas bulan berjalan dihapus lagi (bug pendapatan bulan ini ikut bulan depan)
+const targetC = ' && d < nextMonthStart';
+if (src.indexOf(targetC) === -1) throw new Error('target batas bulan tidak ketemu');
+fs.writeFileSync(path.join(out, 'Code_sabotageC.gs'), src.replace(targetC, ''));
+
+// D: parsing tanggal laporan kembali memakai new Date(v) (UTC untuk teks yyyy-MM-dd)
+const targetD = 'const toD = v => parseLocalDate(v);';
+if (src.indexOf(targetD) === -1) throw new Error('target toD tidak ketemu');
+fs.writeFileSync(path.join(out, 'Code_sabotageD.gs'), src.replace(targetD, 'const toD = v => v instanceof Date ? v : new Date(v);'));
+
 console.log('salinan sabotase siap di', out);

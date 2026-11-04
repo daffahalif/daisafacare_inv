@@ -6,6 +6,24 @@ Newest release first, grouped as `Added` / `Changed` / `Fixed`.
 
 ---
 
+## 1.7 - 2026-11-02
+
+### Added
+
+- `Tambah Anak` on every customer card and in the detail modal: one row per child — mom's name/phone/address/maps prefilled, baby fields empty and focused. Customer picker now labels `IBU` / `BAYI` so siblings of the same mom are distinguishable. No schema change.
+
+### Fixed
+
+- Dashboard "Pendapatan Bulan Ini" had **no upper bound**: every visit from the 1st of the month onward (including future months) was summed. Now the current calendar month only, still by schedule/treatment date (`scheduled` + `done`, `cancelled` excluded, NB package recognised at its master visit).
+- Reports date ranges: `yyyy-MM-dd` values were parsed as UTC midnight, which dropped the first day of a range in timezones behind UTC. New `parseLocalDate` parses local components; used by the dashboard month filter and `getReportsData` from/to.
+- Mobile 390px Jadwal filter bar: `Dari Tanggal` / `Sampai` date inputs were squeezed into 165px cells while the native control needs 188px, so they overlapped on iPhone. Filter bars now use a `minmax(0,1fr)` grid with date fields on their own full row — shared by Jadwal, Keuangan, Laporan, Invoice, Pelanggan. Desktop unchanged.
+
+### Changed
+
+- Harness 324 → **365 assertions**; suite also runs green under `TZ=America/Los_Angeles` (proves the date fix).
+
+---
+
 ## 1.6 - 2026-10-21
 
 ### Added

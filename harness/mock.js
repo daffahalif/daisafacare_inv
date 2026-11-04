@@ -369,6 +369,76 @@ function addExtraSchedules(app, count, startId) {
   return { added: count, firstId, lastId };
 }
 
+// ─── jadwal tambahan untuk uji batas bulan (dashboard & laporan) ──────────────
+// Menanam: satu jadwal bulan berjalan, satu bulan depan, satu bulan lalu, dan satu
+// yang dibatalkan di bulan berjalan. Tanggal dihitung dari hari ini supaya uji tetap
+// bermakna kapan pun harness dijalankan. Baris tidak ditanam di seed bawaan agar
+// hitungan dasar file harness lama tidak berubah.
+function monthBoundarySchedules(refDate) {
+  const now = refDate || new Date();
+  const used = new Set([localDateStr(now), addDaysLocal(localDateStr(now), 1)]);
+  // Hari aman: tidak boleh sama dengan hari ini atau besok (mengganggu todayCount),
+  // dan selalu ada di semua bulan (10..25).
+  const safeDay = (cands) => {
+    for (const d of cands) {
+      const s = localDateStr(new Date(now.getFullYear(), now.getMonth(), d));
+      if (!used.has(s)) { used.add(s); return d; }
+    }
+    return cands[0];
+  };
+  const dayCur = safeDay([15, 16, 14, 17, 13, 18, 12]);
+  const dayCancel = safeDay([25, 26, 24, 27, 23, 20, 21]);
+  const cur = localDateStr(new Date(now.getFullYear(), now.getMonth(), dayCur));
+  const cancel = localDateStr(new Date(now.getFullYear(), now.getMonth(), dayCancel));
+  const next = localDateStr(new Date(now.getFullYear(), now.getMonth() + 1, 10));
+  const prev = localDateStr(new Date(now.getFullYear(), now.getMonth() - 1, 20));
+  const prevFirst = localDateStr(new Date(now.getFullYear(), now.getMonth() - 1, 18));
+  return { cur, cancel, next, prev, prevFirst };
+}
+
+// id dan nominal sengaja unik supaya bisa dijumlah persis di harness.
+function addMonthBoundarySchedules(app, refDate) {
+  const d = monthBoundarySchedules(refDate);
+  const TS0 = '2026-08-01T08:00:00.000Z';
+  const S = (o) => [
+    o.id, o.inv || '', o.cust, 2, o.date, o.time || '09:00', o.loc || 'Jl Uji Bulan', 5.5,
+    o.fee, 0, o.fee, 0, o.total, o.paid, o.due,
+    'TF/QRIS', o.status || 'scheduled', o.ket || 'BELUM BAYAR', '', 1, TS0, TS0,
+    '', '', '', '', '', ''
+  ];
+  const sh = app.__ss.getSheetByName('Schedules');
+  const rows = [
+    // 200000 / DP 50000, bulan berjalan → ikut dihitung
+    S({ id: 201, inv: 'DSF-UJI-201', cust: 1, date: d.cur, fee: 200000, total: 200000, paid: 50000, due: 150000, ket: 'DP' }),
+    // 300000, bulan depan → tidak boleh ikut
+    S({ id: 202, inv: 'DSF-UJI-202', cust: 2, date: d.next, fee: 300000, total: 300000, paid: 100000, due: 200000, ket: 'DP' }),
+    // 400000, bulan lalu, sudah selesai → tidak boleh ikut
+    S({ id: 203, inv: 'DSF-UJI-203', cust: 1, date: d.prev, fee: 400000, total: 400000, paid: 200000, due: 200000, status: 'done', ket: 'LUNAS TF/QRIS' }),
+    // 500000, bulan berjalan tapi dibatalkan → tidak boleh ikut
+    S({ id: 204, inv: 'DSF-UJI-204', cust: 3, date: d.cancel, fee: 500000, total: 500000, paid: 0, due: 500000, status: 'cancelled', ket: 'Dibatalkan customer' }),
+    // 250000 lunas, bulan lalu (2 hari sebelum 203) → dipakai uji batas rentang laporan
+    S({ id: 205, inv: 'DSF-UJI-205', cust: 1, date: d.prevFirst, fee: 250000, total: 250000, paid: 250000, due: 0, status: 'done', ket: 'LUNAS CASH' })
+  ];
+  rows.forEach(r => sh.appendRow(r));
+
+  // Item jadwal bulan depan: kalau batas bulan bocor, nama ini muncul di trBreakdown.
+  const si = app.__ss.getSheetByName('Schedule_Items');
+  si.appendRow([101, 201, 21, 'Mom - Laktasi', 200000, 1, 200000]);
+  si.appendRow([102, 202, 26, 'Baby - Cukur', 300000, 1, 300000]);
+  si.appendRow([103, 203, 9, 'Jaga 2 Jam', 400000, 1, 400000]);
+
+  return {
+    cur: d.cur, cancel: d.cancel, next: d.next, prev: d.prev, prevFirst: d.prevFirst,
+    curTotal: 200000, curPaid: 50000,
+    nextTotal: 300000, nextPaid: 100000,
+    prevTotal: 400000, prevPaid: 200000,
+    prevFirstTotal: 250000, prevFirstPaid: 250000,
+    cancelTotal: 500000,
+    count: rows.length,
+    nextItemName: 'Baby - Cukur', prevItemName: 'Jaga 2 Jam'
+  };
+}
+
 function reset(codePath) {
   const file = codePath || process.argv[2] || DEFAULT_CODE_GS;
   const { ss, meta } = buildSpreadsheet();
@@ -416,6 +486,8 @@ module.exports = {
   reset,
   deepScan,
   addExtraSchedules,
+  addMonthBoundarySchedules,
+  monthBoundarySchedules,
   addDaysLocal,
   localDateStr,
   ymd8,

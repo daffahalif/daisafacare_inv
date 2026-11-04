@@ -1,8 +1,4 @@
-next handle:
-- the pricelist is not compact enough if I add description for each treatment. reduce the font size and space between items.
-- unfortunately, I do not need signature for invoice. but keep the feature for now, just build a signature toggle button on settings
-- the UI in Mobile Phone is still overlapping for some containers (especially Jadwal Hari ini and Jadwal Besok)
-
-our update queue:
-- [TBD] sort option for jadwal list
-- [TBD] pagination for jadwal (for lighter load)
+handle:
+- the dashboard monthly data is not relevant. it should be based on treatment not the transaction / payment date.
+- 1 mom could have many child. can 1 mom add a new child? im still confuse how to store the data
+- the forms field still overlaps the page (on jadwal page)

@@ -254,6 +254,19 @@ function parsePackageTreatment(name, category) {
   return { days: days, visitsPerDay: visitsPerDay };
 }
 
+// Ubah sel bertanggal menjadi objek Date waktu lokal. Teks dari getSheetDataClient
+// berbentuk 'yyyy-MM-dd' atau 'yyyy-MM-ddTHH:mm:ss'. new Date('yyyy-MM-dd') dibaca
+// sebagai tengah malam UTC sehingga di zona waktu di belakang UTC tanggalnya
+// mundur sehari, jadi komponen tanggal diurai manual. Teks lain dianggap tidak valid.
+function parseLocalDate(v) {
+  if (v instanceof Date) return v;
+  const s = String(v === null || v === undefined ? '' : v).trim();
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+  if (!m) return new Date(NaN);
+  return new Date(parseInt(m[1], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10),
+    parseInt(m[4] || '0', 10), parseInt(m[5] || '0', 10), parseInt(m[6] || '0', 10));
+}
+
 // Tambah sejumlah hari pada teks tanggal yyyy-MM-dd memakai tanggal lokal,
 // supaya tidak bergeser karena zona waktu atau perubahan bulan/tahun.
 function addDaysStr(dateStr, days) {
@@ -1469,8 +1482,10 @@ function getDashboardStats(userId, role) {
     // Tanggal besok disusun dari teks tanggal lokal hari ini, bukan dari objek Date
     // hasil parsing, supaya tidak bergeser sehari karena zona waktu.
     const tomorrowStr = addDaysStr(todayStr, 1);
-    // mStart adalah tengah malam lokal awal bulan, jadi tanggal jadwal harus dibandingkan sebagai waktu lokal juga
+    // mStart adalah tengah malam lokal awal bulan, jadi tanggal jadwal harus dibandingkan sebagai waktu lokal juga.
+    // nextMonthStart dipakai sebagai batas atas supaya jadwal bulan depan tidak ikut terhitung.
     const mStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
     const scData = getSheetDataClient(SHEETS.SCHEDULES);
     const timeById = getScheduleTimeById();
     const activeScheds = scData.filter(s => s[SC.STATUS] !== 'cancelled');
@@ -1479,8 +1494,8 @@ function getDashboardStats(userId, role) {
     const cuData = getSheetDataClient(SHEETS.CUSTOMERS);
     const totalCustDue = cuData.reduce((s, c) => s + (parseFloat(c[CU.DUE])||0), 0);
     const monthScheds = activeScheds.filter(s => {
-      const d = new Date(fmtDate(s[SC.DATE]) + 'T00:00:00');
-      return !isNaN(d) && d >= mStart;
+      const d = parseLocalDate(fmtDate(s[SC.DATE]));
+      return !isNaN(d) && d >= mStart && d < nextMonthStart;
     });
     const monthRevenue = monthScheds.reduce((s, sc) => s + (parseFloat(sc[SC.TOTAL])||0), 0);
     const monthCollected = monthScheds.reduce((s, sc) => s + (parseFloat(sc[SC.PAID])||0), 0);
@@ -1582,9 +1597,10 @@ function getDashboardStats(userId, role) {
 function getReportsData(reportType, filters, userId, role) {
   try {
     const f = filters || {};
-    const dFrom = f.dateFrom ? new Date(f.dateFrom + 'T00:00:00') : null;
-    const dTo = f.dateTo ? new Date(f.dateTo + 'T23:59:59') : null;
-    const toD = v => v instanceof Date ? v : new Date(v);
+    const dFrom = f.dateFrom ? parseLocalDate(f.dateFrom) : null;
+    // Hanya bagian tanggal yang dipakai, lalu ditempel 23:59:59 supaya hari terakhir ikut penuh.
+    const dTo = f.dateTo ? parseLocalDate(String(f.dateTo).slice(0, 10) + 'T23:59:59') : null;
+    const toD = v => parseLocalDate(v);
     const inRange = v => {
       if (!dFrom && !dTo) return true;
       const d = toD(v); if (isNaN(d)) return false;

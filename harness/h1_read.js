@@ -240,4 +240,93 @@ t.eq('halaman melebihi rentang: pages', rx.totalPages, 4);
 t.eq('halaman melebihi rentang: dipotong ke akhir', rx.page, 4);
 t.eq('halaman melebihi rentang: sisa baris', rx.data.length, 5);
 
+// ── 11. Dashboard: pendapatan hanya bulan kalender berjalan (batas atas) ──
+// Payung masalah: dulu monthScheds tidak punya batas atas, jadi semua jadwal dari
+// tanggal 1 bulan ini sampai tahun depan ikut dijumlah.
+const appM = mock.reset();
+const curMonth = appM.__meta.today.slice(0, 7);
+const monthSchedsSeed = appM.getSchedules(1, 'admin', {}).data
+  .filter(s => s.status !== 'cancelled' && String(s.schedule_date).slice(0, 7) === curMonth);
+const baseMonthTotal = monthSchedsSeed.reduce((a, s) => a + s.grand_total, 0);
+const baseMonthPaid = monthSchedsSeed.reduce((a, s) => a + s.paid_amount, 0);
+const dashBase = appM.getDashboardStats(1, 'admin').data;
+t.eq('dashboard: pendapatan bulan ini = jumlah jadwal non-cancelled bulan ini', dashBase.monthRevenue, baseMonthTotal);
+t.eq('dashboard: terkumpul bulan ini = jumlah dibayar jadwal bulan ini', dashBase.monthCollected, baseMonthPaid);
+
+const mb = mock.addMonthBoundarySchedules(appM);
+const dashM = appM.getDashboardStats(1, 'admin').data;
+// Tepat +200000 (jadwal 201), bukan +500000: jadwal 202 (bulan depan, 300000) dan
+// 204 (dibatalkan, 500000) harus di luar; 203/205 bulan lalu juga di luar.
+t.eq('dashboard: bulan depan & yang dibatalkan tidak ikut dihitung', dashM.monthRevenue, baseMonthTotal + mb.curTotal);
+t.eq('dashboard: uang terkumpul bulan depan/bulan lalu/batal tidak ikut', dashM.monthCollected, baseMonthPaid + mb.curPaid);
+t.ok('dashboard: jadwal bulan depan tidak bocor ke pendapatan', dashM.monthRevenue < baseMonthTotal + mb.curTotal + mb.nextTotal);
+t.eq('dashboard: pendapatan hari ini tidak terpengaruh batas bulan', dashM.todayRevenue, dashBase.todayRevenue);
+t.eq('dashboard: hari terakhir dailyData tetap sama dengan pendapatan hari ini', dashM.dailyData[dashM.dailyData.length - 1].amount, dashM.todayRevenue);
+t.eq('dashboard: dailyData tetap 30 hari', dashM.dailyData.length, 30);
+t.eq('dashboard: trBreakdown hanya item jadwal bulan ini (Baby - Bapil)', dashM.trBreakdown['Baby - Bapil'], { count: 2, revenue: 210000 });
+t.ok('dashboard: trBreakdown tidak memuat item jadwal bulan depan', dashM.trBreakdown[mb.nextItemName] === undefined);
+t.ok('dashboard: trBreakdown tidak memuat item jadwal bulan lalu', dashM.trBreakdown[mb.prevItemName] === undefined);
+
+// ── 12. Paket NB: diakui sekali di bulan berjalan, kunjungan lain bernilai 0 ──
+const pkgRes = appM.createSchedulePackage({ customer_id: 1, start_date: mb.cur, location: 'Jl Uji Bulan', km: 0, time1: '08:00', treatment_id: 15, dp_percent: 0, payment_method: 'TF/QRIS' }, 1, 'admin');
+t.ok('paket uji bulan berjalan berhasil', pkgRes.success === true);
+t.eq('paket uji NB 1x 7 Hari = 485000', pkgRes.data.grand_total, 485000);
+const pkgRows = appM.getSchedules(1, 'admin', {}).data.filter(s => s.package_id === pkgRes.data.package_id);
+t.eq('paket uji berisi 7 kunjungan', pkgRows.length, 7);
+t.eq('kunjungan selain induk bernilai 0 semua', pkgRows.filter(s => s.visit_no > 1).every(s => s.grand_total === 0 && s.paid_amount === 0), true);
+t.eq('semua kunjungan paket jatuh di bulan berjalan', pkgRows.every(s => String(s.schedule_date).slice(0, 7) === curMonth), true);
+const dashP = appM.getDashboardStats(1, 'admin').data;
+t.eq('dashboard: paket dihitung sekali (bukan 7 kali) di bulan berjalan', dashP.monthRevenue, baseMonthTotal + mb.curTotal + 485000);
+
+// ── 13. Laporan: dasar tanggal jadwal & parsing tanggal lokal ──
+const appR = mock.reset();
+const repAll = appR.getReportsData('monthly', {}, 1, 'admin');
+t.eq('laporan tanpa rentang: 8 booking (yang dibatalkan tidak dihitung)', repAll.data.totalCount, 8);
+t.eq('laporan tanpa rentang: total pendapatan = jumlah grand total jadwal', repAll.data.totalRevenue, 816000);
+t.eq('laporan tanpa rentang: total dibayar tetap dasar pembayaran (disengaja)', repAll.data.totalCollected, 215000);
+
+const mbR = mock.addMonthBoundarySchedules(appR);
+const repFull = appR.getReportsData('monthly', {}, 1, 'admin');
+t.eq('laporan tanpa rentang setelah seed baru: semua jadwal ikut', repFull.data.totalCount, 8 + mbR.count - 1);
+t.eq('laporan tanpa rentang setelah seed baru: pendapatan semua jadwal', repFull.data.totalRevenue, 816000 + mbR.curTotal + mbR.nextTotal + mbR.prevTotal + mbR.prevFirstTotal);
+t.eq('laporan tanpa rentang setelah seed baru: dibayar semua jadwal', repFull.data.totalCollected, 215000 + mbR.curPaid + mbR.nextPaid + mbR.prevPaid + mbR.prevFirstPaid);
+
+// Rentang dua hari di bulan lalu: hari pertama (205) dan hari terakhir (203) wajib ikut.
+// Di zona waktu di belakang UTC, new Date('yyyy-MM-dd') memundurkan sehari dan
+// membuang hari pertama; parseLocalDate tidak.
+const repRange = appR.getReportsData('monthly', { dateFrom: mbR.prevFirst, dateTo: mbR.prev }, 1, 'admin');
+t.eq('laporan rentang: hari pertama & hari terakhir ikut (2 booking)', repRange.data.totalCount, 2);
+t.eq('laporan rentang: pendapatan 250000 + 400000', repRange.data.totalRevenue, mbR.prevFirstTotal + mbR.prevTotal);
+t.eq('laporan rentang: dibayar 250000 + 200000', repRange.data.totalCollected, mbR.prevFirstPaid + mbR.prevPaid);
+t.eq('laporan rentang: satu grup bulan', repRange.data.monthlyData.length, 1);
+t.eq('laporan rentang: label grup = bulan lalu', repRange.data.monthlyData[0].label, mbR.prev.slice(0, 7));
+t.eq('laporan rentang: hitungan per bulan', repRange.data.monthlyData[0].count, 2);
+
+// Rentang satu hari: membuktikan hari terakhir tidak ikut terbuang.
+const repDay = appR.getReportsData('monthly', { dateFrom: mbR.prev, dateTo: mbR.prev }, 1, 'admin');
+t.eq('laporan satu hari: hanya jadwal hari itu', [repDay.data.totalCount, repDay.data.totalRevenue], [1, mbR.prevTotal]);
+
+// Laporan per treatment memakai item jadwal pada tanggal jadwal (SC.DATE).
+const repTr = appR.getReportsData('treatments', { dateFrom: mbR.prevFirst, dateTo: mbR.prev }, 1, 'admin');
+t.eq('laporan treatment: hanya item jadwal dalam rentang', repTr.data.treatments.map(x => [x.name, x.revenue]), [[mbR.prevItemName, 400000]]);
+const repTrAll = appR.getReportsData('treatments', {}, 1, 'admin');
+t.eq('laporan treatment tanpa rentang: item jadwal yang dibatalkan tidak dihitung', repTrAll.data.treatments.filter(x => x.name === 'Baby - Sleep Booster')[0].revenue, 170000);
+
+// Laporan pelanggan memakai SC.TOTAL (nilai treatment), bukan uang yang sudah dibayar.
+const repCu = appR.getReportsData('customers', { dateFrom: mbR.prevFirst, dateTo: mbR.prev }, 1, 'admin');
+t.eq('laporan pelanggan: satu pelanggan, nilai = grand total jadwal', repCu.data.customers.map(c => [c.id, c.totalRevenue, c.count]), [[1, mbR.prevFirstTotal + mbR.prevTotal, 2]]);
+t.ok('laporan pelanggan: nilai bukan jumlah pembayaran', repCu.data.customers[0].totalRevenue !== (mbR.prevFirstPaid + mbR.prevPaid));
+
+// ── 14. parseLocalDate: tanggal teks dibaca sebagai waktu lokal ──
+const pd = app.parseLocalDate('2026-10-21');
+t.eq('parseLocalDate: komponen tanggal lokal', [pd.getFullYear(), pd.getMonth() + 1, pd.getDate()], [2026, 10, 21]);
+t.eq('parseLocalDate: tengah malam lokal (bukan UTC)', pd.getHours(), 0);
+const pdt = app.parseLocalDate('2026-10-21T09:15:30');
+t.eq('parseLocalDate: teks dengan jam', [pdt.getHours(), pdt.getMinutes(), pdt.getSeconds()], [9, 15, 30]);
+t.eq('parseLocalDate: teks dengan spasi', app.parseLocalDate('2026-10-21 09:15:30').getHours(), 9);
+const pdd = app.parseLocalDate(app.__newDate(2026, 9, 21, 9, 0));
+t.eq('parseLocalDate: objek Date diteruskan apa adanya', pdd.getDate(), 21);
+t.ok('parseLocalDate: teks ngawur jadi Invalid Date', isNaN(app.parseLocalDate('21 Oktober 2026')));
+t.ok('parseLocalDate: kosong jadi Invalid Date', isNaN(app.parseLocalDate('')) && isNaN(app.parseLocalDate(null)));
+
 t.finish();

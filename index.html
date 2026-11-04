@@ -2002,6 +2002,66 @@
       margin-top: 2px;
     }
 
+    /* ─── TAMBAH ANAK (satu ibu, banyak anak) ─── */
+    .cust-card-act {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    /* Deret aksi di kepala detail pelanggan (WhatsApp / Maps / Tambah Anak / Edit).
+       min-width:0 + wrap = tombol melipat di layar 390px, tidak keluar modal. */
+    .cust-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      flex: 1 1 240px;
+      min-width: 0;
+    }
+
+    .cust-child-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 13px;
+      margin-bottom: 14px;
+      background: var(--cream-dark);
+      border: 1px solid var(--beige);
+      border-left: 4px solid var(--sage);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--text-sec);
+      overflow-wrap: anywhere;
+    }
+
+    .cust-child-banner i {
+      color: var(--sage-dark);
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .cust-child-banner strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .cust-form-hint {
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      margin: 2px 0 16px;
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+    }
+
+    .cust-form-hint i {
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
     /* ─── REPORTS ─── */
     .report-card {
       background: var(--white);
@@ -2502,19 +2562,49 @@
         font-size: 16px
       }
 
+      /* Filter bar mobile: kisi 2 kolom dengan minmax(0,1fr) — lebar kolom tidak
+         lagi punya lantai min-content, jadi tidak ada isian yang meluber. */
       .filter-bar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-auto-flow: row dense;
+        align-items: end;
         padding: 12px;
         gap: 10px
       }
 
       .filter-bar .fg {
         min-width: 0;
-        flex: 1 1 calc(50% - 5px)
+        width: 100%
       }
 
-      .filter-bar .fg input,
-      .filter-bar .fg select {
+      /* Bar yang hanya punya satu isian (pencarian pelanggan) memakai lebar penuh */
+      .filter-bar .fg:only-child {
+        grid-column: 1 / -1
+      }
+
+      /* Isian tanggal bawaan perlu ±188px; dua kolom di layar 390px hanya
+         memberi 165px, jadi rentang tanggal dapat satu baris penuh. */
+      .filter-bar .fg-date {
+        grid-column: 1 / -1
+      }
+
+      .filter-bar .fg>input,
+      .filter-bar .fg>select,
+      .filter-bar .fg>textarea,
+      .filter-bar .fg>button {
         width: 100%;
+        min-width: 0;
+        max-width: 100%
+      }
+
+      /* Label tombol panjang (mis. Tambah Paket NB) melipat, tidak meluber */
+      .filter-bar .fg>button {
+        white-space: normal;
+        line-height: 1.25
+      }
+
+      .filter-bar input[type="date"] {
         min-width: 0
       }
 
@@ -3691,6 +3781,32 @@
       text-overflow: ellipsis
     }
 
+    /* Label kecil "Ibu" / "Bayi" — supaya dua anak dari ibu yang sama
+       terlihat jelas berbeda saat memilih pelanggan */
+    .cust-pick-k {
+      display: inline-block;
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      color: var(--sage-dark);
+      background: var(--cream-dark);
+      border-radius: 4px;
+      padding: 1px 5px;
+      margin-right: 6px;
+      vertical-align: 1px
+    }
+
+    .cust-pick-row-baby {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--sage-dark);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
     .cust-pick-more {
       padding: 7px 10px;
       font-size: 11px;
@@ -4404,8 +4520,8 @@
     <div class="fg"><label>Cari</label><input type="text" id="fSearch" placeholder="Cari pelanggan, No. HP, invoice, treatment..." oninput="applyJadwalFilters()"></div>
     <div class="fg"><label>Status</label><select class="fg" id="fStatus" onchange="jadwalFilterChange()"><option value="">Semua</option><option value="scheduled">Terjadwal</option><option value="done">Selesai</option><option value="cancelled">Dibatalkan</option></select></div>
     <div class="fg"><label>Urutkan</label><select id="fSort" onchange="applyJadwalFilters(true)"><option value="date_desc" selected>Tanggal terbaru</option><option value="date_asc">Tanggal terlama</option><option value="time_asc">Waktu (pagi ke sore)</option><option value="name_asc">Nama pelanggan (A-Z)</option><option value="total_desc">Total tertinggi</option></select></div>
-    <div class="fg"><label>Dari Tanggal</label><input type="date" id="fFrom" onchange="jadwalFilterChange()"></div>
-    <div class="fg"><label>Sampai</label><input type="date" id="fTo" onchange="jadwalFilterChange()"></div>
+    <div class="fg fg-date"><label>Dari Tanggal</label><input type="date" id="fFrom" onchange="jadwalFilterChange()"></div>
+    <div class="fg fg-date"><label>Sampai</label><input type="date" id="fTo" onchange="jadwalFilterChange()"></div>
     <div class="fg"><label>&nbsp;</label><button class="btn btn-ghost btn-sm" onclick="resetFilters()"><i class="fa fa-rotate-left"></i> Reset</button></div>
     ${isWriter() ? `<div class="fg"><label>&nbsp;</label><button class="btn btn-outline btn-sm" onclick="openPackageModal()" style="width:100%"><i class="fa fa-box-open"></i> Tambah Paket NB</button></div>` : ''}
     <div class="fg" style="margin-left:auto"><label>&nbsp;</label>
@@ -5017,8 +5133,9 @@
         html = `<div class="cust-pick-empty"><i class="fa fa-user-slash"></i> Tidak ada pelanggan yang cocok<button type="button" class="cust-pick-add" onclick="custPickAddNew('${prefix}')">+ Tambah pelanggan baru</button></div>`;
       } else {
         html = rows.map((c, i) => `<div class="cust-pick-row${i === 0 ? ' hl' : ''}" data-i="${i}" onclick="custPickChoose('${prefix}',${i})">
-          <div class="cust-pick-row-name">${sanitize(c.name)}</div>
-          <div class="cust-pick-row-sub">${sanitize(custPhoneShow(c.phone || ''))}${c.baby_name ? ' · Bayi: ' + sanitize(c.baby_name) : ''}</div>
+          <div class="cust-pick-row-name"><span class="cust-pick-k">Ibu</span>${sanitize(c.name)}</div>
+          <div class="cust-pick-row-baby"><span class="cust-pick-k">Bayi</span>${c.baby_name ? sanitize(c.baby_name) : '<span style="font-weight:500;color:var(--text-muted)">belum diisi</span>'}</div>
+          <div class="cust-pick-row-sub"><i class="fa fa-phone"></i> ${sanitize(custPhoneShow(c.phone || '')) || '—'}</div>
         </div>`).join('');
         if (all.length > rows.length) html += `<div class="cust-pick-more">${all.length} hasil</div>`;
       }
@@ -5983,7 +6100,10 @@
       <div class="cust-name">${sanitize(c.name)}</div>
       <div class="cust-phone"><i class="fa fa-phone"></i> ${sanitize(c.phone) || '—'}</div>
       ${c.baby_name ? `<div class="cust-baby"><i class="fa fa-baby"></i> ${sanitize(c.baby_name)}${usiaBayi(c) ? ' (' + sanitize(usiaBayi(c)) + ')' : ''}</div>` : ''}
-      ${c.maps_link ? `<div style="margin-top:8px"><a href="${attrUrl(c.maps_link)}" target="_blank" rel="noopener" class="btn btn-sm btn-outline" onclick="event.stopPropagation()"><i class="fa fa-map-location-dot"></i> Buka Maps</a></div>` : ''}
+      <div class="cust-card-act">
+        ${c.maps_link ? `<a href="${attrUrl(c.maps_link)}" target="_blank" rel="noopener" class="btn btn-sm btn-outline" onclick="event.stopPropagation()"><i class="fa fa-map-location-dot"></i> Buka Maps</a>` : ''}
+        ${isWriter() ? `<button class="btn btn-sm btn-outline" data-act="tambah-anak" onclick="event.stopPropagation();tambahAnak(${c.id})" title="Tambah Anak"><i class="fa fa-child-reaching"></i> Tambah Anak</button>` : ''}
+      </div>
     </div>
     <div class="cust-due">
       ${c.total_due > 0 ? `<div class="cust-due-amt">${fmtRp(c.total_due)}</div><div class="cust-due-lbl">Piutang</div>` : `<div style="color:var(--success);font-size:13px;font-weight:700"><i class="fa fa-check-circle"></i> Lunas</div>`}
@@ -5991,32 +6111,40 @@
   </div>`).join('') : '<div class="table-empty" style="grid-column:1/-1"><i class="fa fa-users"></i>Tidak ada pelanggan ditemukan</div>';
     }
 
-    function openCustomerModal(cust) {
+    // cust   = baris yang diubah (null = tambah pelanggan baru)
+    // childOf = baris ibu sumber saat "Tambah Anak": satu baris pelanggan = satu anak,
+    //           jadi data ibu disalin dan data bayi dikosongkan.
+    function openCustomerModal(cust, childOf) {
       if (!isWriter() && !cust) { toast('Anda tidak memiliki akses untuk menambah pelanggan', 'error'); return; }
+      const src = childOf || cust || null;
+      const val = k => sanitize(src ? (src[k] || '') : '');
+      const judul = childOf ? 'Tambah Anak' : (cust ? 'Ubah' : 'Tambah') + ' Pelanggan';
       $('modalContainer').innerHTML = `
   <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
     <div class="modal">
-      <div class="modal-header"><h3><i class="fa fa-user-plus"></i> ${cust ? 'Ubah' : 'Tambah'} Pelanggan</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
+      <div class="modal-header"><h3><i class="fa ${childOf ? 'fa-child-reaching' : 'fa-user-plus'}"></i> ${judul}</h3><button class="modal-close" onclick="closeModal()"><i class="fa fa-xmark"></i></button></div>
       <div class="modal-body">
+        ${childOf ? `<div class="cust-child-banner"><i class="fa fa-child-reaching"></i><div>Menambahkan anak untuk <strong>${sanitize(childOf.name)}</strong></div></div>` : ''}
         <div class="form-section" style="margin-bottom:14px">
           <div class="form-section-title"><i class="fa fa-user"></i> Data Ibu/Pelanggan</div>
           <div class="form-row cols-2">
-            <div class="fg"><label>Nama Lengkap *</label><input type="text" id="cName" value="${sanitize(cust?.name || '')}"></div>
-            <div class="fg"><label>No. HP / WhatsApp</label><input type="text" id="cPhone" value="${sanitize(cust?.phone || '')}"></div>
+            <div class="fg"><label>Nama Lengkap *</label><input type="text" id="cName" value="${val('name')}"></div>
+            <div class="fg"><label>No. HP / WhatsApp</label><input type="text" id="cPhone" value="${val('phone')}"></div>
           </div>
-          <div class="fg"><label>Link Google Maps</label><input type="url" id="cMaps" value="${sanitize(cust?.maps_link || '')}" placeholder="Tempel link Google Maps (opsional)"></div>
-          <div class="fg"><label>Alamat</label><textarea id="cAddr" rows="2">${sanitize(cust?.address || '')}</textarea></div>
+          <div class="fg"><label>Link Google Maps</label><input type="url" id="cMaps" value="${val('maps_link')}" placeholder="Tempel link Google Maps (opsional)"></div>
+          <div class="fg"><label>Alamat</label><textarea id="cAddr" rows="2">${val('address')}</textarea></div>
         </div>
         <div class="form-section">
           <div class="form-section-title"><i class="fa fa-baby"></i> Data Bayi/Anak (Opsional)</div>
           <div class="form-row cols-2">
-            <div class="fg"><label>Nama Bayi</label><input type="text" id="cBabyName" value="${sanitize(cust?.baby_name || '')}"></div>
+            <div class="fg"><label>Nama Bayi</label><input type="text" id="cBabyName" value="${sanitize(cust?.baby_name || '')}" placeholder="Nama anak"></div>
             <div class="fg">
               <label>Tanggal Lahir Bayi</label>
               <input type="date" id="cDob" value="${sanitize(cust?.dob || '')}" oninput="updateDobHint()">
               <div id="cDobHint" style="font-size:11.5px;font-weight:600;color:var(--sage-dark);margin-top:4px"></div>
             </div>
           </div>
+          <div class="cust-form-hint"><i class="fa fa-circle-info"></i><span>Satu baris pelanggan = satu anak. Kalau ibu punya lebih dari satu anak, pakai tombol Tambah Anak di daftar pelanggan.</span></div>
           <div class="fg" style="margin-bottom:12px"><label>Usia Bayi (manual, dipakai bila tanggal lahir kosong)</label><input type="text" id="cBabyAge" value="${sanitize(cust?.baby_age || '')}" placeholder="Cth: 3 bulan, 1 tahun"></div>
           <div class="fg" style="margin-bottom:12px"><label>Catatan</label><textarea id="cNotes" rows="2">${sanitize(cust?.notes || '')}</textarea></div>
           <label style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--text-sec);cursor:pointer"><input type="checkbox" id="cActive" ${isActiveVal(cust?.is_active) ? 'checked' : ''} style="width:18px;height:18px;accent-color:var(--sage);cursor:pointer"> Status Aktif</label>
@@ -6029,6 +6157,20 @@
     </div>
   </div>`;
       updateDobHint();
+      // Mode tambah anak: kursor langsung ke nama bayi (data ibu sudah terisi)
+      if (childOf) {
+        const el = $('cBabyName');
+        if (el) setTimeout(() => el.focus(), 80);
+      }
+    }
+
+    // Tambah anak untuk ibu yang sama: buka modal tambah dengan data ibu tersalin
+    function tambahAnak(id) {
+      if (!isWriter()) { toast('Anda tidak memiliki akses untuk menambah pelanggan', 'error'); return; }
+      const c = (S.data.customers || []).find(x => String(x.id) === String(id))
+        || (S.data.customerDetail && String(S.data.customerDetail.id) === String(id) ? S.data.customerDetail : null);
+      if (!c) { toast('Data pelanggan tidak ditemukan', 'error'); return; }
+      openCustomerModal(null, c);
     }
 
     // Petunjuk usia di bawah isian Tanggal Lahir (dihitung otomatis dari tanggal lahir)
@@ -6092,9 +6234,10 @@
               ${c.dob ? `<div style="font-size:12.5px;color:var(--text-muted);margin-top:3px"><i class="fa fa-cake-candles"></i> Lahir ${fmtDate(c.dob)}</div>` : ''}
               <div style="font-size:13px;color:var(--text-muted);margin-top:3px"><i class="fa fa-location-dot"></i> ${sanitize(c.address) || '—'}</div>
             </div>
-            <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap">
+            <div class="cust-actions">
               ${c.phone_wa ? `<a href="${URLBASE}wa.me/${sanitize(c.phone_wa)}" target="_blank" rel="noopener" class="wa-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>` : ''}
               ${c.maps_link ? `<a href="${attrUrl(c.maps_link)}" target="_blank" rel="noopener" class="btn btn-sm btn-outline"><i class="fa fa-map-location-dot"></i> Buka Maps</a>` : ''}
+              ${isWriter() ? `<button class="btn btn-outline btn-sm" onclick="tambahAnak(${c.id})"><i class="fa fa-child-reaching"></i> Tambah Anak</button>` : ''}
               ${isWriter() ? `<button class="btn btn-beige btn-sm" onclick="openCustomerModalById(${c.id})"><i class="fa fa-edit"></i> Edit</button>` : ''}
             </div>
           </div>
@@ -7093,8 +7236,8 @@
     function renderPembayaran() {
       $('pageContent').innerHTML = `
   <div class="filter-bar">
-    <div class="fg"><label>Dari</label><input type="date" id="pfFrom" onchange="loadPayments()"></div>
-    <div class="fg"><label>Sampai</label><input type="date" id="pfTo" onchange="loadPayments()"></div>
+    <div class="fg fg-date"><label>Dari</label><input type="date" id="pfFrom" onchange="loadPayments()"></div>
+    <div class="fg fg-date"><label>Sampai</label><input type="date" id="pfTo" onchange="loadPayments()"></div>
     <div class="fg"><label>&nbsp;</label><button class="btn btn-ghost btn-sm" onclick="$('pfFrom').value='';$('pfTo').value='';loadPayments()"><i class="fa fa-rotate-left"></i></button></div>
   </div>
   <div class="card" id="payTable"><div class="table-empty"><i class="fa fa-spinner fa-spin"></i></div></div>`;
@@ -7132,8 +7275,8 @@
     function renderLaporan() {
       $('pageContent').innerHTML = `
   <div class="filter-bar">
-    <div class="fg"><label>Dari</label><input type="date" id="rfFrom"></div>
-    <div class="fg"><label>Sampai</label><input type="date" id="rfTo"></div>
+    <div class="fg fg-date"><label>Dari</label><input type="date" id="rfFrom"></div>
+    <div class="fg fg-date"><label>Sampai</label><input type="date" id="rfTo"></div>
     <div class="fg"><label>&nbsp;</label><button class="btn btn-primary btn-sm" onclick="loadReport()"><i class="fa fa-chart-bar"></i> Tampilkan</button></div>
   </div>
   <div class="settings-tabs">
